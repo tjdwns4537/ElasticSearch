@@ -1,3 +1,10 @@
+# setting
+.gitignore
+.properties
+.yml
+.txt
+.docs
+
 # Compiled class file
 *.class
 
