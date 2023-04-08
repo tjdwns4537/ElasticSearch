@@ -30,24 +30,30 @@ class CrawlerServiceTest {
         String[] numberArr = {
                 "005930", "035720", "035420", "000270", "051910", "096770"
         };
-
         String url = "https://finance.naver.com/item/main.naver?code=";
 
         try {
-
             for (int i = 0; i < numberArr.length; i++) {
-                url = url + numberArr[i];
+                Document doc = Jsoup.connect(url+numberArr[i]).get();
+
+                Elements titleElements = doc.getElementsByAttributeValue("class", "wrap_company");
+                Element titleElement = titleElements.get(0);
+                Elements title = titleElement.select("a");
+                System.out.println(title.get(0).text());
+
+                Elements priceElements = doc.getElementsByAttributeValue("class", "no_today");
+                Element priceElement = priceElements.get(0);
+                Elements priceSpanElements = priceElement.select("span");
+                System.out.println(priceSpanElements.get(0).text());
+
+                Elements percentElements = doc.getElementsByAttributeValue("class", "no_exday");
+                Element percnetElement = percentElements.get(0);
+                Elements percentSpanElements = percnetElement.select(".blind");
+                System.out.println(percentSpanElements.get(1).text());
+
+                System.out.println("다음");
             }
 
-            Document doc = Jsoup.connect(url).get();
-
-            Elements elements = doc.getElementsByAttributeValue("class", "no_today");
-
-            Element element = elements.get(0);
-
-            Elements spanElements = element.select("span");
-
-            System.out.println(spanElements.get(0));
         } catch (IOException e) {
 
         }
