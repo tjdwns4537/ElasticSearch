@@ -1,4 +1,4 @@
-package com.example.elasticsearch.elastic.document;
+package com.example.elasticsearch.stock.domain;
 
 import com.example.elasticsearch.helper.Indices;
 import lombok.AccessLevel;
@@ -9,20 +9,23 @@ import org.springframework.data.elasticsearch.annotations.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Document(indexName = Indices.ARTICLE_INDEX) // article 이라는 색인에 속함
+@Document(indexName = Indices.STOCK_INDEX) // article 이라는 색인에 속함
 @Mapping(mappingPath = "/static/elastic/article-mapping.json")
 @Setting(settingPath = "/static/elastic/article-setting.json")
-public class ArticleDoc {
+public class Stock {
     @Id
     @Field(type = FieldType.Keyword)
     private Long id;
-    /** 제목 */
+
+    /** 종목 이름 */
     @Field(type = FieldType.Text)
     private String title;
-    /** 기사 날짜 */
+
+    /** 종목 가격 */
     @Field(type = FieldType.Text)
-    private String articleDateTime;
-    /** 키워드 */
+    private String price;
+
+    /** 종목 등락율 */
     @Field(type = FieldType.Text)
-    private String keyword;
+    private String percent;
 }

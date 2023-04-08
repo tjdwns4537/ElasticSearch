@@ -1,9 +1,9 @@
 package com.example.elasticsearch.elastic.controller;
 
-import com.example.elasticsearch.elastic.document.ArticleDoc;
-import com.example.elasticsearch.article.domain.ArticleDto;
+import com.example.elasticsearch.stock.domain.Stock;
+import com.example.elasticsearch.stock.domain.StockDto;
 import com.example.elasticsearch.helper.StatusEnum;
-import com.example.elasticsearch.article.service.ArticleSearchService;
+import com.example.elasticsearch.stock.service.StockSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,29 +19,29 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ElasticController {
 
-    @Autowired private final ArticleSearchService articleSearchService;
+    @Autowired private final StockSearchService stockSearchService;
 
     @PostMapping
-    public ResponseEntity<HttpStatus> saveArticle(@RequestBody ArticleDoc articleDoc) {
-        Optional<ArticleDoc> save = Optional.ofNullable(articleSearchService.save(articleDoc));
+    public ResponseEntity<HttpStatus> saveStock(@RequestBody Stock stock) {
+        Optional<Stock> save = Optional.ofNullable(stockSearchService.save(stock));
         if(!save.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ArticleDto> findByIdArticle(@PathVariable String id) {
-        ArticleDto articleDto = new ArticleDto();
+    public ResponseEntity<StockDto> findByIdStock(@PathVariable String id) {
+        StockDto stockDto = new StockDto();
 
-        Optional<ArticleDoc> articleDoc = Optional.ofNullable(articleSearchService.findById(id));
+        Optional<Stock> articleDoc = Optional.ofNullable(stockSearchService.findById(id));
         if(articleDoc.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        articleDto.setStatusEnum(StatusEnum.OK);
-        articleDto.setData(articleDoc);
-        articleDto.setMessage("해당 id의 데이터를 찾음");
+        stockDto.setStatusEnum(StatusEnum.OK);
+        stockDto.setData(articleDoc);
+        stockDto.setMessage("해당 id의 데이터를 찾음");
 
-        return new ResponseEntity<>(articleDto, headers ,HttpStatus.OK);
+        return new ResponseEntity<>(stockDto, headers ,HttpStatus.OK);
     }
 }
