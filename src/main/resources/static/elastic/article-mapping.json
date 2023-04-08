@@ -3,6 +3,6 @@
     "id" : {"type" : "keyword"},
     "title" : {"type" : "text", "analyzer" : "korean"},
     "articleDateTime" : {"type" : "keyword"},
-    "keyword" : {"type" : "text", "analyzer" : "korean"},
+    "keyword" : {"type" : "text", "analyzer" : "korean"}
   }
 }
