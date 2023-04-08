@@ -1,9 +1,9 @@
-package com.example.elasticsearch.controller;
+package com.example.elasticsearch.elastic.controller;
 
-import com.example.elasticsearch.document.ArticleDoc;
-import com.example.elasticsearch.domain.ArticleDto;
+import com.example.elasticsearch.elastic.document.ArticleDoc;
+import com.example.elasticsearch.article.domain.ArticleDto;
 import com.example.elasticsearch.helper.StatusEnum;
-import com.example.elasticsearch.service.ArticleSearchService;
+import com.example.elasticsearch.article.service.ArticleSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

@@ -1,4 +1,4 @@
-package com.example.elasticsearch.domain;
+package com.example.elasticsearch.article.domain;
 
 import com.example.elasticsearch.helper.StatusEnum;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
-package com.example.elasticsearch.service;
+package com.example.elasticsearch.article.service;
 
-import com.example.elasticsearch.document.ArticleDoc;
-import com.example.elasticsearch.repository.ArticleRepository;
+import com.example.elasticsearch.article.repository.ArticleRepository;
+import com.example.elasticsearch.elastic.document.ArticleDoc;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

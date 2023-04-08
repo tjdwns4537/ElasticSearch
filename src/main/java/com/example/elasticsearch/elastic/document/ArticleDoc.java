@@ -1,4 +1,4 @@
-package com.example.elasticsearch.document;
+package com.example.elasticsearch.elastic.document;
 
 import com.example.elasticsearch.helper.Indices;
 import lombok.AccessLevel;
