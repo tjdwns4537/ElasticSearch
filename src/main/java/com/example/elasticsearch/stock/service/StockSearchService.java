@@ -1,6 +1,6 @@
 package com.example.elasticsearch.stock.service;
 
-import com.example.elasticsearch.stock.repository.StockRepository;
+import com.example.elasticsearch.stock.repository.StockElasticRepository;
 import com.example.elasticsearch.stock.domain.Stock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 public class StockSearchService {
 
     @Autowired
-    private final StockRepository stockRepository;
+    private final StockElasticRepository stockElasticRepository;
 
     public Stock save(Stock stock) {
-        return stockRepository.save(stock);
+        return stockElasticRepository.save(stock);
     }
 
     public Stock findById(String id) {
-        return stockRepository.findById(id).orElse(null);
+        return stockElasticRepository.findById(id).orElse(null);
     }
 }

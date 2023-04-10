@@ -1,7 +1,7 @@
 package com.example.elasticsearch.elastic.controller;
 
 import com.example.elasticsearch.stock.domain.Stock;
-import com.example.elasticsearch.stock.domain.StockDto;
+import com.example.elasticsearch.stock.domain.StockElasticDto;
 import com.example.elasticsearch.helper.StatusEnum;
 import com.example.elasticsearch.stock.service.StockSearchService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class ElasticController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StockDto> findByIdStock(@PathVariable String id) {
-        StockDto stockDto = new StockDto();
+    public ResponseEntity<StockElasticDto> findByIdStock(@PathVariable String id) {
+        StockElasticDto stockElasticDto = new StockElasticDto();
 
         Optional<Stock> articleDoc = Optional.ofNullable(stockSearchService.findById(id));
         if(articleDoc.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -38,10 +38,10 @@ public class ElasticController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        stockDto.setStatusEnum(StatusEnum.OK);
-        stockDto.setData(articleDoc);
-        stockDto.setMessage("해당 id의 데이터를 찾음");
+        stockElasticDto.setStatusEnum(StatusEnum.OK);
+        stockElasticDto.setData(articleDoc);
+        stockElasticDto.setMessage("해당 id의 데이터를 찾음");
 
-        return new ResponseEntity<>(stockDto, headers ,HttpStatus.OK);
+        return new ResponseEntity<>(stockElasticDto, headers ,HttpStatus.OK);
     }
 }

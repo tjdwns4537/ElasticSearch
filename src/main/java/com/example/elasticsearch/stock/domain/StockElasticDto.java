@@ -4,12 +4,12 @@ import com.example.elasticsearch.helper.StatusEnum;
 import lombok.Data;
 
 @Data
-public class StockDto {
+public class StockElasticDto {
     private StatusEnum statusEnum;
     private String message;
     private Object data;
 
-    public StockDto() {
+    public StockElasticDto() {
         this.statusEnum = StatusEnum.BAD_REQUEST;
         this.message = null;
         this.data = null;
