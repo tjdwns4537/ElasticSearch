@@ -51,6 +51,12 @@ class CrawlerServiceTest {
                 Elements percentSpanElements = percnetElement.select(".blind");
                 System.out.println(percentSpanElements.get(1).text());
 
+                Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
+                Element tradeElement = tradeElements.get(0);
+                Element tradeText = tradeElement.select(".blind").get(3);
+                System.out.println(tradeText.text());
+
+
             }
 
         } catch (IOException e) {
