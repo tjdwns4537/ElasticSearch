@@ -2,7 +2,7 @@
   "properties" : {
     "id" : {"type" : "keyword"},
     "title" : {"type" : "text", "analyzer" : "korean"},
-    "articleDateTime" : {"type" : "keyword"},
-    "keyword" : {"type" : "text", "analyzer" : "korean"}
+    "price" : {"type" : "keyword"},
+    "percent" : {"type" : "text", "analyzer" : "korean"}
   }
 }

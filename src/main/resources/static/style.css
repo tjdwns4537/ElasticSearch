@@ -61,9 +61,8 @@
     align-content: center;
     padding-left: 8px;
     padding-right: 8px;
-
-
 }
+
 .main-section .searchbar-wrap i{
     line-height: 50px;
     color : var( --midium-gray-color);
