@@ -1,6 +1,6 @@
-package com.example.elasticsearch.stock.service;
+package com.example.elasticsearch.elastic.service;
 
-import com.example.elasticsearch.stock.repository.StockElasticRepository;
+import com.example.elasticsearch.elastic.repository.StockElasticRepository;
 import com.example.elasticsearch.stock.domain.Stock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class StockSearchService {
         return stockElasticRepository.save(stock);
     }
 
-    public Stock findById(String id) {
+    public Stock findById(Long id) {
         return stockElasticRepository.findById(id).orElse(null);
     }
 }

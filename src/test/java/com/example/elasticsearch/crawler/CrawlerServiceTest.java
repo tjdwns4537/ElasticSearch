@@ -1,17 +1,29 @@
 package com.example.elasticsearch.crawler;
 
+import com.example.elasticsearch.crawler.repository.StockJpaRepository;
+import com.example.elasticsearch.stock.domain.StockDbDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@SpringBootTest
 class CrawlerServiceTest {
+
+    @Autowired
+    StockJpaRepository stockJpaRepositorys;
+
+    @BeforeEach
+    public void init() {
+
+    }
 
     @Test
     @DisplayName("크롤링 정상 작동 테스트")
@@ -32,6 +44,7 @@ class CrawlerServiceTest {
         };
         String url = "https://finance.naver.com/item/main.naver?code=";
 
+
         try {
             for (int i = 0; i < numberArr.length; i++) {
                 Document doc = Jsoup.connect(url+numberArr[i]).get();
@@ -39,24 +52,24 @@ class CrawlerServiceTest {
                 Elements titleElements = doc.getElementsByAttributeValue("class", "wrap_company");
                 Element titleElement = titleElements.get(0);
                 Elements title = titleElement.select("a");
-                System.out.println(title.get(0).text());
+                String text1 = title.text();
 
                 Elements priceElements = doc.getElementsByAttributeValue("class", "no_today");
                 Element priceElement = priceElements.get(0);
                 Elements priceSpanElements = priceElement.select("span");
-                System.out.println(priceSpanElements.get(0).text());
+                String text2 = priceSpanElements.get(0).text();
 
                 Elements percentElements = doc.getElementsByAttributeValue("class", "no_exday");
                 Element percnetElement = percentElements.get(0);
                 Elements percentSpanElements = percnetElement.select(".blind");
-                System.out.println(percentSpanElements.get(1).text());
+                String text3 = percentSpanElements.get(1).text();
 
                 Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
                 Element tradeElement = tradeElements.get(0);
                 Element tradeText = tradeElement.select(".blind").get(3);
-                System.out.println(tradeText.text());
+                String text4 = tradeText.text();
 
-
+//                stockJpaRepositorys.save(new StockDbDto(text1, text2, text3, text4));
             }
 
         } catch (IOException e) {

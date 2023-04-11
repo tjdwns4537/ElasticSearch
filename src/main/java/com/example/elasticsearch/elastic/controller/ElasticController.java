@@ -3,7 +3,7 @@ package com.example.elasticsearch.elastic.controller;
 import com.example.elasticsearch.stock.domain.Stock;
 import com.example.elasticsearch.stock.domain.StockElasticDto;
 import com.example.elasticsearch.helper.StatusEnum;
-import com.example.elasticsearch.stock.service.StockSearchService;
+import com.example.elasticsearch.elastic.service.StockSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
-@RestController
+@RestController(value = "/elastic")
 @RequiredArgsConstructor
 public class ElasticController {
 
@@ -29,7 +29,7 @@ public class ElasticController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StockElasticDto> findByIdStock(@PathVariable String id) {
+    public ResponseEntity<StockElasticDto> findByIdStock(@PathVariable Long id) {
         StockElasticDto stockElasticDto = new StockElasticDto();
 
         Optional<Stock> articleDoc = Optional.ofNullable(stockSearchService.findById(id));

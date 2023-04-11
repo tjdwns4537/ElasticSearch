@@ -1,38 +1,44 @@
 package com.example.elasticsearch.stock.domain;
 
-import lombok.Data;
 import lombok.Getter;
-import org.springframework.data.annotation.Id;
+import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
-@Table(name = "stock")
+@Setter
+@Entity
+@Table(name = "STOCKS")
 public class StockDbDto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stock_id")
     private Long id;
 
     @Column(name = "stock_name")
-    private String name;
+    private String stockName;
 
     @Column(name = "stock_price")
-    private String price;
+    private String stockPrice;
 
     @Column(name = "stock_percent")
-    private String percent;
+    private String stockPercent;
 
     @Column(name = "trade_count")
     private String tradeCount;
 
-    public StockDbDto(String name, String price, String percent, String tradeCount) {
-        this.name = name;
-        this.price = price;
-        this.percent = percent;
+    public StockDbDto() {
+        this.stockName = null;
+        this.stockPrice = null;
+        this.stockPercent = null;
+        this.tradeCount = null;
+    }
+
+    public StockDbDto(String stockName, String stockPrice, String stockPercent, String tradeCount) {
+        this.stockName = stockName;
+        this.stockPrice = stockPrice;
+        this.stockPercent = stockPercent;
         this.tradeCount = tradeCount;
     }
 

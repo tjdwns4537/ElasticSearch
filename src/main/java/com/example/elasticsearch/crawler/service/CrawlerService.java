@@ -2,10 +2,8 @@ package com.example.elasticsearch.crawler.service;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.helper.StockEnum;
-import com.example.elasticsearch.stock.domain.Stock;
 import com.example.elasticsearch.stock.domain.StockDbDto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,13 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CrawlerService {
 
     @Autowired
@@ -31,7 +27,9 @@ public class CrawlerService {
     @Value("${crawler.url}")
     String url;
 
-    public void crawlerImp() {
+    public StockDbDto crawlerImp() {
+        Optional<StockDbDto> saveStock = Optional.of(new StockDbDto());
+
         String[] arr = {
                 StockEnum.KAKAO.getNumber(),
                 StockEnum.SAMSUNG.getNumber(),
@@ -67,13 +65,15 @@ public class CrawlerService {
                 /** 거래량 **/
                 Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
                 Element tradeElement = tradeElements.get(0);
-                String tradeText = tradeElement.select(".blind").get(3).text();
+                String tradeResult = tradeElement.select(".blind").get(3).text();
 
-                stockJpaRepository.save(StockDbDto.from(titleResult, priceResult, percentResult,tradeText));
+                saveStock = Optional.of(stockJpaRepository.save(StockDbDto.from(titleResult, priceResult, percentResult, tradeResult)));
             }
 
         } catch (IOException e) {
             log.error("크롤링에 에러가 발생했습니다.");
         }
+
+        return saveStock.get();
     }
 }
