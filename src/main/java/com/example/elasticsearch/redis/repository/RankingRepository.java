@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,9 +24,15 @@ public class RankingRepository {
     public RankingRepository(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.ZSetOperations = redisTemplate.opsForZSet();
+
     }
 
-    public void getStockInfo(StockDbDto stockDbDto) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >
+    @PostConstruct
+    public void init() {
+        redisTemplate.delete(STOCK);
+    }
+
+    public void setStockRanking(StockDbDto stockDbDto) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >
         double percent = Double.parseDouble(stockDbDto.getStockPercent());
         ZSetOperations.add(STOCK, stockDbDto.getStockName(), percent);
     }

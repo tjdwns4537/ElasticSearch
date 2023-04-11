@@ -1,6 +1,7 @@
 package com.example.elasticsearch.crawler.controller;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
+import com.example.elasticsearch.redis.repository.RankingRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -11,19 +12,24 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 @Slf4j
 public class CrawlerController {
 
     @Autowired private final CrawlerService crawlerService;
+    @Autowired private final RankingRepository rankingRepository;
 
     @GetMapping("/main")
     public String crawlerService(Model model) {
-        StockDbDto stockDbDto = crawlerService.crawlerImp();
-        model.addAttribute("stock",stockDbDto);
+        crawlerService.crawlerImp();
+        List<String> stockRanking = rankingRepository.getStockRanking();
 
-        log.info("insert data : {} ",stockDbDto.getStockName());
+        model.addAttribute("stock",stockRanking); // 실시간 순위 화면에 출력
+        log.info("list size : {} ", stockRanking.size());
+
         return "home";
     }
 }

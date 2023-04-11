@@ -2,6 +2,7 @@ package com.example.elasticsearch.crawler.service;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.helper.StockEnum;
+import com.example.elasticsearch.redis.repository.RankingRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -22,12 +24,13 @@ import java.util.Optional;
 public class CrawlerService {
 
     @Autowired private final StockJpaRepository stockJpaRepository;
+    @Autowired private final RankingRepository rankingRepository;
 
     @Value("${crawler.url}")
     String url;
 
-    public StockDbDto crawlerImp() {
-        Optional<StockDbDto> saveStock = Optional.of(new StockDbDto());
+    public void crawlerImp() {
+        Optional<StockDbDto> saveStock;
 
         String[] arr = {
                 StockEnum.KAKAO.getNumber(),
@@ -67,12 +70,11 @@ public class CrawlerService {
                 String tradeResult = tradeElement.select(".blind").get(3).text();
 
                 saveStock = Optional.of(stockJpaRepository.save(StockDbDto.of(titleResult, priceResult, percentResult, tradeResult)));
+                rankingRepository.setStockRanking(saveStock.get()); // redis 에 저장
             }
 
         } catch (IOException e) {
             log.error("크롤링에 에러가 발생했습니다.");
         }
-
-        return saveStock.get();
     }
 }
