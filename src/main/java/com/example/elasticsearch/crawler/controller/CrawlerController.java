@@ -22,8 +22,8 @@ public class CrawlerController {
     public String crawlerService(Model model) {
         StockDbDto stockDbDto = crawlerService.crawlerImp();
         model.addAttribute("stock",stockDbDto);
-        log.info("model : {} ",model.getAttribute("stock"));
 
+        log.info("insert data : {} ",stockDbDto.getStockName());
         return "home";
     }
 }

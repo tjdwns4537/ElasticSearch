@@ -21,8 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CrawlerService {
 
-    @Autowired
-    private final StockJpaRepository stockJpaRepository;
+    @Autowired private final StockJpaRepository stockJpaRepository;
 
     @Value("${crawler.url}")
     String url;
@@ -67,7 +66,7 @@ public class CrawlerService {
                 Element tradeElement = tradeElements.get(0);
                 String tradeResult = tradeElement.select(".blind").get(3).text();
 
-                saveStock = Optional.of(stockJpaRepository.save(StockDbDto.from(titleResult, priceResult, percentResult, tradeResult)));
+                saveStock = Optional.of(stockJpaRepository.save(StockDbDto.of(titleResult, priceResult, percentResult, tradeResult)));
             }
 
         } catch (IOException e) {

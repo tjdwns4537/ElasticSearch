@@ -1,0 +1,38 @@
+package com.example.elasticsearch.redis.repository;
+
+import com.example.elasticsearch.stock.domain.StockDbDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
+@Service
+public class RankingRepository {
+
+    private final String STOCK = "stock";
+
+    private RedisTemplate<String, String> redisTemplate;
+    private ZSetOperations<String, String> ZSetOperations;
+
+    @Autowired
+    public RankingRepository(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+        this.ZSetOperations = redisTemplate.opsForZSet();
+    }
+
+    public void getStockInfo(StockDbDto stockDbDto) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >
+        double percent = Double.parseDouble(stockDbDto.getStockPercent());
+        ZSetOperations.add(STOCK, stockDbDto.getStockName(), percent);
+    }
+
+    public List<String> getStockRanking() { // 출력
+        Set<String> range = ZSetOperations.range("stock", 0, -1);
+        List<String> list = new ArrayList<>(range);
+        return list;
+    }
+}

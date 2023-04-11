@@ -42,7 +42,7 @@ public class StockDbDto {
         this.tradeCount = tradeCount;
     }
 
-    public static StockDbDto from(String name, String price, String percent, String tradeCount) {
+    public static StockDbDto of(String name, String price, String percent, String tradeCount) {
         return new StockDbDto(name, price, percent, tradeCount);
     }
 }
