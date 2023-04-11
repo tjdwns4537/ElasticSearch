@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,16 +26,7 @@
             <dt>실시간 급상승 검색어</dt>
             <dd>
                 <ol>
-                    <li><a href="#" class="">1 순위</a></li>
-                    <li><a href="#">2 순위</a></li>
-                    <li><a href="#">3 순위</a></li>
-                    <li><a href="#">4 순위</a></li>
-                    <li><a href="#">5 순위</a></li>
-                    <li><a href="#">6 순위</a></li>
-                    <li><a href="#">7 순위</a></li>
-                    <li><a href="#">8 순위</a></li>
-                    <li><a href="#">9 순위</a></li>
-                    <li><a href="#">10 순위</a></li>
+                    <li th:each="stock, stockStat:${stockList}" th:text="|${stockStat.index+1}. ${stock}|"></li>
                 </ol>
             </dd>
         </dl>

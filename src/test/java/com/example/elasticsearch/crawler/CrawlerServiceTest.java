@@ -66,10 +66,14 @@ class CrawlerServiceTest {
 
                 Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
                 Element tradeElement = tradeElements.get(0);
-                Element tradeText = tradeElement.select(".blind").get(3);
-                String text4 = tradeText.text();
+                Element trade = tradeElement.select(".blind").get(3);
+                String text4 = trade.text();
 
-//                stockJpaRepositorys.save(new StockDbDto(text1, text2, text3, text4));
+                System.out.println("title : " + text1);
+                System.out.println("price : " + text2);
+                System.out.println("percent : " + text3);
+                System.out.println("tradeCount : " + text4);
+
             }
 
         } catch (IOException e) {
