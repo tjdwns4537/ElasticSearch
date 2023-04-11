@@ -6,9 +6,10 @@ body {
 }
 
 #content {
-    margin: 20px;
+    width: 500px;
     padding: 10px;
     background: #393;
+    margin: auto;
 }
 
 #rank-list a {
