@@ -34,7 +34,10 @@ public class RankingRepository {
 
     public void setStockRanking(StockDbDto stockDbDto) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >
         double percent = Double.parseDouble(stockDbDto.getStockPercent());
-        ZSetOperations.add(STOCK, "["+stockDbDto.getStockName() + "] "+stockDbDto.getStockPrice()+"원", percent);
+        ZSetOperations.add(STOCK, "["+stockDbDto.getStockName() + "] 현재가: "
+                        +stockDbDto.getStockPrice()+"원 - 등락율 : "
+                        +String.format("%.2f",Double.parseDouble(stockDbDto.getStockPercent())) + "%"
+                , percent);
     }
 
     public List<String> getStockRanking() { // 출력
