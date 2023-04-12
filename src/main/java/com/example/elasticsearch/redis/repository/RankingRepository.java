@@ -36,12 +36,12 @@ public class RankingRepository {
         double percent = Double.parseDouble(stockDbDto.getStockPercent());
         ZSetOperations.add(STOCK, "["+stockDbDto.getStockName() + "] 현재가: "
                         +stockDbDto.getStockPrice()+"원 - 등락율 : "
-                        +String.format("%.2f",Double.parseDouble(stockDbDto.getStockPercent())) + "%"
+                        +stockDbDto.getStockPercent() + "%"
                 , percent);
     }
 
     public List<String> getStockRanking() { // 출력
-        Set<String> range = ZSetOperations.range("stock", 0, -1);
+        Set<String> range = ZSetOperations.reverseRange("stock", 0, -1);
         List<String> list = new ArrayList<>(range);
         return list;
     }

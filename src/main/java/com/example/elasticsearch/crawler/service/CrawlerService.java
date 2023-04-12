@@ -62,7 +62,7 @@ public class CrawlerService {
                 Elements percentElements = doc.getElementsByAttributeValue("class", "no_exday");
                 Element percnetElement = percentElements.get(0);
                 Elements percentSpanElements = percnetElement.select(".blind");
-                String percentResult = percentSpanElements.get(1).text();
+                String percentResult = String.format("%.2f",Double.parseDouble(percentSpanElements.get(1).text()));
 
                 /** 거래량 **/
                 Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
