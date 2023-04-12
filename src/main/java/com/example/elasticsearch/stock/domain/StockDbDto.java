@@ -7,8 +7,8 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "STOCKS")
+@Entity(name = "stocks")
+@Table(name = "stocks")
 public class StockDbDto {
 
     @Id
