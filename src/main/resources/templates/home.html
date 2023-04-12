@@ -40,10 +40,10 @@
     </div>
 
     <div class="buttons">
-        <form th:action="@{/elastic/StockInfo}" >
+        <form th:action="@{/stockInfo}" method="get" >
             <div class="searchbar-wrap">
                 <i class="fas fa-search"></i>
-                <input class="search-input" type="text"/>
+                <input class="search-input" type="text" name="stockName" placeholder="주식 종목 입력"/>
             </div>
             <button type="submit"> 추출 </button>
         </form>

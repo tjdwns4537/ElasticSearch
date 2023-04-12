@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StockJpaRepository extends JpaRepository<StockDbDto, Long>, CustomStockRepository {
+//    StockDbDto findByStockName(String stockName);
 }
