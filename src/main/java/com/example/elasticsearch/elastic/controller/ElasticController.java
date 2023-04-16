@@ -12,12 +12,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @Slf4j
 public class ElasticController {
@@ -32,13 +33,13 @@ public class ElasticController {
     }
 
     @GetMapping("/elastic/{stockName}")
-    public ResponseEntity<StockElasticDto> findByIdStock(@PathVariable String stockName) {
+    public String findByIdStock(@PathVariable String stockName) {
         log.info("주식 종목 명 : {}",stockName);
 
         StockElasticDto stockElasticDto = new StockElasticDto(); // 반환할 ElasticDto
 
         Optional<StockDbDto> stock = Optional.ofNullable(stockSearchService.findByName(stockName)); // DB에서 해당 종목이름의 데이터 출력
-        if(stock.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(stock.isEmpty()) return "page404/notFound";
 
         stockElasticDto.setStatusEnum(StatusEnum.OK);
         stockElasticDto.setData(stock);
@@ -47,6 +48,6 @@ public class ElasticController {
         HttpHeaders headers = new HttpHeaders(); // 응답 헤더
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        return new ResponseEntity<>(stockElasticDto, headers ,HttpStatus.OK);
+        return "redirect:/";
     }
 }

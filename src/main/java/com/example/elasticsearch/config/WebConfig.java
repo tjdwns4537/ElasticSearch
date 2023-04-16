@@ -11,7 +11,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String[] resourceLocation = {
                 "classpath:/static/", "classpath:/resources/","classpath:/public/","classpath:/static/elastic/",
-                "classpath:/template/"
+                "classpath:/template/", "classpath:/template/page404"
         };
         registry.addResourceHandler("/**").addResourceLocations(resourceLocation);
         super.addResourceHandlers(registry);
