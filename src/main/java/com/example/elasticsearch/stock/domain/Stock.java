@@ -10,8 +10,8 @@ import org.springframework.data.elasticsearch.annotations.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(indexName = Indices.STOCK_INDEX) // article 이라는 색인에 속함
-@Mapping(mappingPath = "/static/elastic/stock-mapping.json")
-@Setting(settingPath = "/static/elastic/stock-setting.json")
+@Mapping(mappingPath = "/elastic/stock-mapping.json")
+@Setting(settingPath = "/elastic/stock-setting.json")
 public class Stock {
     @Id
     @Field(type = FieldType.Keyword)
@@ -19,13 +19,17 @@ public class Stock {
 
     /** 종목 이름 */
     @Field(type = FieldType.Text)
-    private String title;
+    private String stockName;
 
     /** 종목 가격 */
     @Field(type = FieldType.Text)
-    private String price;
+    private String stockPrice;
 
     /** 종목 등락율 */
     @Field(type = FieldType.Text)
-    private String percent;
+    private String stockPercent;
+
+    /** 종목 등락율 */
+    @Field(type = FieldType.Text)
+    private String tradeCount;
 }
