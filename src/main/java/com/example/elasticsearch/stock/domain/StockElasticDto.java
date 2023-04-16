@@ -6,12 +6,12 @@ import lombok.Data;
 @Data
 public class StockElasticDto {
     private StatusEnum statusEnum;
-    private String message;
     private Object data;
+    private String message;
 
     public StockElasticDto() {
         this.statusEnum = StatusEnum.BAD_REQUEST;
-        this.message = null;
         this.data = null;
+        this.message = null;
     }
 }
