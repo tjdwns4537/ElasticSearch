@@ -10,8 +10,8 @@ import org.springframework.data.elasticsearch.annotations.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(indexName = Indices.STOCK_INDEX) // article 이라는 색인에 속함
-@Mapping(mappingPath = "/elastic/stock-mapping.json")
-@Setting(settingPath = "/elastic/stock-setting.json")
+@Mapping(mappingPath = "/static/elastic/stock-mapping.json")
+@Setting(settingPath = "/static/elastic/stock-setting.json")
 public class Stock {
     @Id
     @Field(type = FieldType.Keyword)

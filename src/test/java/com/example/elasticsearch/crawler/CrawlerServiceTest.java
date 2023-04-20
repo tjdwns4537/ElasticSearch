@@ -1,7 +1,9 @@
 package com.example.elasticsearch.crawler;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
+import com.example.elasticsearch.crawler.repository.StockListJpaRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
+import com.example.elasticsearch.stock.domain.StockLikeDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.List;
 
 @SpringBootTest
 class CrawlerServiceTest {
@@ -20,10 +23,8 @@ class CrawlerServiceTest {
     @Autowired
     StockJpaRepository stockJpaRepositorys;
 
-    @BeforeEach
-    public void init() {
-
-    }
+    @Autowired
+    StockListJpaRepository stockListJpaRepository;
 
     @Test
     @DisplayName("크롤링 정상 작동 테스트")
@@ -78,6 +79,38 @@ class CrawlerServiceTest {
 
         } catch (IOException e) {
 
+        }
+    }
+
+
+    @DisplayName("종목번호 찾기")
+    @Test
+    void testFind() {
+        String[] arr = {"https://kr.investing.com/search/?q=삼성전자",
+                "https://kr.investing.com/search/?q=기아",
+                "https://kr.investing.com/search/?q=네이버"
+        };
+
+        try{
+
+            for (String i : arr) {
+                Document doc = Jsoup.connect(i).get();
+
+                /** 종목 이름 **/
+                Elements titleElements = doc.getElementsByAttributeValue("class", "js-inner-all-results-quote-item row");
+                Element titleElement = titleElements.get(0);
+                Elements title = titleElement.select(".second");
+                String titleResult = title.get(0).text();
+                StockLikeDto stockLikeDto = StockLikeDto.of(titleResult);
+                stockListJpaRepository.save(stockLikeDto);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<StockLikeDto> all = stockListJpaRepository.findAll();
+        for (StockLikeDto i : all) {
+            System.out.println("stock : "+i.getLikeStock());
         }
     }
 

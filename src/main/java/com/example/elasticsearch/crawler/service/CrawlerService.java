@@ -1,9 +1,11 @@
 package com.example.elasticsearch.crawler.service;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
+import com.example.elasticsearch.crawler.repository.StockListJpaRepository;
 import com.example.elasticsearch.helper.StockEnum;
 import com.example.elasticsearch.redis.repository.RankingRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
+import com.example.elasticsearch.stock.domain.StockLikeDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -14,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -25,11 +26,15 @@ public class CrawlerService {
 
     @Autowired private final StockJpaRepository stockJpaRepository;
     @Autowired private final RankingRepository rankingRepository;
+    @Autowired private final StockListJpaRepository stockListJpaRepository;
 
     @Value("${crawler.url}")
     String url;
 
-    public void crawlerImp() {
+    @Value("${crawler.findUrl}")
+    String findUrl;
+
+    public void crawlerSelectImp() {
         Optional<StockDbDto> saveStock;
 
         String[] arr = {
@@ -76,5 +81,25 @@ public class CrawlerService {
         } catch (IOException e) {
             log.error("크롤링에 에러가 발생했습니다.");
         }
+    }
+
+    public void findStockNumber(String name) {
+        findUrl = findUrl + name;
+
+        try{
+            Document doc = Jsoup.connect(findUrl).get();
+
+            /** 종목 이름 **/
+            Elements titleElements = doc.getElementsByAttributeValue("class", "js-inner-all-results-quote-item row");
+            Element titleElement = titleElements.get(0);
+            Elements title = titleElement.select(".second");
+            String titleResult = title.get(0).text();
+            StockLikeDto stockLikeDto = StockLikeDto.of(titleResult);
+            stockListJpaRepository.save(stockLikeDto);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }
