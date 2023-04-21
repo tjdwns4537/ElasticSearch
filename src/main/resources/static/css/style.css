@@ -69,12 +69,12 @@
 }
 
 .main-section .logo-wrap .like .like-input{
+    width: 100px;
     padding-left:5px;
 }
 
 .main-section .logo-wrap .like button{
     width: 50px;
-    float: right;
 }
 
 
