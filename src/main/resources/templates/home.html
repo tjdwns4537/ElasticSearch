@@ -39,12 +39,12 @@
         <a href="#"><img class="logo-img" src="image/logo.png"></a>
 
         <div class="like">
-            <form th:action="@{/likeStock}" method="post" >
+            <form th:action="@{/likeStock}" th:object="${stockForm}" method="post">
                 <div class="like-wrap">
                     <h4> 나의 관심 주식 </h4>
-                    <input class="like-input" type="text" name="stockName" placeholder="관심 추가"/>
-                    <button type="submit"> 추가 </button>
+                    <input class="like-input" type="text" th:field="*{stockName}" placeholder="관심 추가"/><br>
                 </div>
+                <button type="submit"> 추가 </button>
             </form>
             <dl class="like-list">
                 <dd>

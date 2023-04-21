@@ -61,12 +61,22 @@
 .main-section .logo-wrap .like h4{
     font-size: 14px;
     display: inline-block;
-    margin-right: 20px;
+    margin-right: 10px;
+}
+
+.main-section .logo-wrap .like-wrap{
+    display: inline-block;
 }
 
 .main-section .logo-wrap .like .like-input{
     padding-left:5px;
 }
+
+.main-section .logo-wrap .like button{
+    width: 50px;
+    float: right;
+}
+
 
 .main-section .logo-wrap .like li{
     list-style-type: none;

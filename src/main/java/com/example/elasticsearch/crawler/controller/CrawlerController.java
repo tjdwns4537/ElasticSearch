@@ -4,6 +4,7 @@ import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.StockSearchService;
 import com.example.elasticsearch.redis.repository.RankingRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
+import com.example.elasticsearch.stock.domain.StockForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class CrawlerController {
         crawlerService.crawlerSelectImp();
         List<String> stockRanking = rankingRepository.getStockRanking();
         model.addAttribute("stockList",stockRanking); // 실시간 순위 화면에 출력
+        model.addAttribute("stockForm", new StockForm());
         return "home";
     }
 
@@ -44,12 +46,6 @@ public class CrawlerController {
         log.info(stock.get().getStockPrice());
         log.info(stock.get().getTradeCount());
 
-        return "redirect:/";
-    }
-
-    @PostMapping("/likeStock")
-    public String likeit(Model model) {
-//        model.addAttribute()
         return "redirect:/";
     }
 }

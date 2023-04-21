@@ -2,7 +2,6 @@ package com.example.elasticsearch.crawler.service;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.StockListJpaRepository;
-import com.example.elasticsearch.helper.StockEnum;
 import com.example.elasticsearch.redis.repository.RankingRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
@@ -17,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,19 +37,16 @@ public class CrawlerService {
     public void crawlerSelectImp() {
         Optional<StockDbDto> saveStock;
 
-        String[] arr = {
-                StockEnum.KAKAO.getNumber(),
-                StockEnum.SAMSUNG.getNumber(),
-                StockEnum.NAVER.getNumber(),
-                StockEnum.SKENOVATION.getNumber(),
-                StockEnum.KIA.getNumber(),
-                StockEnum.LGCHEMISTRY.getNumber(),
-        };
+        List<StockLikeDto> stockLikeList = stockListJpaRepository.findAll();
+
+        if(stockLikeList.size() > 6){ // 최대 개수 6개로 조정
+            stockLikeList = stockLikeList.subList(0, 6);
+        }
 
         try {
-            for (int i = 0; i < arr.length; i++) {
+            for (StockLikeDto i : stockLikeList) {
 
-                Document doc = Jsoup.connect(url+arr[i]).get();
+                Document doc = Jsoup.connect(url+i.getLikeStock()).get();
 
                 /** 종목 이름 **/
                 Elements titleElements = doc.getElementsByAttributeValue("class", "wrap_company");
@@ -83,23 +80,27 @@ public class CrawlerService {
         }
     }
 
-    public void findStockNumber(String name) {
-        findUrl = findUrl + name;
-
+    public String findStockNumber(String name) {
+        String titleResult = "";
+        String selectUrl = findUrl + name;
+        log.info("입력 url: {}", selectUrl);
         try{
-            Document doc = Jsoup.connect(findUrl).get();
+            Document doc = Jsoup.connect(selectUrl).get();
 
             /** 종목 이름 **/
             Elements titleElements = doc.getElementsByAttributeValue("class", "js-inner-all-results-quote-item row");
             Element titleElement = titleElements.get(0);
             Elements title = titleElement.select(".second");
-            String titleResult = title.get(0).text();
-            StockLikeDto stockLikeDto = StockLikeDto.of(titleResult);
-            stockListJpaRepository.save(stockLikeDto);
+            titleResult = title.get(0).text();
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
+        return titleResult;
+    }
 
-
+    public void saveStackNumber(String titleResult ) {
+        StockLikeDto stockLikeDto = StockLikeDto.of(titleResult);
+        stockListJpaRepository.save(stockLikeDto);
     }
 }
