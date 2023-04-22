@@ -1,14 +1,12 @@
 package com.example.elasticsearch.crawler;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
-import com.example.elasticsearch.crawler.repository.StockListJpaRepository;
-import com.example.elasticsearch.stock.domain.StockDbDto;
+import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ class CrawlerServiceTest {
     StockJpaRepository stockJpaRepositorys;
 
     @Autowired
-    StockListJpaRepository stockListJpaRepository;
+    LikeStockJpaRepository likeStockJpaRepository;
 
     @Test
     @DisplayName("크롤링 정상 작동 테스트")
@@ -102,13 +100,13 @@ class CrawlerServiceTest {
                 Elements title = titleElement.select(".second");
                 String titleResult = title.get(0).text();
                 StockLikeDto stockLikeDto = StockLikeDto.of(titleResult);
-                stockListJpaRepository.save(stockLikeDto);
+                likeStockJpaRepository.save(stockLikeDto);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        List<StockLikeDto> all = stockListJpaRepository.findAll();
+        List<StockLikeDto> all = likeStockJpaRepository.findAll();
         for (StockLikeDto i : all) {
             System.out.println("stock : "+i.getLikeStock());
         }
@@ -132,6 +130,7 @@ class CrawlerServiceTest {
 
             String[] splitResult = titleResult.split("% ");
             for (int i = 0; i < splitResult.length; i++) {
+                splitResult[i] = splitResult[i] + "%";
                 System.out.println("res : " + splitResult[i]);
             }
         } catch (IOException e) {

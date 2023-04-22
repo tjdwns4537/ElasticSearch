@@ -2,7 +2,8 @@ package com.example.elasticsearch.crawler.controller;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.StockSearchService;
-import com.example.elasticsearch.redis.repository.RankingRepository;
+import com.example.elasticsearch.redis.repository.LikeStockRepository;
+import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockForm;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -23,29 +23,26 @@ import java.util.Optional;
 public class CrawlerController {
 
     @Autowired private final CrawlerService crawlerService;
-    @Autowired private final RankingRepository rankingRepository;
+    @Autowired private final LikeStockRepository likeStockRepository;
+    @Autowired private final LiveStockRepository liveStockRepository;
     @Autowired private final StockSearchService stockSearchService;
 
     @GetMapping
     public String crawlerService(Model model) {
-        crawlerService.crawlerSelectImp();
-        List<String> stockRanking = rankingRepository.getStockRanking();
-        model.addAttribute("stockList",stockRanking); // 실시간 순위 화면에 출력
+        crawlerService.likeStockFindAll();
+        crawlerService.saveLiveStock();
+        List<String> likeStock = likeStockRepository.getStockRanking();
+        List<String> liveStock = liveStockRepository.getStockLive();
+
+        model.addAttribute("likeStockList",likeStock); // 관심 주식 항목 화면에 출력
+        model.addAttribute("liveStockList",liveStock); // 실시간 주식 순위 화면에 출력
         model.addAttribute("stockForm", new StockForm());
         return "home";
     }
 
     @GetMapping("/stockInfo")
     public String extract(@RequestParam("stockName") String stockName) {
-
-        log.info("주식 종목 명 : {}",stockName);
         Optional<StockDbDto> stock = Optional.ofNullable(stockSearchService.findByName(stockName)); // DB에서 해당 종목이름의 데이터 출력
-
-        log.info(stock.get().getStockName());
-        log.info(stock.get().getStockPercent());
-        log.info(stock.get().getStockPrice());
-        log.info(stock.get().getTradeCount());
-
         return "redirect:/";
     }
 }

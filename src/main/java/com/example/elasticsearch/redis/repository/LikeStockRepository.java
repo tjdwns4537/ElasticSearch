@@ -8,20 +8,19 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 @Service
-public class RankingRepository {
+public class LikeStockRepository {
 
-    private final String STOCK = "stock";
+    private final String STOCK = "LIKESTOCK";
 
     private RedisTemplate<String, String> redisTemplate;
     private ZSetOperations<String, String> ZSetOperations;
 
     @Autowired
-    public RankingRepository(RedisTemplate<String, String> redisTemplate) {
+    public LikeStockRepository(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.ZSetOperations = redisTemplate.opsForZSet();
 
@@ -41,8 +40,11 @@ public class RankingRepository {
     }
 
     public List<String> getStockRanking() { // 출력
-        Set<String> range = ZSetOperations.reverseRange("stock", 0, -1);
+        Set<String> range = ZSetOperations.reverseRange(STOCK, 0, -1);
         List<String> list = new ArrayList<>(range);
+        if(list.size() > 5){
+            return list.subList(0, 5);
+        }
         return list;
     }
 }

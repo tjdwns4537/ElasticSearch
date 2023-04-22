@@ -1,8 +1,9 @@
 package com.example.elasticsearch.crawler.service;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
-import com.example.elasticsearch.crawler.repository.StockListJpaRepository;
-import com.example.elasticsearch.redis.repository.RankingRepository;
+import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
+import com.example.elasticsearch.redis.repository.LikeStockRepository;
+import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,9 @@ import java.util.Optional;
 public class CrawlerService {
 
     @Autowired private final StockJpaRepository stockJpaRepository;
-    @Autowired private final RankingRepository rankingRepository;
-    @Autowired private final StockListJpaRepository stockListJpaRepository;
+    @Autowired private final LikeStockRepository likeStockRepository;
+    @Autowired private final LiveStockRepository liveStockRepository;
+    @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
 
     @Value("${crawler.url}")
     String url;
@@ -34,14 +36,13 @@ public class CrawlerService {
     @Value("${crawler.findUrl}")
     String findUrl;
 
-    public void crawlerSelectImp() {
+    @Value("${crawler.liveUrl}")
+    String liveUrl;
+
+    public void likeStockFindAll() {
         Optional<StockDbDto> saveStock;
 
-        List<StockLikeDto> stockLikeList = stockListJpaRepository.findAll();
-
-        if(stockLikeList.size() > 6){ // 최대 개수 6개로 조정
-            stockLikeList = stockLikeList.subList(0, 6);
-        }
+        List<StockLikeDto> stockLikeList = likeStockJpaRepository.findAll();
 
         try {
             for (StockLikeDto i : stockLikeList) {
@@ -72,7 +73,7 @@ public class CrawlerService {
                 String tradeResult = tradeElement.select(".blind").get(3).text();
 
                 saveStock = Optional.of(stockJpaRepository.save(StockDbDto.of(titleResult, priceResult, percentResult, tradeResult)));
-                rankingRepository.setStockRanking(saveStock.get()); // redis 에 저장
+                likeStockRepository.setStockRanking(saveStock.get()); // redis 에 저장
             }
 
         } catch (IOException e) {
@@ -99,8 +100,27 @@ public class CrawlerService {
         return titleResult;
     }
 
-    public void saveStackNumber(String titleResult ) {
+    public void saveStackNumber(String titleResult) {
         StockLikeDto stockLikeDto = StockLikeDto.of(titleResult);
-        stockListJpaRepository.save(stockLikeDto);
+        likeStockJpaRepository.save(stockLikeDto);
+    }
+
+    public void saveLiveStock() {
+        try{
+            Document doc = Jsoup.connect(liveUrl).get();
+
+            /** 종목 이름 **/
+            Elements titleElements = doc.getElementsByAttributeValue("class", "group_type is_active");
+            Element titleElement = titleElements.get(0);
+            Elements title = titleElement.select("#_topItems1");
+            String titleResult = title.get(0).text();
+
+            String[] splitResult = titleResult.split("% ");
+            for (int i = 0; i < splitResult.length; i++) {
+                liveStockRepository.setStockLive(splitResult[i] + "%");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

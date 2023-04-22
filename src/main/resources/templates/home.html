@@ -26,7 +26,7 @@
         <dl id="rank-list">
             <dd>
                 <ol>
-                    <li th:each="stock, stockStat:${stockList}" th:text="|${stockStat.index+1}. ${stock}|"></li>
+                    <li th:each="likeStock, liveStocks:${liveStockList}" th:text="|${liveStocks.index+1}. ${likeStock}|"></li>
                 </ol>
             </dd>
         </dl>
@@ -48,7 +48,7 @@
             <dl class="like-list">
                 <dd>
                     <ol>
-                        <li th:each="stock, stockStat:${stockList}" th:text="|${stockStat.index+1}. ${stock}|"></li>
+                        <li th:each="likeStock, likeStocks:${likeStockList}" th:text="|${likeStocks.index+1}. ${likeStock}|"></li>
                     </ol>
                 </dd>
             </dl>
