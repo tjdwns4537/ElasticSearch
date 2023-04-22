@@ -58,10 +58,16 @@ class CrawlerServiceTest {
                 Elements priceSpanElements = priceElement.select("span");
                 String text2 = priceSpanElements.get(0).text();
 
+                String percentText = "";
                 Elements percentElements = doc.getElementsByAttributeValue("class", "no_exday");
                 Element percnetElement = percentElements.get(0);
+                System.out.println(percnetElement);
                 Elements percentSpanElements = percnetElement.select(".blind");
-                String text3 = percentSpanElements.get(1).text();
+                Elements selectDown = percnetElement.select(".no_down");
+                Elements selectUp = percnetElement.select(".no_up");
+                if(!selectDown.isEmpty()) percentText += "-";
+                if(!selectUp.isEmpty()) percentText += "+";
+                String percent = percentText + percentSpanElements.get(0).text();
 
                 Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
                 Element tradeElement = tradeElements.get(0);
@@ -70,7 +76,7 @@ class CrawlerServiceTest {
 
                 System.out.println("title : " + text1);
                 System.out.println("price : " + text2);
-                System.out.println("percent : " + text3);
+                System.out.println("percent : " + percent);
                 System.out.println("tradeCount : " + text4);
 
             }

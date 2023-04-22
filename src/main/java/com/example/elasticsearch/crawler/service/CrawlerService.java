@@ -41,7 +41,6 @@ public class CrawlerService {
 
     public void likeStockFindAll() {
         Optional<StockDbDto> saveStock = Optional.empty();
-
         List<StockLikeDto> stockLikeList = likeStockJpaRepository.findAll();
 
         try {
@@ -62,17 +61,22 @@ public class CrawlerService {
                 String priceResult = priceSpanElements.get(0).text();
 
                 /** 주식 등락율 **/
+                StringBuilder percent = new StringBuilder();
                 Elements percentElements = doc.getElementsByAttributeValue("class", "no_exday");
                 Element percnetElement = percentElements.get(0);
+                Elements selectDown = percnetElement.select(".no_down");
+                Elements selectUp = percnetElement.select(".no_up");
+                if(!selectDown.isEmpty()) percent.append("-");
+                if(!selectUp.isEmpty()) percent.append("+");
                 Elements percentSpanElements = percnetElement.select(".blind");
-                String percentResult = String.format("%.2f",Double.parseDouble(percentSpanElements.get(1).text()));
+                percent.append(String.format("%.2f", Double.parseDouble(percentSpanElements.get(1).text())));
 
                 /** 거래량 **/
                 Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
                 Element tradeElement = tradeElements.get(0);
                 String tradeResult = tradeElement.select(".blind").get(3).text();
 
-                StockDbDto stock = StockDbDto.of(titleResult, priceResult, percentResult, tradeResult);
+                StockDbDto stock = StockDbDto.of(titleResult, priceResult, percent.toString(), tradeResult);
 
                 /**
                  * TODO
