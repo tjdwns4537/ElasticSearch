@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 @Slf4j
-public class CustomStocRepositoryImpl implements CustomStockRepository {
+public class CustomStockRepositoryImpl implements CustomStockRepository {
 
     @Autowired
     private final JPAQueryFactory jpaQueryFactory;

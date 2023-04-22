@@ -31,10 +31,13 @@ public class CrawlerController {
     public String crawlerService(Model model) {
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
-        List<String> likeStock = likeStockRepository.getStockRanking();
+
+        List<String> likeStockAll = likeStockRepository.getLikeStockAll();
+        List<String> likeStockRanking = likeStockRepository.getLikeStockRanking();
         List<String> liveStock = liveStockRepository.getStockLive();
 
-        model.addAttribute("likeStockList",likeStock); // 관심 주식 항목 화면에 출력
+        model.addAttribute("likeStockRanking",likeStockRanking); // 관심 주식 항목 순위 화면에 출력
+        model.addAttribute("likeStockList",likeStockAll); // 관심 주식 항목 화면에 출력
         model.addAttribute("liveStockList",liveStock); // 실시간 주식 순위 화면에 출력
         model.addAttribute("stockForm", new StockForm());
         return "home";

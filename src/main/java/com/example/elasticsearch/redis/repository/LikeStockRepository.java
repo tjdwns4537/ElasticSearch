@@ -39,12 +39,16 @@ public class LikeStockRepository {
                 , percent);
     }
 
-    public List<String> getStockRanking() { // 출력
+    public List<String> getLikeStockRanking() { // 출력
         Set<String> range = ZSetOperations.reverseRange(STOCK, 0, -1);
         List<String> list = new ArrayList<>(range);
         if(list.size() > 5){
             return list.subList(0, 5);
         }
         return list;
+    }
+
+    public List<String> getLikeStockAll() {
+        return new ArrayList<>(ZSetOperations.reverseRange(STOCK, 0, -1));
     }
 }
