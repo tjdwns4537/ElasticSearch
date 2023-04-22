@@ -34,7 +34,6 @@ public class CustomStockRepositoryImpl implements CustomStockRepository {
 
     @Override
     public StockLikeDto findByLikeStockName(String stockName) {
-        log.info("들어온 관심 주식종목 : {}",stockName);
         QStockLikeDto qStockLikeDto = QStockLikeDto.stockLikeDto;
 
         return jpaQueryFactory.select(qStockLikeDto)

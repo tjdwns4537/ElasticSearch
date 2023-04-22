@@ -33,10 +33,7 @@ public class LikeStockRepository {
 
     public void setStockRanking(StockDbDto stockDbDto) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >
         double percent = Double.parseDouble(stockDbDto.getStockPercent());
-        ZSetOperations.add(STOCK, "["+stockDbDto.getStockName() + "] 현재가: "
-                        +stockDbDto.getStockPrice()+"원 - 등락율 : "
-                        +stockDbDto.getStockPercent() + "%"
-                , percent);
+        ZSetOperations.add(STOCK, stockDbDto.getStockName(), percent);
     }
 
     public List<String> getLikeStockRanking() { // 출력
@@ -48,7 +45,7 @@ public class LikeStockRepository {
         return list;
     }
 
-    public List<String> getLikeStockAll() {
-        return new ArrayList<>(ZSetOperations.reverseRange(STOCK, 0, -1));
+    public void deleteLikeStock(String stockName) {
+        ZSetOperations.remove(STOCK, stockName);
     }
 }

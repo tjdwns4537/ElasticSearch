@@ -2,10 +2,10 @@ package com.example.elasticsearch.crawler.controller;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.StockSearchService;
-import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockForm;
+import com.example.elasticsearch.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +23,7 @@ import java.util.Optional;
 public class CrawlerController {
 
     @Autowired private final CrawlerService crawlerService;
-    @Autowired private final LikeStockRepository likeStockRepository;
-    @Autowired private final LiveStockRepository liveStockRepository;
+    @Autowired private final StockService stockService;
     @Autowired private final StockSearchService stockSearchService;
 
     @GetMapping
@@ -32,9 +31,9 @@ public class CrawlerController {
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
 
-        List<String> likeStockAll = likeStockRepository.getLikeStockAll();
-        List<String> likeStockRanking = likeStockRepository.getLikeStockRanking();
-        List<String> liveStock = liveStockRepository.getStockLive();
+        List<String> likeStockRanking = stockService.getLikeStockRanking();
+        List<String> likeStockAll = stockService.getLikeStockAll();
+        List<String> liveStock = stockService.getStockLive();
 
         model.addAttribute("likeStockRanking",likeStockRanking); // 관심 주식 항목 순위 화면에 출력
         model.addAttribute("likeStockList",likeStockAll); // 관심 주식 항목 화면에 출력

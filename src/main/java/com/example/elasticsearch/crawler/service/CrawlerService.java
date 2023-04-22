@@ -40,7 +40,7 @@ public class CrawlerService {
     String liveUrl;
 
     public void likeStockFindAll() {
-        Optional<StockDbDto> saveStock;
+        Optional<StockDbDto> saveStock = Optional.empty();
 
         List<StockLikeDto> stockLikeList = likeStockJpaRepository.findAll();
 
@@ -72,7 +72,21 @@ public class CrawlerService {
                 Element tradeElement = tradeElements.get(0);
                 String tradeResult = tradeElement.select(".blind").get(3).text();
 
-                saveStock = Optional.of(stockJpaRepository.save(StockDbDto.of(titleResult, priceResult, percentResult, tradeResult)));
+                StockDbDto stock = StockDbDto.of(titleResult, priceResult, percentResult, tradeResult);
+
+                /**
+                 * TODO
+                 *  - Update 쿼리로 수정 필요
+                 * **/
+                try {
+                    StockDbDto findStock = stockJpaRepository.findByStockName(titleResult);
+                    stockJpaRepository.deleteById(findStock.getId());
+                    stockJpaRepository.save(stock);
+                    saveStock = Optional.of(stockJpaRepository.save(stock));
+                } catch (NullPointerException e) {
+                    saveStock = Optional.of(stockJpaRepository.save(stock));
+                }
+
                 likeStockRepository.setStockRanking(saveStock.get()); // redis 에 저장
             }
 
@@ -97,11 +111,6 @@ public class CrawlerService {
             return "";
         }
         return titleResult;
-    }
-
-    public void saveStackNumber(String titleResult) {
-        StockLikeDto stockLikeDto = StockLikeDto.of(titleResult);
-        likeStockJpaRepository.save(stockLikeDto);
     }
 
     public void saveLiveStock() {
