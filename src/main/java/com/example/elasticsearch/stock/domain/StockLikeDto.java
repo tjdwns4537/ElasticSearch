@@ -22,12 +22,9 @@ public class StockLikeDto {
 
     }
 
-
     public StockLikeDto(String likeStock) {
         this.likeStock = likeStock;
     }
-
-
     public static StockLikeDto of(String likeStock) {
         return new StockLikeDto(likeStock);
     }

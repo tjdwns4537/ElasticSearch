@@ -46,7 +46,6 @@
     height: 200px;
 }
 
-
 .main-section .logo-img{
     height: 150px;
     float: left;
@@ -74,6 +73,10 @@
 }
 
 .main-section .logo-wrap .like button{
+    width: 50px;
+}
+
+.main-section .logo-wrap .like .delete-button{
     width: 50px;
 }
 

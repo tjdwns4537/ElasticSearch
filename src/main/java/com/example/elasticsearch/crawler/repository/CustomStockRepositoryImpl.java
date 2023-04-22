@@ -1,7 +1,9 @@
 package com.example.elasticsearch.crawler.repository;
 
 import com.example.elasticsearch.stock.domain.QStockDbDto;
+import com.example.elasticsearch.stock.domain.QStockLikeDto;
 import com.example.elasticsearch.stock.domain.StockDbDto;
+import com.example.elasticsearch.stock.domain.StockLikeDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,6 @@ public class CustomStockRepositoryImpl implements CustomStockRepository {
 
     @Override
     public StockDbDto findByStockName(String stockName) {
-        log.info("들어온 주식종목 : {}",stockName);
         QStockDbDto qStockDbDto = QStockDbDto.stockDbDto;
 
         StockDbDto resultStock = jpaQueryFactory.select(qStockDbDto)
@@ -29,5 +30,16 @@ public class CustomStockRepositoryImpl implements CustomStockRepository {
                 .fetchOne();
 
         return resultStock;
+    }
+
+    @Override
+    public StockLikeDto findByLikeStockName(String stockName) {
+        log.info("들어온 관심 주식종목 : {}",stockName);
+        QStockLikeDto qStockLikeDto = QStockLikeDto.stockLikeDto;
+
+        return jpaQueryFactory.select(qStockLikeDto)
+                .from(qStockLikeDto)
+                .where(qStockLikeDto.likeStock.eq(stockName))
+                .fetchOne();
     }
 }
