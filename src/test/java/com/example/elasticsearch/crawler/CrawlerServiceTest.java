@@ -114,4 +114,30 @@ class CrawlerServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("실시간 차트 종목 순위")
+    void liveStock(){
+        String url = "https://finance.naver.com/";
+
+        try{
+            Document doc = Jsoup.connect(url).get();
+
+            /** 종목 이름 **/
+            Elements titleElements = doc.getElementsByAttributeValue("class", "group_type is_active");
+            Element titleElement = titleElements.get(0);
+            Elements title = titleElement.select("#_topItems1");
+            String titleResult = title.get(0).text();
+            System.out.println("titleResult : ");
+            System.out.println(titleResult);
+
+            String[] splitResult = titleResult.split("% ");
+            for (int i = 0; i < splitResult.length; i++) {
+                System.out.println("res : " + splitResult[i]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
