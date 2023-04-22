@@ -84,7 +84,6 @@ public class CrawlerService {
     public String findStockNumber(String name) {
         String titleResult = "";
         String selectUrl = findUrl + name;
-        log.info("입력 url: {}", selectUrl);
         try{
             Document doc = Jsoup.connect(selectUrl).get();
 
