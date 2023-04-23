@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +41,23 @@ public class StockService {
     }
 
     public String saveStockNumber(String stockName) {
-        String stockNumber = crawlerService.findStockNumber(stockName); // 주식명으로 주식넘버 조회
-        StockLikeDto stockLikeDto = StockLikeDto.of(stockNumber);
-        likeStockJpaRepository.save(stockLikeDto);
+
+        /**
+         * TODO
+         *  - update 문으로 변경 필요
+         * **/
+
+        String stockNumber = "";
+        try {
+            Optional<StockLikeDto> byLikeStockName = Optional.of(likeStockJpaRepository.findByLikeStockName(stockName));
+            likeStockJpaRepository.deleteById(byLikeStockName.get().getId());
+            stockNumber = crawlerService.findStockNumber(stockName); // 주식명으로 주식넘버 조회
+            likeStockJpaRepository.save(StockLikeDto.of(stockNumber));
+        } catch (NullPointerException e) {
+            stockNumber = crawlerService.findStockNumber(stockName); // 주식명으로 주식넘버 조회
+            likeStockJpaRepository.save(StockLikeDto.of(stockNumber));
+        }
+
         return stockNumber;
     }
 

@@ -85,7 +85,6 @@ public class CrawlerService {
                 try {
                     StockDbDto findStock = stockJpaRepository.findByStockName(titleResult);
                     stockJpaRepository.deleteById(findStock.getId());
-                    stockJpaRepository.save(stock);
                     saveStock = Optional.of(stockJpaRepository.save(stock));
                 } catch (NullPointerException e) {
                     saveStock = Optional.of(stockJpaRepository.save(stock));
