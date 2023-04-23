@@ -3,7 +3,7 @@ $(function() {
     var height = $('#rank-list li').height();
 
     function step(index) {
-        $('#rank-list ol').delay(3000).animate({
+        $('#rank-list ol').delay(1500).animate({
             top: -height * index,
         }, 500, function() {
             step((index + 1) % count);

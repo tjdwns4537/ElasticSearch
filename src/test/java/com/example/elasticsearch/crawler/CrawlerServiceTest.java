@@ -134,5 +134,37 @@ class CrawlerServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("테마주 검색")
+    public void themaStock() {
+        String naverUrl = "https://finance.naver.com/sise/theme.naver";
+        String paxNet = "http://www.paxnet.co.kr/stock/infoStock/thema";
+        try{
+            Document naverDoc = Jsoup.connect(naverUrl).get();
+            Document paxNetDoc = Jsoup.connect(paxNet).get();
+
+            /** 네이버 종목 테마 **/
+            Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
+            Element naverTitleElement = naverTitleElements.get(0);
+            Elements naverTitle = naverTitleElement.select(".col_type1");
+            String naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2").text();
+
+            String[] naverStockThema = naverTitle.text().split(" "); // 테마명
+            String[] naverStockPercent = naverPercent.split(" "); // 테마 퍼센트
+
+            /** paxNet 종목 테마 **/
+            Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");
+            Elements paxNetSelect = paxNetTitleElements.select(".ellipsis");
+            String paxNetSelectText = paxNetSelect.text();
+            Elements paxNetSelectPercent = paxNetTitleElements.select(".red");
+
+            String[] paxNetSelectStockThemaName = paxNetSelectText.split(" "); // 테마명
+            String[] percentText = paxNetSelectPercent.text().split(" "); // 테마 퍼센트
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

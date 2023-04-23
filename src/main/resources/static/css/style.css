@@ -42,7 +42,7 @@
 }
 
 .main-section .logo-wrap {
-    margin-top: 100px;
+    margin-top: 150px;
     height: 200px;
 }
 
@@ -55,6 +55,18 @@
     padding-left: 30px;
     line-height:32px;
     float: left;
+}
+
+.main-section .like-wrap .like-form{
+    border-bottom: 1px solid #999fa6;
+}
+
+.main-section .logo-wrap .like-list{
+    height: 165px;
+    align-content: center;
+    border: 1px solid #717271;
+    align-content: center;
+    text-align: center;
 }
 
 .main-section .logo-wrap .like h4{
@@ -82,7 +94,6 @@
 
 .main-section .logo-wrap .like li{
     list-style-type: none;
-    border-bottom: 1px solid
 }
 
 .main-section .searchbar-wrap{
