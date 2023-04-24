@@ -167,4 +167,22 @@ class CrawlerServiceTest {
         }
     }
 
+    @Test
+    @DisplayName("실시간 뉴스 기사 크롤링")
+    public void liveArticle() {
+        String url = "https://news.naver.com/";
+
+        try {
+            Document articleDoc = Jsoup.connect(url).get();
+
+            /** 뉴스기사 **/
+            Elements articleTitleElements1 = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
+            Elements articleTitleElements2 = articleDoc.getElementsByAttributeValue("class", "cjs_d");
+            System.out.println(articleTitleElements1);
+            System.out.println(articleTitleElements2);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

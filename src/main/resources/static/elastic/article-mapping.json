@@ -1,0 +1,8 @@
+{
+  "properties" : {
+    "id" : {"type" : "keyword"},
+    "articleName" : {"type" : "text", "analyzer" : "korean"},
+    "articleDate" : {"type" : "keyword"},
+    "state" : {"type" : "text"},
+  }
+}

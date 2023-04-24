@@ -1,9 +1,0 @@
-{
-  "properties" : {
-    "id" : {"type" : "keyword"},
-    "stockName" : {"type" : "text", "analyzer" : "korean"},
-    "stockPrice" : {"type" : "keyword"},
-    "stockPercent" : {"type" : "text"},
-    "tradeCount" : {"type" : "text"}
-  }
-}

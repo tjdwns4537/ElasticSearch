@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,9 @@ public class CrawlerService {
 
     @Value("${crawler.liveUrl}")
     String liveUrl;
+
+    @Value("${liveArticleUrl}")
+    String articleUrl;
 
     public void likeStockFindAll() {
         Optional<StockDbDto> saveStock = Optional.empty();
@@ -133,5 +137,21 @@ public class CrawlerService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<String> readArticle() {
+        List<String> list = new ArrayList<>();
+        try {
+            Document articleDoc = Jsoup.connect(articleUrl).get();
+
+            /** 뉴스기사 **/
+            Elements articleTitleElements = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
+            Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
+            list.add(articleTitleElements.text());
+            list.add(articleContentElements.text());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

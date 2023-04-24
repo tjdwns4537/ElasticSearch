@@ -1,6 +1,6 @@
 package com.example.elasticsearch.elastic.controller;
 
-import com.example.elasticsearch.stock.domain.Stock;
+import com.example.elasticsearch.stock.domain.Article;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockElasticDto;
 import com.example.elasticsearch.helper.StatusEnum;
@@ -26,8 +26,8 @@ public class ElasticController {
     @Autowired private final StockSearchService stockSearchService;
 
     @PostMapping(value = "/elastic")
-    public ResponseEntity<HttpStatus> saveStock(@RequestBody Stock stock) { // 엘라스틱 저장소로 저장
-        Optional<Stock> save = Optional.ofNullable(stockSearchService.save(stock));
+    public ResponseEntity<HttpStatus> saveStock(@RequestBody Article article) { // 엘라스틱 저장소로 저장
+        Optional<Article> save = Optional.ofNullable(stockSearchService.save(article));
         if(!save.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(HttpStatus.OK);
     }
