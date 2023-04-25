@@ -19,7 +19,6 @@ public class ElasticSearchConfig extends AbstractElasticsearchConfiguration {
     @Value("${elasticsearch.host}")
     public String host;
 
-    @Bean
     @Override
     public RestHighLevelClient elasticsearchClient() {
         // http port 와 통신할 주소

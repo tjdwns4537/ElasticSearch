@@ -1,8 +1,7 @@
 package com.example.elasticsearch.crawler.controller;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
-import com.example.elasticsearch.elastic.service.StockSearchService;
-import com.example.elasticsearch.redis.repository.LiveStockRepository;
+import com.example.elasticsearch.elastic.service.ArticleSearchService;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockForm;
 import com.example.elasticsearch.stock.service.StockService;
@@ -24,7 +23,7 @@ public class CrawlerController {
 
     @Autowired private final CrawlerService crawlerService;
     @Autowired private final StockService stockService;
-    @Autowired private final StockSearchService stockSearchService;
+    @Autowired private final ArticleSearchService articleSearchService;
 
     @GetMapping
     public String crawlerService(Model model) {
@@ -44,7 +43,6 @@ public class CrawlerController {
 
     @GetMapping("/stockInfo")
     public String extract(@RequestParam("stockName") String stockName) {
-        Optional<StockDbDto> stock = Optional.ofNullable(stockSearchService.findByName(stockName)); // DB에서 해당 종목이름의 데이터 출력
         return "redirect:/";
     }
 }

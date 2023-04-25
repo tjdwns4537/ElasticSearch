@@ -1,8 +1,10 @@
 {
   "properties" : {
-    "id" : {"type" : "keyword"},
-    "articleName" : {"type" : "text", "analyzer" : "korean"},
-    "articleDate" : {"type" : "keyword"},
+    "id" : {"type" : "long"},
+    "searchKeyword" : {"type" : "text", "analyzer" : "korean"},
+    "title" : {"type" : "text"},
     "state" : {"type" : "text"},
+    "count" : {"type" :  "text"},
+    "readDate" : {"type" :  "date"}
   }
 }

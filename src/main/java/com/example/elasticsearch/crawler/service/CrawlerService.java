@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -145,20 +143,24 @@ public class CrawlerService {
         }
     }
 
-    public List<String> readArticle() {
-        List<String> list = new ArrayList<>();
+    public Map<String, String> readArticle() {
+        Map<String, String> map = new HashMap<>();
         try {
             Document articleDoc = Jsoup.connect(articleUrl).get();
 
             /** 뉴스기사 **/
             Elements articleTitleElements = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
             Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
-            list.add(articleTitleElements.text());
-            list.add(articleContentElements.text());
+            for (Element i : articleTitleElements) {
+                map.put("title", i.text());
+            }
+            for (Element i : articleContentElements) {
+                map.put("content", i.text());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
+        return map;
     }
 
     public void readThema() {
