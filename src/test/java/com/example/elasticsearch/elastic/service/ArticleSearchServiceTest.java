@@ -83,10 +83,10 @@ class ArticleSearchServiceTest {
     @DisplayName("문장에서 키워드 추출 기능 테스트")
     public void extractElasticSearch() throws IOException {
 
-        Article article = Article.of("I like USA's tech");
+        Article article = Article.of("경찰과 도둑, 개정법, 축구와 야구, 전세 사기");
         Article savedArticle = articleElasticRepository.save(article);
 
-        AnalyzeRequest request = AnalyzeRequest.withGlobalAnalyzer("standard", savedArticle.getTitle());
+        AnalyzeRequest request = AnalyzeRequest.withGlobalAnalyzer("nori", savedArticle.getTitle());
         AnalyzeResponse response = client.indices().analyze(request, RequestOptions.DEFAULT);
 
         List<AnalyzeResponse.AnalyzeToken> tokens = response.getTokens();
