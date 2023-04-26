@@ -1,21 +1,18 @@
 package com.example.elasticsearch.stock.domain;
 
 import com.example.elasticsearch.helper.Indices;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.elasticsearch.annotations.*;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import java.util.Date;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 
 @TypeAlias("article")
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(indexName = Indices.ARTICLE_INDEX) // article 이라는 색인에 속함
 //@Mapping(mappingPath = "/static/elastic/article-mapping.json")
 //@Setting(settingPath = "/static/elastic/article-setting.json")
@@ -28,6 +25,10 @@ public class Article {
     /** 키워드 제목 */
     @Field(type = FieldType.Text)
     private String title;
+
+    public Article() {
+
+    }
 
     public Article(String title) {
         this.title = title;

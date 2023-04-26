@@ -1,21 +1,18 @@
 package com.example.elasticsearch.elastic.controller;
 
-import com.example.elasticsearch.stock.domain.Article;
-import com.example.elasticsearch.stock.domain.StockDbDto;
-import com.example.elasticsearch.stock.domain.StockElasticDto;
-import com.example.elasticsearch.helper.StatusEnum;
 import com.example.elasticsearch.elastic.service.ArticleSearchService;
+import com.example.elasticsearch.stock.domain.Article;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import java.nio.charset.Charset;
 import java.util.Optional;
 
 @Controller
