@@ -1,7 +1,7 @@
 package com.example.elasticsearch.elastic.controller;
 
 import com.example.elasticsearch.elastic.service.ArticleSearchService;
-import com.example.elasticsearch.stock.domain.Article;
+import com.example.elasticsearch.article.domain.Article;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.elasticsearch.stock.domain;
+package com.example.elasticsearch.article.domain;
 
 import com.example.elasticsearch.helper.Indices;
 import lombok.*;
@@ -7,7 +7,10 @@ import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import java.util.UUID;
 
 @TypeAlias("article")
 @Getter
@@ -19,8 +22,8 @@ import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 public class Article {
 
     @Id
-    @Field(type = FieldType.Long)
-    private Long id;
+    @Field(type = FieldType.Text)
+    private String id;
 
     /** 키워드 제목 */
     @Field(type = FieldType.Text)
@@ -31,6 +34,7 @@ public class Article {
     }
 
     public Article(String title) {
+        this.id = UUID.randomUUID().toString();
         this.title = title;
     }
 
