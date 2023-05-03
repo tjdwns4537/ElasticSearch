@@ -4,12 +4,12 @@ import com.example.elasticsearch.helper.Indices;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @TypeAlias("article")
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @Document(indexName = Indices.ARTICLE_INDEX) // article 이라는 색인에 속함
-//@Mapping(mappingPath = "/static/elastic/article-mapping.json")
+@Mapping(mappingPath = "/static/elastic/article-mapping.json")
 //@Setting(settingPath = "/static/elastic/article-setting.json")
 public class Article {
 
@@ -26,7 +26,7 @@ public class Article {
     private String id;
 
     /** 키워드 제목 */
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "my_analyzer")
     private String title;
 
     public Article() {
@@ -40,6 +40,14 @@ public class Article {
 
     public static Article of(String title) {
         return new Article(title);
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        map.put("title", title);
+        // add other properties as needed
+        return map;
     }
 
 //    /** 키워드 */

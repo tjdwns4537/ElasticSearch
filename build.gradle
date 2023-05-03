@@ -24,16 +24,26 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://artifacts.elastic.co/maven"
+    }
 }
 
 dependencies {
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.elasticsearch:elasticsearch:7.15.2'
+    implementation 'org.elasticsearch:elasticsearch-core:7.15.2'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.15.2'
+    implementation 'org.elasticsearch:x-content:7.15.2'
+
+
     implementation 'org.springframework.boot:spring-boot-devtools'
     implementation 'io.lettuce:lettuce-core:6.1.5.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'mysql:mysql-connector-java:8.0.32'
     implementation 'org.jsoup:jsoup:1.15.4'
-    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'

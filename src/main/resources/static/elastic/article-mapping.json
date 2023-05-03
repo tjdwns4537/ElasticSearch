@@ -1,10 +1,29 @@
 {
-  "properties" : {
-    "id" : {"type" : "long"},
-    "searchKeyword" : {"type" : "text", "analyzer" : "korean"},
-    "title" : {"type" : "text"},
-    "state" : {"type" : "text"},
-    "count" : {"type" :  "text"},
-    "readDate" : {"type" :  "date"}
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "sentiment_analyzer": {
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "sentiment"
+          ]
+        }
+      },
+      "filter": {
+        "sentiment": {
+          "type": "sentiment",
+          "language": "english"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "content": {
+        "type": "text",
+        "analyzer": "sentiment_analyzer"
+      }
+    }
   }
 }
