@@ -1,6 +1,7 @@
 package com.example.elasticsearch.elastic.service;
 
 import com.example.elasticsearch.article.domain.Article;
+import com.example.elasticsearch.article.domain.MyIndexCreator;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.helper.Indices;
@@ -52,23 +53,32 @@ class ArticleSearchServiceTest {
     @Autowired
     private RestHighLevelClient client;
 
+    @Autowired
+    private MyIndexCreator myIndexCreator;
+
+
     @Test
     @DisplayName("텍스트 감정 분석 테스트")
-    public void analysisText() throws IOException {
+    public void analysisText() throws Exception {
+
+        myIndexCreator.createIndex();
+
+
+
         // 이름이 "my_index"인 Elastic 검색 인덱스를 만드는 새 요청을 만듭니다.
-        CreateIndexRequest request = new CreateIndexRequest("my_index");
-
-        // "my_index"에 대한 인덱스 설정을 설정합니다. 이 예제에서는 샤드 수를 1로 설정하고 복제본 수를 0으로 설정합니다.
-        request.settings(Settings.builder()
-                .put("index.number_of_shards", 1)
-                .put("index.number_of_replicas", 0)
-        );
-
-        // "my_index"에 대한 인덱스 매핑을 설정합니다. 이 예에서는 "sentment" 분석기가 구성된 "my_field" 필드에 대한 매핑을 정의합니다.
+//        CreateIndexRequest request = new CreateIndexRequest("test");
+//
+//        // "my_index"에 대한 인덱스 설정을 설정합니다. 이 예제에서는 샤드 수를 1로 설정하고 복제본 수를 0으로 설정합니다.
+//        request.settings(Settings.builder()
+//                .put("index.number_of_shards", 1)
+//                .put("index.number_of_replicas", 0)
+//        );
+//
+//        // "my_index"에 대한 인덱스 매핑을 설정합니다. 이 예에서는 "sentment" 분석기가 구성된 "my_field" 필드에 대한 매핑을 정의합니다.
 //        XContentBuilder builder = XContentFactory.jsonBuilder();
 //        builder.startObject();
 //        {
-//            builder.startObject("my_type");
+//            builder.startObject("_doc");
 //            {
 //                builder.startObject("properties");
 //                {
@@ -81,15 +91,13 @@ class ArticleSearchServiceTest {
 //                }
 //                builder.endObject();
 //            }
-//            builder.endObject();
 //        }
 //        builder.endObject();
 //
-//        request.mapping(builder);
+////        request.mapping(builder);
 //
 //        // 인덱스 만들기 요청을 Elastic search로 보내고 응답을 반환합니다. 클라이언트 개체는 Elasticsearch Java High-Level REST Client의 인스턴스입니다.
 //        CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
-
 
 //        SearchRequest request2 = new SearchRequest("my_index");
 //        SearchSourceBuilder builder2 = new SearchSourceBuilder();

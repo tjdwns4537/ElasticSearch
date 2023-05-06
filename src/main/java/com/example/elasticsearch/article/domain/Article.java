@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @Document(indexName = Indices.ARTICLE_INDEX) // article 이라는 색인에 속함
-@Mapping(mappingPath = "/static/elastic/article-mapping.json")
+//@Mapping(mappingPath = "/static/elastic/article-mapping.json")
 //@Setting(settingPath = "/static/elastic/article-setting.json")
 public class Article {
 
@@ -26,7 +26,8 @@ public class Article {
     private String id;
 
     /** 키워드 제목 */
-    @Field(type = FieldType.Text, analyzer = "my_analyzer")
+//    @Field(type = FieldType.Text, analyzer = "my_analyzer")
+    @Field(type = FieldType.Text)
     private String title;
 
     public Article() {

@@ -28,9 +28,6 @@ public class ArticleSearchService {
     @Autowired
     private final ArticleElasticRepository articleElasticRepository;
 
-    @Autowired
-    private final ElasticsearchTemplate elasticsearchTemplate;
-
     public Article save(Article article) {
         return articleElasticRepository.save(article);
     }
