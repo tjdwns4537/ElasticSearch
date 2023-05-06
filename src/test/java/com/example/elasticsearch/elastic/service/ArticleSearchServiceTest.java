@@ -65,30 +65,30 @@ class ArticleSearchServiceTest {
         );
 
         // "my_index"에 대한 인덱스 매핑을 설정합니다. 이 예에서는 "sentment" 분석기가 구성된 "my_field" 필드에 대한 매핑을 정의합니다.
-        XContentBuilder builder = XContentFactory.jsonBuilder();
-        builder.startObject();
-        {
-            builder.startObject("my_type");
-            {
-                builder.startObject("properties");
-                {
-                    builder.startObject("my_field");
-                    {
-                        builder.field("type", "text");
-                        builder.field("analyzer", "sentiment");
-                    }
-                    builder.endObject();
-                }
-                builder.endObject();
-            }
-            builder.endObject();
-        }
-        builder.endObject();
-
-        request.mapping(builder);
-
-        // 인덱스 만들기 요청을 Elastic search로 보내고 응답을 반환합니다. 클라이언트 개체는 Elasticsearch Java High-Level REST Client의 인스턴스입니다.
-        CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
+//        XContentBuilder builder = XContentFactory.jsonBuilder();
+//        builder.startObject();
+//        {
+//            builder.startObject("my_type");
+//            {
+//                builder.startObject("properties");
+//                {
+//                    builder.startObject("my_field");
+//                    {
+//                        builder.field("type", "text");
+//                        builder.field("analyzer", "sentiment");
+//                    }
+//                    builder.endObject();
+//                }
+//                builder.endObject();
+//            }
+//            builder.endObject();
+//        }
+//        builder.endObject();
+//
+//        request.mapping(builder);
+//
+//        // 인덱스 만들기 요청을 Elastic search로 보내고 응답을 반환합니다. 클라이언트 개체는 Elasticsearch Java High-Level REST Client의 인스턴스입니다.
+//        CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
 
 
 //        SearchRequest request2 = new SearchRequest("my_index");
