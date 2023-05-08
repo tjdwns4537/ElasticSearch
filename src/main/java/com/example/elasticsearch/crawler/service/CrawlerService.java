@@ -1,7 +1,9 @@
 package com.example.elasticsearch.crawler.service;
 
+import com.example.elasticsearch.article.domain.Article;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
+import com.example.elasticsearch.elastic.service.ArticleSearchService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -28,6 +30,7 @@ public class CrawlerService {
     @Autowired private final LikeStockRepository likeStockRepository;
     @Autowired private final LiveStockRepository liveStockRepository;
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
+    @Autowired private final ArticleSearchService articleSearchService;
 
     @Value("${crawler.url}")
     String url;
@@ -143,24 +146,21 @@ public class CrawlerService {
         }
     }
 
-    public Map<String, String> readArticle() {
-        Map<String, String> map = new HashMap<>();
+    public  List<String> readArticle() {
+        List<String> crawlingArticle = new ArrayList<>();
         try {
             Document articleDoc = Jsoup.connect(articleUrl).get();
 
             /** 뉴스기사 **/
             Elements articleTitleElements = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
             Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
-            for (Element i : articleTitleElements) {
-                map.put("title", i.text());
-            }
-            for (Element i : articleContentElements) {
-                map.put("content", i.text());
-            }
+            crawlingArticle = articleTitleElements.eachText();
+            crawlingArticle.addAll(articleContentElements.eachText());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return map;
+
+        return crawlingArticle;
     }
 
     public void readThema() {

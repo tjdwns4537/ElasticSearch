@@ -60,8 +60,11 @@ class ArticleSearchServiceTest {
     @Autowired
     private RestHighLevelClient client;
 
-    @Autowired
-    private ArticleSearchService articleSearchService;
+    @Test
+    public void wordContainTest() {
+        String test = "기아자동차의 수주 성공";
+        System.out.println(test.contains("자동차"));
+    }
 
     public boolean analyzeWord(String word) throws IOException {
         BufferedReader reader = new BufferedReader(

@@ -21,12 +21,11 @@ import java.util.UUID;
 public class Article {
 
     @Id
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private String id;
 
     /** 키워드 제목 */
-//    @Field(type = FieldType.Text, analyzer = "my_analyzer")
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private String title;
 
     public Article() {

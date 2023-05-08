@@ -10,7 +10,5 @@ import java.util.List;
 @Repository
 public interface ArticleElasticRepository extends ElasticsearchRepository<Article, String> {
     List<Article> findByTitleContaining(String keyword);
-
-    @Query("{\"match\": {\"title\": {\"query\": \"?0\"}}}")
     List<Article> findByTitle(String title);
 }
