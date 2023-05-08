@@ -1,0 +1,10 @@
+{
+  "properties" : {
+    "id" : {"type" : "long"},
+    "searchKeyword" : {"type" : "text", "analyzer" : "nori"},
+    "title" : {"type" : "text"},
+    "state" : {"type" : "text"},
+    "count" : {"type" :  "text"},
+    "readDate" : {"type" :  "date"}
+  }
+}

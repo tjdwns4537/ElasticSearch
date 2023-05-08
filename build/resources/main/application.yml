@@ -1,0 +1,39 @@
+elasticsearch:
+  host: localhost
+  port: 9200
+  xpack.security.enabled: false
+
+crawler:
+  url: https://finance.naver.com/item/main.naver?code=
+  findUrl : https://kr.investing.com/search/?q=
+  liveUrl : https://finance.naver.com/
+  naverThemaUrl : https://finance.naver.com/sise/theme.naver
+  paxNetThemaUrl : http://www.paxnet.co.kr/stock/infoStock/thema
+  liveArticleUrl : https://news.naver.com/
+
+spring:
+  redis:
+    host: localhost
+    port: 6379
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/stock?characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: "@TDtd159357"
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show-sql: true
+        format_sql: true
+
+  devtools:
+    livereload:
+      enabled: true
+
+  thymeleaf:
+    cache: false
+

@@ -1,0 +1,47 @@
+version: '3.7'
+services:
+  es:
+    build:
+      context: .
+      args:
+        VERSION: 7.15.2
+    container_name: es
+    environment:
+      - node.name=single-node
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+    ports:
+      - 9200:9200
+    networks:
+      - es-bridge
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.15.2
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: http://es:9200
+    depends_on:
+      - es
+    networks:
+      - es-bridge
+
+  redis:
+      image: redis:alpine
+      command: redis-server --port 6379
+      container_name: redis_boot
+      hostname: redis_boot
+      labels:
+        - "name=redis"
+        - "mode=standalone"
+      ports:
+        - 6379:6379
+
+networks:
+  es-bridge:
+    driver: bridge
+

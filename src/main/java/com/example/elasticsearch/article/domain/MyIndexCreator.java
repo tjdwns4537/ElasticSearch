@@ -1,14 +1,15 @@
 package com.example.elasticsearch.article.domain;
 
+import com.example.elasticsearch.helper.Indices;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class MyIndexCreator {
 
     private final RestHighLevelClient client;
@@ -19,7 +20,7 @@ public class MyIndexCreator {
     }
 
     public void createIndex() throws Exception {
-        CreateIndexRequest request = new CreateIndexRequest("my_index");
+        CreateIndexRequest request = new CreateIndexRequest(Indices.ARTICLE_INDEX);
         XContentBuilder builder = XContentFactory.jsonBuilder();
         builder.startObject();
         {

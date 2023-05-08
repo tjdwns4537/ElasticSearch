@@ -5,13 +5,18 @@ import com.example.elasticsearch.article.domain.MyIndexCreator;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.helper.Indices;
+import org.apache.http.HttpHost;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.indices.AnalyzeRequest;
 import org.elasticsearch.client.indices.AnalyzeResponse;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -33,7 +38,9 @@ import org.elasticsearch.action.search.SearchRequest;
 
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,13 +57,61 @@ class ArticleSearchServiceTest {
     @Autowired
     private RestHighLevelClient client;
 
+    @Autowired
+    private ArticleSearchService articleSearchService;
+
+    @Test
+    @DisplayName("단어 개수 체크")
+    public void deleteAndSave() throws IOException {
+        try {
+            DeleteIndexRequest request = new DeleteIndexRequest(Indices.ARTICLE_INDEX);
+            client.indices().delete(request, RequestOptions.DEFAULT);
+        } catch (ElasticsearchException e) {
+            if (e.status() == RestStatus.NOT_FOUND) {
+                // The index doesn't exist, so we don't need to delete it
+                System.out.println("NOT_FOUND");
+            } else {
+                throw e;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest(Indices.ARTICLE_INDEX);
+        client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+
+        AnalyzeRequest request = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", "true true false");
+        AnalyzeResponse response = client.indices().analyze(request, RequestOptions.DEFAULT);
+
+        Map<String, Integer> wordCountMap = new HashMap<>();
+        int positiveCount = 0;
+        int negativeCount = 0;
+
+        for (AnalyzeResponse.AnalyzeToken token : response.getTokens()) {
+            String term = token.getTerm();
+            if (term.equals("true")) {
+                positiveCount++;
+            } else if (term.equals("false")) {
+                negativeCount++;
+            }
+            int count = wordCountMap.getOrDefault(term, 0);
+            wordCountMap.put(term, count + 1);
+        }
+
+        System.out.println("Positive count: " + positiveCount);
+        System.out.println("Negative count: " + negativeCount);
+        System.out.println("Word count map: " + wordCountMap);
+
+        client.close();
+    }
+
     @Test
     @DisplayName("Elastic Search Teample save TEST")
     public void saveTemplate() {
         Article article = new Article("1", "I like USA's tech");
 
         IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(article.getId().toString())
+                .withId(article.getId())
                 .withObject(article)
                 .build();
 

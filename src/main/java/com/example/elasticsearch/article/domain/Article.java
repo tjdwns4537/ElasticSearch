@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@TypeAlias("article")
 @Getter
 @Setter
 @AllArgsConstructor
