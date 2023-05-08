@@ -37,6 +37,9 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.action.search.SearchRequest;
 
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -60,9 +63,26 @@ class ArticleSearchServiceTest {
     @Autowired
     private ArticleSearchService articleSearchService;
 
+    public boolean analyzeWord(String word) throws IOException {
+        BufferedReader reader = new BufferedReader(
+                new FileReader("/Users/parksungjun/Desktop/ElasticSearchProject/ElasticSearch/src/main/resources/static/elastic/positive_words_self.txt")
+        );
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if(word.equals(str)){
+                System.out.println("단어 : " + word + "비교 : " + str);
+                return true;
+            }
+        }
+
+        reader.close();
+        return false;
+    }
+
     @Test
     @DisplayName("단어 개수 체크")
     public void deleteAndSave() throws IOException {
+        String word = "기아자동차 15년도 실적 흑자 달성";
         try {
             DeleteIndexRequest request = new DeleteIndexRequest(Indices.ARTICLE_INDEX);
             client.indices().delete(request, RequestOptions.DEFAULT);
@@ -80,7 +100,7 @@ class ArticleSearchServiceTest {
         CreateIndexRequest createIndexRequest = new CreateIndexRequest(Indices.ARTICLE_INDEX);
         client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
 
-        AnalyzeRequest request = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", "true true false");
+        AnalyzeRequest request = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", word);
         AnalyzeResponse response = client.indices().analyze(request, RequestOptions.DEFAULT);
 
         Map<String, Integer> wordCountMap = new HashMap<>();
@@ -89,7 +109,7 @@ class ArticleSearchServiceTest {
 
         for (AnalyzeResponse.AnalyzeToken token : response.getTokens()) {
             String term = token.getTerm();
-            if (term.equals("true")) {
+            if (analyzeWord(term)) {
                 positiveCount++;
             } else if (term.equals("false")) {
                 negativeCount++;

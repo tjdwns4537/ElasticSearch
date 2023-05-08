@@ -41,8 +41,9 @@ public class CrawlerController {
         return "home";
     }
 
-    @GetMapping("/stockInfo")
-    public String extract(@RequestParam("stockName") String stockName) {
+    @GetMapping("/searchInfo")
+    public String extract(@RequestParam("searchInfo") String searchInfo) {
+
         return "redirect:/";
     }
 }
