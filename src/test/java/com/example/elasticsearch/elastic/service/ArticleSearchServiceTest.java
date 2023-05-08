@@ -42,9 +42,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ArticleSearchServiceTest {
 
     @Autowired
-    private CrawlerService crawlerService;
-
-    @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     @Autowired
@@ -52,66 +49,6 @@ class ArticleSearchServiceTest {
 
     @Autowired
     private RestHighLevelClient client;
-
-    @Autowired
-    private MyIndexCreator myIndexCreator;
-
-
-    @Test
-    @DisplayName("텍스트 감정 분석 테스트")
-    public void analysisText() throws Exception {
-
-        myIndexCreator.createIndex();
-
-
-
-        // 이름이 "my_index"인 Elastic 검색 인덱스를 만드는 새 요청을 만듭니다.
-//        CreateIndexRequest request = new CreateIndexRequest("test");
-//
-//        // "my_index"에 대한 인덱스 설정을 설정합니다. 이 예제에서는 샤드 수를 1로 설정하고 복제본 수를 0으로 설정합니다.
-//        request.settings(Settings.builder()
-//                .put("index.number_of_shards", 1)
-//                .put("index.number_of_replicas", 0)
-//        );
-//
-//        // "my_index"에 대한 인덱스 매핑을 설정합니다. 이 예에서는 "sentment" 분석기가 구성된 "my_field" 필드에 대한 매핑을 정의합니다.
-//        XContentBuilder builder = XContentFactory.jsonBuilder();
-//        builder.startObject();
-//        {
-//            builder.startObject("_doc");
-//            {
-//                builder.startObject("properties");
-//                {
-//                    builder.startObject("my_field");
-//                    {
-//                        builder.field("type", "text");
-//                        builder.field("analyzer", "sentiment");
-//                    }
-//                    builder.endObject();
-//                }
-//                builder.endObject();
-//            }
-//        }
-//        builder.endObject();
-//
-////        request.mapping(builder);
-//
-//        // 인덱스 만들기 요청을 Elastic search로 보내고 응답을 반환합니다. 클라이언트 개체는 Elasticsearch Java High-Level REST Client의 인스턴스입니다.
-//        CreateIndexResponse response = client.indices().create(request, RequestOptions.DEFAULT);
-
-//        SearchRequest request2 = new SearchRequest("my_index");
-//        SearchSourceBuilder builder2 = new SearchSourceBuilder();
-//        builder2.query(QueryBuilders.matchQuery("my_field", "positive"));
-//        request.source(builder);
-//
-//        SearchResponse response2 = client.search(request2, RequestOptions.DEFAULT);
-//
-//        SearchHits hits = response2.getHits();
-//        for (SearchHit hit : hits) {
-//            String myField = hit.getSourceAsMap().get("my_field").toString();
-//            System.out.println("my_field value: " + myField);
-//        }
-    }
 
     @Test
     @DisplayName("Elastic Search Teample save TEST")
