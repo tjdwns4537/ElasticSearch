@@ -3,11 +3,8 @@ package com.example.elasticsearch.article.domain;
 import com.example.elasticsearch.helper.Indices;
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.elasticsearch.annotations.*;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

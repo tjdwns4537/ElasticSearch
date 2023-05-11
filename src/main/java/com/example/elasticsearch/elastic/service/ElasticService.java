@@ -1,8 +1,7 @@
 package com.example.elasticsearch.elastic.service;
 
 import com.example.elasticsearch.article.domain.Article;
-import com.example.elasticsearch.article.domain.Search;
-import com.example.elasticsearch.article.repository.SearchRepository;
+import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.helper.Indices;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +17,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ArticleSearchService {
+public class ElasticService {
 
     @Autowired
     private final RestHighLevelClient client;
@@ -41,52 +42,26 @@ public class ArticleSearchService {
         return articleElasticRepository.findByTitle(title);
     }
 
-    public void senseAnalyze(String text) {
-//        GetIndexRequest getIndexRequest = new GetIndexRequest(Indices.ARTICLE_INDEX);
-//        boolean exists;
+    public void readThemaAnalyze(String compare, String searchInfo) throws IOException {
+        log.info("crawlingData : {}", compare);
 
-//        try{
-//            exists = client.indices().exists(getIndexRequest, RequestOptions.DEFAULT); // 인덱스가 이미 존재하면 기능 수행
+        try{
+            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_THEMA_INDEX, "standard", searchInfo);
+            AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
 
-//            if (client.indices().exists(getIndexRequest,RequestOptions.DEFAULT)) {
-//                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(Indices.ARTICLE_INDEX);
-//                client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-//                CreateIndexRequest createIndexRequest = new CreateIndexRequest(Indices.ARTICLE_INDEX);
-//                client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
-//            }
+            Map<String, Integer> wordCountMap = new HashMap<>();
+            for (AnalyzeResponse.AnalyzeToken token : response.getTokens()) {
+                String term = token.getTerm();
+                log.info("term : {}",term);
+                int count = wordCountMap.getOrDefault(term, 0);
+                wordCountMap.put(term, count + 1);
+            }
 
-//            CreateIndexRequest createIndexRequest = new CreateIndexRequest(Indices.ARTICLE_INDEX);
-//            client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
-//
-//            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", text);
-//            AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
+            log.info("분석된 단어 : {}", wordCountMap);
+            client.close();
+        } catch (IOException e){
 
-//            Map<String, Integer> wordCountMap = new HashMap<>();
-//            int positiveCount = 0;
-//            int negativeCount = 0;
-//            for (AnalyzeResponse.AnalyzeToken token : response.getTokens()) {
-//                String term = token.getTerm();
-//                log.info("term : {}",term);
-//                if (isPositive(term)) {
-//                    positiveCount++;
-//                } else if (isNegative(term)) {
-//                    negativeCount++;
-//                }
-//                int count = wordCountMap.getOrDefault(term, 0);
-//                wordCountMap.put(term, count + 1);
-//            }
-
-//            log.info("긍정적인 단어 개수 : {}", positiveCount);
-//            log.info("부정적인 단어 개수 : {}", negativeCount);
-////            log.info("분석된 단어 : {}", wordCountMap);
-//
-//            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(Indices.ARTICLE_INDEX);
-//            client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-//
-//            client.close();
-//        } catch (IOException e){
-//
-//        }
+        }
     }
 
     private boolean isPositive(String word) throws IOException {
@@ -124,8 +99,6 @@ public class ArticleSearchService {
     public void stringAnalyze(Search search, String text) { // 단어 분석
         try{
             AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", text);
-
-//            AnalyzeRequest request = AnalyzeRequest.withGlobalAnalyzer("nori", text);
             AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
 
             List<AnalyzeResponse.AnalyzeToken> tokens = response.getTokens();
@@ -136,7 +109,6 @@ public class ArticleSearchService {
             for (AnalyzeResponse.AnalyzeToken token : tokens) {
                 String term = token.getTerm();
 
-                log.info("term : {}",term);
                 if (isPositive(term)) {
                     positiveCount++;
                 } else if (isNegative(term)) {

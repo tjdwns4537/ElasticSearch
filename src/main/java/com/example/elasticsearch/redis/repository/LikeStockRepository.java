@@ -4,6 +4,7 @@ import com.example.elasticsearch.stock.domain.StockDbDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@Service
+@Repository
 public class LikeStockRepository {
 
     private final String STOCK = "LIKESTOCK";

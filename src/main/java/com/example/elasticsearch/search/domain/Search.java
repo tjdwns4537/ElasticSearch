@@ -1,4 +1,4 @@
-package com.example.elasticsearch.article.domain;
+package com.example.elasticsearch.search.domain;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,6 @@ import javax.persistence.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @Getter
 @Setter

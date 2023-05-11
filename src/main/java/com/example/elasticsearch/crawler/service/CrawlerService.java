@@ -1,9 +1,8 @@
 package com.example.elasticsearch.crawler.service;
 
-import com.example.elasticsearch.article.domain.Article;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
-import com.example.elasticsearch.elastic.service.ArticleSearchService;
+import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -30,7 +29,7 @@ public class CrawlerService {
     @Autowired private final LikeStockRepository likeStockRepository;
     @Autowired private final LiveStockRepository liveStockRepository;
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
-    @Autowired private final ArticleSearchService articleSearchService;
+    @Autowired private final ElasticService elasticService;
 
     @Value("${crawler.url}")
     String url;
@@ -163,19 +162,22 @@ public class CrawlerService {
         return crawlingArticle;
     }
 
-    public void readThema() {
+    public void readThema(String searchInfo) {
         try{
             Document naverDoc = Jsoup.connect(naverUrl).get();
             Document paxNetDoc = Jsoup.connect(paxNet).get();
 
             /** 네이버 종목 테마 **/
-            Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
-            Element naverTitleElement = naverTitleElements.get(0);
+            Elements naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2");
+            Element naverTitleElement = naverDoc.getElementsByAttributeValue("class", "type_1 theme").get(0);
+
             Elements naverTitle = naverTitleElement.select(".col_type1");
-            String naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2").text();
 
             String[] naverStockThema = naverTitle.text().split(" "); // 테마명
-            String[] naverStockPercent = naverPercent.split(" "); // 테마 퍼센트
+            String[] naverStockPercent = naverPercent.text().split(" "); // 테마 퍼센트
+
+            elasticService.readThemaAnalyze(naverTitleElement.text(), searchInfo);
+
 
             /** paxNet 종목 테마 **/
             Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");

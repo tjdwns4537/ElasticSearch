@@ -3,12 +3,13 @@ package com.example.elasticsearch.redis.repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-@Service
+@Repository
 public class LiveStockRepository {
 
     private final String STOCK = "LIVESTOCK";

@@ -1,10 +1,12 @@
 package com.example.elasticsearch.crawler.controller;
 
-import com.example.elasticsearch.article.domain.Search;
-import com.example.elasticsearch.article.repository.SearchRepository;
+import com.example.elasticsearch.article.domain.Article;
+import com.example.elasticsearch.article.service.ArticleService;
+import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
+import com.example.elasticsearch.search.domain.Search;
+import com.example.elasticsearch.search.repository.SearchRepository;
 import com.example.elasticsearch.crawler.service.CrawlerService;
-import com.example.elasticsearch.elastic.service.ArticleSearchService;
-import com.example.elasticsearch.stock.domain.StockDbDto;
+import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.stock.domain.StockForm;
 import com.example.elasticsearch.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,8 +26,9 @@ public class CrawlerController {
 
     @Autowired private final CrawlerService crawlerService;
     @Autowired private final StockService stockService;
-    @Autowired private final ArticleSearchService articleSearchService;
+    @Autowired private final ElasticService elasticService;
     @Autowired private final SearchRepository searchRepository;
+    @Autowired private final ArticleRedisRepository articleRedisRepository;
 
     @GetMapping
     public String crawlerService(Model model) {
@@ -52,10 +52,15 @@ public class CrawlerController {
         Search search = Search.of(searchInfo);
 
         for (String i : crawlingArticle) {
-            if(i.contains(searchInfo)) articleSearchService.stringAnalyze(search, i);
+            if(i.contains(searchInfo)) {
+                elasticService.stringAnalyze(search, i); // 긍정, 부정 점수 측정
+                articleRedisRepository.save(i); // 관련 기사 저장
+            }
         }
 
         searchRepository.save(search);
+        crawlerService.readThema(searchInfo);
+
         return "redirect:/";
     }
 }
