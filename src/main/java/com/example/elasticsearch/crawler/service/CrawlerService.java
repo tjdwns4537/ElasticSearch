@@ -2,7 +2,6 @@ package com.example.elasticsearch.crawler.service;
 
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
-import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -29,7 +28,7 @@ public class CrawlerService {
     @Autowired private final LikeStockRepository likeStockRepository;
     @Autowired private final LiveStockRepository liveStockRepository;
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
-    @Autowired private final ElasticService elasticService;
+//    @Autowired private final ElasticService elasticService;
 
     @Value("${crawler.url}")
     String url;
@@ -185,7 +184,6 @@ public class CrawlerService {
                     return result;
                 }
             }
-
 //            /** paxNet 종목 테마 **/
 //            Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");
 //            Elements paxNetSelect = paxNetTitleElements.select(".ellipsis");
@@ -194,8 +192,6 @@ public class CrawlerService {
 //
 //            String[] paxNetSelectStockThemaName = paxNetSelectText.split(" "); // 테마명
 //            String[] percentText = paxNetSelectPercent.text().split(" "); // 테마 퍼센트
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }

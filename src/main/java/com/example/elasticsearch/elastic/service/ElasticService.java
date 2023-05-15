@@ -32,15 +32,11 @@ public class ElasticService {
     @Autowired
     private final ArticleElasticRepository articleElasticRepository;
 
-    public ArticleEls save(ArticleEls articleEls) {
-        log.info("출력 : {}", articleEls.getId());
-        log.info("출력 : {}", articleEls.getTitle());
-        return articleElasticRepository.save(articleEls);
-    }
-
-    public List<ArticleEls> findByTitle(String title) {
-        return articleElasticRepository.findByTitle(title);
-    }
+//    public ArticleEls save(ArticleEls articleEls) {
+//        log.info("출력 : {}", articleEls.getId());
+//        log.info("출력 : {}", articleEls.getTitle());
+//        return articleElasticRepository.save(articleEls);
+//    }
 
     public void readThemaAnalyze(String searchInfo) {
 
@@ -86,16 +82,7 @@ public class ElasticService {
         return false;
     }
 
-    public List<String> findAll() {
-        List<String> list = new ArrayList<>();
-        Iterable<ArticleEls> all = articleElasticRepository.findAll();
-        for (ArticleEls i : all) {
-            list.add(i.getTitle());
-        }
-        return list;
-    }
-
-    public void stringAnalyze(Search search, String text) { // 단어 분석
+    public Search stringAnalyze(Search search, String text) { // 단어 분석
         try{
             AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", text);
             AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
@@ -122,6 +109,6 @@ public class ElasticService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return search;
     }
 }

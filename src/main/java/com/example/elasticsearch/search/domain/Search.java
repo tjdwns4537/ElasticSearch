@@ -10,9 +10,9 @@ import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
-@Table
 @Entity
 public class Search {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

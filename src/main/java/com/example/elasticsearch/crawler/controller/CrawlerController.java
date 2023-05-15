@@ -52,18 +52,25 @@ public class CrawlerController {
 
         for (String i : crawlingArticle) {
             if(i.contains(searchInfo)) {
-                elasticService.stringAnalyze(search, i); // 긍정, 부정 점수 측정
+                search = elasticService.stringAnalyze(search, i);// 자바를 활용해 긍정, 부정 점수 측정
                 articleRedisRepository.save(i); // 관련 기사 저장
+                log.info("기사: {}", i);
             }
         }
 
         searchRepository.save(search); // 검색어 저장 -> 검색어 목록으로 활용
 
-        Map<String, String> stringStringMap = crawlerService.readThema(searchInfo); // 검색어 크롤링
+        Map<String, String> themaInfo = crawlerService.readThema(searchInfo); // 검색어 크롤링
 
-        log.info("크롤링 검색어 : {}", stringStringMap.get("THEMA_NAME"));
-        log.info("크롤링 검색어 퍼센트 : {}", stringStringMap.get("THEMA_PERCENT"));
-        elasticService.readThemaAnalyze(searchInfo);
+        if(themaInfo.isEmpty()){
+            log.info("해당하는 테마가 없습니다. 테마명 : {}", searchInfo);
+            return "redirect:/";
+        }
+
+        log.info("크롤링 검색어 : {}", themaInfo.get("THEMA_NAME"));
+        log.info("크롤링 검색어 퍼센트 : {}", themaInfo.get("THEMA_PERCENT"));
+
+//        elasticService.readThemaAnalyze(searchInfo);
 
         return "redirect:/";
     }

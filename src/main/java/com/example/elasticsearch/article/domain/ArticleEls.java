@@ -12,7 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Document(indexName = Indices.ARTICLE_INDEX) // article 이라는 색인에 속함
 public class ArticleEls {
-
     @Id
     @Field(type = FieldType.Keyword)
     private String id;

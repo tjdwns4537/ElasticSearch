@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+//@Repository
 public interface ArticleElasticRepository extends ElasticsearchRepository<ArticleEls, String> {
     List<ArticleEls> findByTitleContaining(String keyword);
     List<ArticleEls> findByTitle(String title);

@@ -9,6 +9,9 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.indices.AnalyzeRequest;
 import org.elasticsearch.client.indices.AnalyzeResponse;
 import org.elasticsearch.rest.RestStatus;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +53,13 @@ class ElasticServiceTest {
         System.out.println(test.contains("자동차"));
     }
 
-    public boolean analyzeWord(String word) throws IOException {
+    @Test
+    public void analyzeWeb() throws IOException {
+        String text = "난 이 영화가 좋아";
+
+    }
+
+    public boolean analyzeJavaWord(String word) throws IOException {
         BufferedReader reader = new BufferedReader(
                 new FileReader("/Users/parksungjun/Desktop/ElasticSearchProject/ElasticSearch/src/main/resources/static/elastic/positive_words_self.txt")
         );
@@ -96,7 +105,7 @@ class ElasticServiceTest {
 
         for (AnalyzeResponse.AnalyzeToken token : response.getTokens()) {
             String term = token.getTerm();
-            if (analyzeWord(term)) {
+            if (analyzeJavaWord(term)) {
                 positiveCount++;
             } else if (term.equals("false")) {
                 negativeCount++;
