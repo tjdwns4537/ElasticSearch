@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 @SpringBootTest
-class LikeArticleRepositoryTest {
+class LikeArticleRepositoryTestEls {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;

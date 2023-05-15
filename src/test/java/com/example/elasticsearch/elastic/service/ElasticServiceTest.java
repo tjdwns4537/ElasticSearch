@@ -1,6 +1,6 @@
 package com.example.elasticsearch.elastic.service;
 
-import com.example.elasticsearch.article.domain.Article;
+import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.helper.Indices;
 import org.elasticsearch.ElasticsearchException;
@@ -115,11 +115,11 @@ class ElasticServiceTest {
     @Test
     @DisplayName("Elastic Search Teample save TEST")
     public void saveTemplate() {
-        Article article = new Article("1", "I like USA's tech");
+        ArticleEls articleEls = new ArticleEls("1", "I like USA's tech");
 
         IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(article.getId())
-                .withObject(article)
+                .withId(articleEls.getId())
+                .withObject(articleEls)
                 .build();
 
         IndexCoordinates indexCoordinates = IndexCoordinates.of(Indices.ARTICLE_INDEX);
@@ -127,12 +127,12 @@ class ElasticServiceTest {
         String documentId = elasticsearchRestTemplate.index(indexQuery,indexCoordinates);
         assertThat(documentId).isNotNull();
 
-        Article retrievedArticle = elasticsearchRestTemplate.get(article.getId(), Article.class);
-        assertThat(retrievedArticle).isNotNull();
-        String id = retrievedArticle.getId();
-        String title = retrievedArticle.getTitle();
-        assertThat(id).isEqualTo(article.getId());
-        assertThat(title).isEqualTo(article.getTitle());
+        ArticleEls retrievedArticleEls = elasticsearchRestTemplate.get(articleEls.getId(), ArticleEls.class);
+        assertThat(retrievedArticleEls).isNotNull();
+        String id = retrievedArticleEls.getId();
+        String title = retrievedArticleEls.getTitle();
+        assertThat(id).isEqualTo(articleEls.getId());
+        assertThat(title).isEqualTo(articleEls.getTitle());
 
         System.out.println("save id : "+id);
         System.out.println("save title : "+title);
@@ -141,23 +141,23 @@ class ElasticServiceTest {
     @Test
     @DisplayName("ElasticSearch Repository Test")
     public void saveRepository() {
-        Article article = Article.of("I like USA's tech");
-        Article savedArticle = articleElasticRepository.save(article);
+        ArticleEls articleEls = ArticleEls.of("I like USA's tech");
+        ArticleEls savedArticleEls = articleElasticRepository.save(articleEls);
 
-        Optional<Article> foundArticle = articleElasticRepository.findById(savedArticle.getId());
+        Optional<ArticleEls> foundArticle = articleElasticRepository.findById(savedArticleEls.getId());
 
         assertThat(foundArticle).isPresent();
-        assertThat(foundArticle.get().getId()).isEqualTo(savedArticle.getId());
-        assertThat(foundArticle.get().getTitle()).isEqualTo(savedArticle.getTitle());
+        assertThat(foundArticle.get().getId()).isEqualTo(savedArticleEls.getId());
+        assertThat(foundArticle.get().getTitle()).isEqualTo(savedArticleEls.getTitle());
     }
 
     @Test
     @DisplayName("문장에서 키워드 추출 기능 테스트")
     public void extractElasticSearch() throws IOException {
-        Article article = Article.of("경찰과 도둑, 개정법, 축구와 야구, 전세 사기");
-        Article savedArticle = articleElasticRepository.save(article);
+        ArticleEls articleEls = ArticleEls.of("경찰과 도둑, 개정법, 축구와 야구, 전세 사기");
+        ArticleEls savedArticleEls = articleElasticRepository.save(articleEls);
 
-        AnalyzeRequest request = AnalyzeRequest.withGlobalAnalyzer("nori", savedArticle.getTitle());
+        AnalyzeRequest request = AnalyzeRequest.withGlobalAnalyzer("nori", savedArticleEls.getTitle());
         AnalyzeResponse response = client.indices().analyze(request, RequestOptions.DEFAULT);
 
         List<AnalyzeResponse.AnalyzeToken> tokens = response.getTokens();
@@ -170,11 +170,11 @@ class ElasticServiceTest {
     @Test
     @DisplayName("단어 추출 테스트")
     public void extract() {
-        Article article = new Article("1", "I like USA's tech");
+        ArticleEls articleEls = new ArticleEls("1", "I like USA's tech");
 
         IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(article.getId().toString())
-                .withObject(article)
+                .withId(articleEls.getId().toString())
+                .withObject(articleEls)
                 .build();
 
         IndexCoordinates indexCoordinates = IndexCoordinates.of(Indices.ARTICLE_INDEX);

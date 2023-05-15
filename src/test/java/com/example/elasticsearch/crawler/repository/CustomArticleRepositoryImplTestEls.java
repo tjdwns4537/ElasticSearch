@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class CustomArticleRepositoryImplTest {
+class CustomArticleRepositoryImplTestEls {
 
     @Autowired
     private EntityManager em;

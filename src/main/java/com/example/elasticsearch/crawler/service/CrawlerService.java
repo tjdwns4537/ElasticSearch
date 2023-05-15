@@ -162,7 +162,9 @@ public class CrawlerService {
         return crawlingArticle;
     }
 
-    public void readThema(String searchInfo) {
+    public Map<String, String> readThema(String searchInfo) {
+        Map<String, String> result = new HashMap<>();
+
         try{
             Document naverDoc = Jsoup.connect(naverUrl).get();
             Document paxNetDoc = Jsoup.connect(paxNet).get();
@@ -176,21 +178,27 @@ public class CrawlerService {
             String[] naverStockThema = naverTitle.text().split(" "); // 테마명
             String[] naverStockPercent = naverPercent.text().split(" "); // 테마 퍼센트
 
-            elasticService.readThemaAnalyze(naverTitleElement.text(), searchInfo);
+            for (int i = 0; i < naverStockThema.length; i++) {
+                if (naverStockThema[i].equals(searchInfo)){
+                    result.put("THEMA_NAME", naverStockThema[i]);
+                    result.put("THEMA_PERCENT", naverStockPercent[i]);
+                    return result;
+                }
+            }
 
-
-            /** paxNet 종목 테마 **/
-            Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");
-            Elements paxNetSelect = paxNetTitleElements.select(".ellipsis");
-            String paxNetSelectText = paxNetSelect.text();
-            Elements paxNetSelectPercent = paxNetTitleElements.select(".red");
-
-            String[] paxNetSelectStockThemaName = paxNetSelectText.split(" "); // 테마명
-            String[] percentText = paxNetSelectPercent.text().split(" "); // 테마 퍼센트
+//            /** paxNet 종목 테마 **/
+//            Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");
+//            Elements paxNetSelect = paxNetTitleElements.select(".ellipsis");
+//            String paxNetSelectText = paxNetSelect.text();
+//            Elements paxNetSelectPercent = paxNetTitleElements.select(".red");
+//
+//            String[] paxNetSelectStockThemaName = paxNetSelectText.split(" "); // 테마명
+//            String[] percentText = paxNetSelectPercent.text().split(" "); // 테마 퍼센트
 
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return result;
     }
 }

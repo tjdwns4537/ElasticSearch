@@ -1,7 +1,5 @@
 package com.example.elasticsearch.crawler.controller;
 
-import com.example.elasticsearch.article.domain.Article;
-import com.example.elasticsearch.article.service.ArticleService;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
 import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.search.repository.SearchRepository;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -58,8 +57,13 @@ public class CrawlerController {
             }
         }
 
-        searchRepository.save(search);
-        crawlerService.readThema(searchInfo);
+        searchRepository.save(search); // 검색어 저장 -> 검색어 목록으로 활용
+
+        Map<String, String> stringStringMap = crawlerService.readThema(searchInfo); // 검색어 크롤링
+
+        log.info("크롤링 검색어 : {}", stringStringMap.get("THEMA_NAME"));
+        log.info("크롤링 검색어 퍼센트 : {}", stringStringMap.get("THEMA_PERCENT"));
+        elasticService.readThemaAnalyze(searchInfo);
 
         return "redirect:/";
     }

@@ -1,6 +1,6 @@
 package com.example.elasticsearch.elastic.service;
 
-import com.example.elasticsearch.article.domain.Article;
+import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.helper.Indices;
@@ -32,18 +32,17 @@ public class ElasticService {
     @Autowired
     private final ArticleElasticRepository articleElasticRepository;
 
-    public Article save(Article article) {
-        log.info("출력 : {}", article.getId());
-        log.info("출력 : {}", article.getTitle());
-        return articleElasticRepository.save(article);
+    public ArticleEls save(ArticleEls articleEls) {
+        log.info("출력 : {}", articleEls.getId());
+        log.info("출력 : {}", articleEls.getTitle());
+        return articleElasticRepository.save(articleEls);
     }
 
-    public List<Article> findByTitle(String title) {
+    public List<ArticleEls> findByTitle(String title) {
         return articleElasticRepository.findByTitle(title);
     }
 
-    public void readThemaAnalyze(String compare, String searchInfo) throws IOException {
-        log.info("crawlingData : {}", compare);
+    public void readThemaAnalyze(String searchInfo) {
 
         try{
             AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_THEMA_INDEX, "standard", searchInfo);
@@ -89,8 +88,8 @@ public class ElasticService {
 
     public List<String> findAll() {
         List<String> list = new ArrayList<>();
-        Iterable<Article> all = articleElasticRepository.findAll();
-        for (Article i : all) {
+        Iterable<ArticleEls> all = articleElasticRepository.findAll();
+        for (ArticleEls i : all) {
             list.add(i.getTitle());
         }
         return list;
