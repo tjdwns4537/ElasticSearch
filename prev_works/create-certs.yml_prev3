@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  create_certs:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    container_name: create_certs
+    command: >
+      bash -c '
+        yum install -y -q -e 0 unzip;
+        if [[ ! -f /certs/elastic-certificates.p12 ]]; then
+          bin/elasticsearch-certutil cert --silent --pem --in config/certificates/instances.yml -out /certs/bundle.zip;
+          unzip /certs/bundle.zip -d /certs;
+          mv /certs/ca/ca.crt /usr/share/elasticsearch/config/ca.crt;
+          mv /certs/es/es.crt /usr/share/elasticsearch/config/es.crt;
+          mv /certs/es/es.key /usr/share/elasticsearch/config/es.key;
+          bin/elasticsearch-certutil cert --silent --pem --in config/certificates/instances.yml -out /certs/master.zip;
+          unzip /certs/master.zip -d /certs;
+          mv /certs/master/master.crt /usr/share/elasticsearch/config/master.crt;
+          mv /certs/master/master.key /usr/share/elasticsearch/config/master.key;
+        fi;
+        chown -R 1000:0 /certs
+      '
+    working_dir: /usr/share/elasticsearch
+    volumes:
+      - /Users/parksungjun/Desktop/ElasticSearchProject/ElasticSearch/elasticsearch/certs:/certs
+      - .:/usr/share/elasticsearch/config/certificates
+    networks:
+      - elastic
+
+networks:
+  elastic:
+    driver: bridge
+
