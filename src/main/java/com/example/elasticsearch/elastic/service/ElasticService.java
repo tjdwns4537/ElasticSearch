@@ -10,8 +10,11 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.AnalyzeRequest;
 import org.elasticsearch.client.indices.AnalyzeResponse;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -83,32 +86,54 @@ public class ElasticService {
     }
 
     public Search stringAnalyze(Search search, String text) { // 단어 분석
-        try{
-            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", text);
-            AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
+        log.info("입력 기사 : {}", text);
 
-            List<AnalyzeResponse.AnalyzeToken> tokens = response.getTokens();
+        // 로컬 주피터
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-            int positiveCount = 0;
-            int negativeCount = 0;
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("text", text);
 
-            for (AnalyzeResponse.AnalyzeToken token : tokens) {
-                String term = token.getTerm();
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody.toString(), headers);
+        String url = "http://localhost:8080/process"; // local jupyter url
 
-                if (isPositive(term)) {
-                    positiveCount++;
-                } else if (isNegative(term)) {
-                    negativeCount++;
-                }
-            }
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
-            log.info("긍정적인 단어 개수 : {}", positiveCount);
-            log.info("부정적인 단어 개수 : {}", negativeCount);
-            search.setPositiveNumber(search.getPositiveNumber()+positiveCount);
-            search.setNegativeNumber(search.getNegativeNumber()+negativeCount);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String response = responseEntity.getBody();
+        log.info("response : {}", response);
+
+        search.setNegativeNumber(1);
+        search.setPositiveNumber(2);
+
         return search;
+
+//        try{
+//            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", text);
+//            AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
+//
+//            List<AnalyzeResponse.AnalyzeToken> tokens = response.getTokens();
+//
+//            int positiveCount = 0;
+//            int negativeCount = 0;
+//
+//            for (AnalyzeResponse.AnalyzeToken token : tokens) {
+//                String term = token.getTerm();
+//
+//                if (isPositive(term)) {
+//                    positiveCount++;
+//                } else if (isNegative(term)) {
+//                    negativeCount++;
+//                }
+//            }
+//
+//            log.info("긍정적인 단어 개수 : {}", positiveCount);
+//            log.info("부정적인 단어 개수 : {}", negativeCount);
+//            search.setPositiveNumber(search.getPositiveNumber()+positiveCount);
+//            search.setNegativeNumber(search.getNegativeNumber()+negativeCount);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 }
