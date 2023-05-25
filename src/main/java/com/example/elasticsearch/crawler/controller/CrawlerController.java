@@ -53,21 +53,6 @@ public class CrawlerController {
         return "home";
     }
 
-//    @PostMapping("/googleColab")
-//    public void sendData() {
-//        RestTemplate restTemplate = new RestTemplate();
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//        String message = "Hello, Flask Server!";
-//        String url = "http://http://127.0.0.1:5000/analyze"; // google-colab url
-//
-//        HttpEntity<String> requestEntity = new HttpEntity<>(message, headers);
-//        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-//
-//        String response = responseEntity.getBody();
-//    }
-
     @PostMapping("/searchInfo")
     public String extract(@RequestParam("searchInfo") String searchInfo) {
         List<String> crawlingArticle = crawlerService.readArticle();
@@ -83,17 +68,16 @@ public class CrawlerController {
 
         searchRepository.save(search); // 검색어 저장 -> 검색어 목록으로 활용
 
-        Map<String, String> themaInfo = crawlerService.readThema(searchInfo); // 검색어 크롤링
-
-        if(themaInfo.isEmpty()){
-            log.info("해당하는 테마가 없습니다. 테마명 : {}", searchInfo);
-            return "redirect:/";
-        }
-
-        log.info("크롤링 검색어 : {}", themaInfo.get("THEMA_NAME"));
-        log.info("크롤링 검색어 퍼센트 : {}", themaInfo.get("THEMA_PERCENT"));
-
-        elasticService.readThemaAnalyze(searchInfo);
+//        Map<String, String> themaInfo = crawlerService.readThema(searchInfo); // 검색어 크롤링
+//
+//        if(themaInfo.isEmpty()){
+//            log.info("해당하는 테마가 없습니다. 테마명 : {}", searchInfo);
+//            return "redirect:/";
+//        }
+//
+//        log.info("크롤링 검색어 : {}", themaInfo.get("THEMA_NAME"));
+//        log.info("크롤링 검색어 퍼센트 : {}", themaInfo.get("THEMA_PERCENT"));
+//        elasticService.readThemaAnalyze(searchInfo);
 
         return "redirect:/";
     }

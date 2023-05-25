@@ -7,4 +7,9 @@ import lombok.Setter;
 @Setter
 public class StockForm {
     private String stockName;
+
+    public boolean isNull() {
+        if(stockName.isEmpty()) return true;
+        else return false;
+    }
 }

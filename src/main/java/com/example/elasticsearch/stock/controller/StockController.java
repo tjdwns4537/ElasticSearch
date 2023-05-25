@@ -19,8 +19,8 @@ public class StockController {
 
     @PostMapping("/likeStock")
     public String likeList(@ModelAttribute("stockForm") StockForm stockForm) {
+        if(stockForm.isNull()) return "redirect:/";
         String stockName = stockForm.getStockName();
-
         String stockNumber = stockService.saveStockNumber(stockName);// DB에 저장
 
         if (stockNumber.isEmpty()) {
@@ -32,6 +32,8 @@ public class StockController {
 
     @PostMapping("/deleteLikeStock")
     public String DeleteList(@ModelAttribute("stockForm") StockForm stockForm) {
+        if(stockForm.isNull()) return "redirect:/";
+
         String stockName = stockForm.getStockName();
         stockService.deleteLikeStock(stockName);
 
