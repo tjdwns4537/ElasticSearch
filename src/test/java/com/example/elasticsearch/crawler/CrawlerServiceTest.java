@@ -178,8 +178,13 @@ class CrawlerServiceTest {
             /** 뉴스기사 **/
             Elements articleTitleElements1 = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
             Elements articleTitleElements2 = articleDoc.getElementsByAttributeValue("class", "cjs_d");
-            System.out.println(articleTitleElements1);
-            System.out.println(articleTitleElements2);
+
+            List<String> list = articleTitleElements1.eachText();
+
+            for(String i : list) System.out.println(i);
+
+//            System.out.println(articleTitleElements1);
+//            System.out.println(articleTitleElements2);
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,7 +1,10 @@
 package com.example.elasticsearch.crawler.service;
 
+import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
+import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
+import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -28,7 +31,8 @@ public class CrawlerService {
     @Autowired private final LikeStockRepository likeStockRepository;
     @Autowired private final LiveStockRepository liveStockRepository;
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
-//    @Autowired private final ElasticService elasticService;
+    @Autowired private final ElasticService elasticService;
+    @Autowired private final ArticleElasticRepository articleElasticRepository;
 
     @Value("${crawler.url}")
     String url;
@@ -144,21 +148,35 @@ public class CrawlerService {
         }
     }
 
-    public  List<String> readArticle() {
-        List<String> crawlingArticle = new ArrayList<>();
+    public void readArticle() {
         try {
             Document articleDoc = Jsoup.connect(articleUrl).get();
 
             /** 뉴스기사 **/
             Elements articleTitleElements = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
             Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
-            crawlingArticle = articleTitleElements.eachText();
-            crawlingArticle.addAll(articleContentElements.eachText());
+            List<String> crawlingArticle = articleTitleElements.eachText(); // save in list
+
+            for (String i : crawlingArticle) {
+                ArticleEls article = ArticleEls.of(i);
+                ArticleEls save = elasticService.save(article);
+                log.info("Data: {}", save.getTitle());
+                log.info("Data: {}", save.getId());
+            }
+
+//            for (String i : crawlingArticle) {
+//                // Check if the article already exists in Elasticsearch before saving
+//                List<ArticleEls> existingArticles = articleElasticRepository.findByTitleContaining(i);
+//                if (existingArticles.isEmpty()) {
+//                    ArticleEls article = ArticleEls.of(i);
+//                    ArticleEls save = elasticService.save(article);
+//                    log.info("Data: {}", save.getTitle());
+//                    log.info("Data: {}", save.getId());
+//                }
+//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return crawlingArticle;
     }
 
     public Map<String, String> readThema(String searchInfo) {

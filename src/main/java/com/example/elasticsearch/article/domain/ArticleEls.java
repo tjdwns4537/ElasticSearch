@@ -10,14 +10,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Document(indexName = Indices.ARTICLE_INDEX) // article 이라는 색인에 속함
 public class ArticleEls {
     @Id
-    @Field(type = FieldType.Keyword)
     private String id;
 
     /** 키워드 제목 */
-    @Field(type = FieldType.Keyword)
     private String title;
 
     public ArticleEls(String title) {
@@ -29,3 +28,4 @@ public class ArticleEls {
         return new ArticleEls(title);
     }
 }
+
