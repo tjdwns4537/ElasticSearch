@@ -5,6 +5,7 @@ import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.search.repository.SearchRepository;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticService;
+import com.example.elasticsearch.sentiment.service.KoreanSentiment;
 import com.example.elasticsearch.stock.domain.StockForm;
 import com.example.elasticsearch.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class CrawlerController {
     @Autowired private final ElasticService elasticService;
     @Autowired private final SearchRepository searchRepository;
     @Autowired private final ArticleRedisRepository articleRedisRepository;
+    @Autowired private final KoreanSentiment koreanSentiment;
 
     @GetMapping
     public String crawlerService(Model model) {
@@ -73,7 +75,7 @@ public class CrawlerController {
 
         for (String i : crawlingArticle) {
             if(i.contains(searchInfo)) {
-                search = elasticService.stringAnalyze(search, i);// 주피터를 활용해 긍정, 부정 점수 측정
+                search = koreanSentiment.articleAnalyze(search, i);// 주피터를 활용해 긍정, 부정 점수 측정
                 articleRedisRepository.save(i); // 관련 기사 저장
                 log.info("기사: {}", i);
             }

@@ -4,6 +4,7 @@ import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.sentiment.service.KoreanSentiment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RequestOptions;
@@ -34,12 +35,6 @@ public class ElasticService {
 
     @Autowired
     private final ArticleElasticRepository articleElasticRepository;
-
-//    public ArticleEls save(ArticleEls articleEls) {
-//        log.info("출력 : {}", articleEls.getId());
-//        log.info("출력 : {}", articleEls.getTitle());
-//        return articleElasticRepository.save(articleEls);
-//    }
 
     public void readThemaAnalyze(String searchInfo) {
 
@@ -83,57 +78,5 @@ public class ElasticService {
         }
         reader.close();
         return false;
-    }
-
-    public Search stringAnalyze(Search search, String text) { // 단어 분석
-        log.info("입력 기사 : {}", text);
-
-        // 로컬 주피터
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("text", text);
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody.toString(), headers);
-        String url = "http://localhost:8080/process"; // local jupyter url
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-        String response = responseEntity.getBody();
-        log.info("response : {}", response);
-
-        search.setNegativeNumber(1);
-        search.setPositiveNumber(2);
-
-        return search;
-
-//        try{
-//            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_INDEX, "standard", text);
-//            AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
-//
-//            List<AnalyzeResponse.AnalyzeToken> tokens = response.getTokens();
-//
-//            int positiveCount = 0;
-//            int negativeCount = 0;
-//
-//            for (AnalyzeResponse.AnalyzeToken token : tokens) {
-//                String term = token.getTerm();
-//
-//                if (isPositive(term)) {
-//                    positiveCount++;
-//                } else if (isNegative(term)) {
-//                    negativeCount++;
-//                }
-//            }
-//
-//            log.info("긍정적인 단어 개수 : {}", positiveCount);
-//            log.info("부정적인 단어 개수 : {}", negativeCount);
-//            search.setPositiveNumber(search.getPositiveNumber()+positiveCount);
-//            search.setNegativeNumber(search.getNegativeNumber()+negativeCount);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 }
