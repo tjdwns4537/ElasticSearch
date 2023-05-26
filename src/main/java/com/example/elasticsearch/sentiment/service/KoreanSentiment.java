@@ -19,7 +19,7 @@ public class KoreanSentiment {
 
     public Map<String,Integer> labelCheck(Map<String, Integer> map, String label) {
         if(label.equals("LABEL_1")) map.put(Indices.POSITIVE, map.getOrDefault(Indices.POSITIVE, 0)+1);
-        else map.put(Indices.NEGATIVE, map.getOrDefault(Indices.NEGATIVE, 0)+1);
+        if(label.equals("LABEL_0")) map.put(Indices.NEGATIVE, map.getOrDefault(Indices.NEGATIVE, 0)+1);
         return map;
     }
 
