@@ -14,9 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ElasticService {
 
-//    @Autowired
-//    private final RestHighLevelClient client;
-
     @Autowired
     private final ArticleElasticRepository articleElasticRepository;
 
@@ -39,26 +36,7 @@ public class ElasticService {
         articleElasticRepository.deleteAll();
     }
 
-//    public void readThemaAnalyze(String searchInfo) {
-//
-//        try{
-//            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_THEMA_INDEX, "standard", searchInfo);
-//            AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
-//
-//            Map<String, Integer> wordCountMap = new HashMap<>();
-//            for (AnalyzeResponse.AnalyzeToken token : response.getTokens()) {
-//                String term = token.getTerm();
-//                log.info("term : {}",term);
-//                int count = wordCountMap.getOrDefault(term, 0);
-//                wordCountMap.put(term, count + 1);
-//            }
-//
-//            log.info("분석된 단어 : {}", wordCountMap);
-//            client.close();
-//        } catch (IOException e){
-//
-//        }
-//    }
+
 
 //    private boolean isPositive(String word) throws IOException {
 //        BufferedReader reader = new BufferedReader(
