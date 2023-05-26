@@ -33,19 +33,12 @@ public class SearchController {
 
         List<ArticleEls> list = elasticService.ContainByKeyword(searchInfo);
 
+        String s = koreanSentiment.articleAnalyze(list);
+
         elasticService.deleteAll();
 
-        //        Search search = Search.of(searchInfo);
-
-//        for (String i : crawlingArticle) {
-//            if(i.contains(searchInfo)) {
-//                search = koreanSentiment.articleAnalyze(search, i);// 주피터를 활용해 긍정, 부정 점수 측정
-//                articleRedisRepository.save(i); // 관련 기사 저장
-//                log.info("기사: {}", i);
-//            }
-//        }
-//
-//        searchRepository.save(search); // 검색어 저장 -> 검색어 목록으로 활용
+        if(s.equals("P")) log.info("{}는 긍정적입니다.", searchInfo);
+        if(s.equals("N")) log.info("{}는 부정적입니다.", searchInfo);
 
 //        Map<String, String> themaInfo = crawlerService.readThema(searchInfo); // 검색어 크롤링
 //
