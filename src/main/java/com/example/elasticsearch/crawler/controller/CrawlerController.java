@@ -32,12 +32,16 @@ public class CrawlerController {
 
     @Autowired private final CrawlerService crawlerService;
     @Autowired private final StockService stockService;
+    @Autowired private final ElasticService elasticService;
 
     @GetMapping
     public String crawlerService(Model model) {
+        elasticService.deleteAll();
+
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
         crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
+
 
         List<String> likeStockRanking = stockService.getLikeStockRanking();
         List<String> likeStockAll = stockService.getLikeStockAll();

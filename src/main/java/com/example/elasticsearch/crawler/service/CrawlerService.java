@@ -159,7 +159,7 @@ public class CrawlerService {
 
             for (String i : crawlingArticle) {
                 ArticleEls article = ArticleEls.of(i);
-                ArticleEls save = elasticService.save(article);
+                elasticService.save(article);
             }
 
 //            for (String i : crawlingArticle) {

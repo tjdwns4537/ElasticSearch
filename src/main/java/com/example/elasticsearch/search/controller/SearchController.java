@@ -37,8 +37,6 @@ public class SearchController {
 
         Map<String, Integer> result = koreanSentiment.articleAnalyze(list);
 
-        elasticService.deleteAll();
-
         log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, result.getOrDefault(Indices.POSITIVE, 0), result.getOrDefault(Indices.NEGATIVE, 0));
 
 //        Map<String, String> themaInfo = crawlerService.readThema(searchInfo); // 검색어 크롤링
