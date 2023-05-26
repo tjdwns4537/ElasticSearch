@@ -3,6 +3,9 @@ package com.example.elasticsearch.sentiment.service;
 import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.search.domain.Search;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.*;
@@ -42,7 +45,18 @@ public class KoreanSentiment {
 
             // 주피터로 전송
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            String response = responseEntity.getBody(); // 응답 데이터
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            JsonNode jsonNode = null;
+            try {
+                jsonNode = objectMapper.readTree(responseEntity.getBody());
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+            String response = jsonNode.get("sentiment").asText();
+
             log.info("응답 라벨 : {}", response);
 
             check = labelCheck(check,response);
