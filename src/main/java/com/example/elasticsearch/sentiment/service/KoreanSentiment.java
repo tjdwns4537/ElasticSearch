@@ -34,8 +34,8 @@ public class KoreanSentiment {
         int negative = 0;
 
         for(ArticleEls i: articleList){
-            log.info("입력 기사 : {}", i);
-            requestBody.put("text", i);
+            log.info("입력 기사 : {}", i.getTitle());
+            requestBody.put("text", i.getTitle());
 
             // 주피터로 전송
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
