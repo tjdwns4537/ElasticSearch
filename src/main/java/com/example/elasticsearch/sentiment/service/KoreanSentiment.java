@@ -27,7 +27,6 @@ public class KoreanSentiment {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         JSONObject requestBody = new JSONObject();
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody.toString(), headers);
         String url = "http://localhost:8080/analyze"; // local jupyter url
 
         int positive = 0;
@@ -36,6 +35,8 @@ public class KoreanSentiment {
         for(ArticleEls i: articleList){
             log.info("입력 기사 : {}", i.getTitle());
             requestBody.put("text", i.getTitle());
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(requestBody.toString(), headers);
 
             // 주피터로 전송
             ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
