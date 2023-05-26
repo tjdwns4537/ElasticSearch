@@ -3,6 +3,7 @@ package com.example.elasticsearch.search.controller;
 import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticService;
+import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
 import com.example.elasticsearch.search.repository.SearchRepository;
 import com.example.elasticsearch.sentiment.service.KoreanSentiment;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Slf4j
@@ -33,12 +35,11 @@ public class SearchController {
 
         List<ArticleEls> list = elasticService.ContainByKeyword(searchInfo);
 
-        String s = koreanSentiment.articleAnalyze(list);
+        Map<String, Integer> result = koreanSentiment.articleAnalyze(list);
 
         elasticService.deleteAll();
 
-        if(s.equals("P")) log.info("{}는 긍정적입니다.", searchInfo);
-        if(s.equals("N")) log.info("{}는 부정적입니다.", searchInfo);
+        log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, result.get(Indices.POSITIVE), result.get(Indices.NEGATIVE));
 
 //        Map<String, String> themaInfo = crawlerService.readThema(searchInfo); // 검색어 크롤링
 //

@@ -9,18 +9,23 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class KoreanSentiment {
 
-    public String labelCheck(String label) {
-        if(label.equals("LABEL_1")) return Indices.POSITIVE;
-        else return Indices.NEGATIVE;
+    public Map<String,Integer> labelCheck(Map<String, Integer> map, String label) {
+        if(label.equals("LABEL_1")) map.put(Indices.POSITIVE, map.getOrDefault(Indices.POSITIVE, 0)+1);
+        else map.put(Indices.NEGATIVE, map.getOrDefault(Indices.NEGATIVE, 0)+1);
+        return map;
     }
 
-    public String articleAnalyze(List<ArticleEls> articleList) { // 단어 분석
+    public Map<String, Integer> articleAnalyze(List<ArticleEls> articleList) { // 단어 분석
+
+        Map<String, Integer> check = new HashMap<>();
 
         // 로컬 주피터 연결 환경 세팅
         RestTemplate restTemplate = new RestTemplate();
@@ -28,9 +33,6 @@ public class KoreanSentiment {
         headers.setContentType(MediaType.APPLICATION_JSON);
         JSONObject requestBody = new JSONObject();
         String url = "http://localhost:8080/analyze"; // local jupyter url
-
-        int positive = 0;
-        int negative = 0;
 
         for(ArticleEls i: articleList){
             log.info("입력 기사 : {}", i.getTitle());
@@ -43,11 +45,9 @@ public class KoreanSentiment {
             String response = responseEntity.getBody(); // 응답 데이터
             log.info("응답 라벨 : {}", response);
 
-            if(response.equals("LABEL_1")) positive++;
-            if(response.equals("LABEL_0")) negative++;
+            check = labelCheck(check,response);
         }
 
-        if(positive > negative) return "P";
-        return "N";
+        return check;
     }
 }
