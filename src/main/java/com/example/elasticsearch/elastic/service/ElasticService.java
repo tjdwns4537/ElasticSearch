@@ -1,29 +1,13 @@
 package com.example.elasticsearch.elastic.service;
 
 import com.example.elasticsearch.article.domain.ArticleEls;
-import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
-import com.example.elasticsearch.helper.Indices;
-import com.example.elasticsearch.sentiment.service.KoreanSentiment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.AnalyzeRequest;
-import org.elasticsearch.client.indices.AnalyzeResponse;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -41,10 +25,18 @@ public class ElasticService {
         return save;
     }
 
-    public List<ArticleEls> findByTitle(String keyword) {
+    public List<ArticleEls> ContainByKeyword(String keyword) {
         List<ArticleEls> byTitle = articleElasticRepository.findByTitleContaining(keyword);
 
         return byTitle;
+    }
+
+    public List<ArticleEls> findByTitle(String title) {
+        return articleElasticRepository.findByTitle(title);
+    }
+
+    public void deleteAll() {
+        articleElasticRepository.deleteAll();
     }
 
 //    public void readThemaAnalyze(String searchInfo) {

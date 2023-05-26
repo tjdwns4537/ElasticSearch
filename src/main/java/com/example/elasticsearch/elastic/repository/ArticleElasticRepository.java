@@ -10,4 +10,9 @@ import java.util.List;
 @Repository
 public interface ArticleElasticRepository extends ElasticsearchRepository<ArticleEls, String> {
     List<ArticleEls> findByTitleContaining(String keyword);
+
+    List<ArticleEls> findByTitle(String title);
+
+    @Override
+    void deleteAll();
 }

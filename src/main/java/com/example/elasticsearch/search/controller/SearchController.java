@@ -4,7 +4,6 @@ import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
-import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.search.repository.SearchRepository;
 import com.example.elasticsearch.sentiment.service.KoreanSentiment;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +31,9 @@ public class SearchController {
 
         if(searchInfo.isEmpty()) return "redirect:/";
 
-        crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
+        List<ArticleEls> list = elasticService.ContainByKeyword(searchInfo);
 
-        List<ArticleEls> list = elasticService.findByTitle(searchInfo);
-
-        for (ArticleEls i : list) {
-            log.info("list check : {}",i.getId());
-            log.info("list check : {}",i.getTitle());
-        }
+        elasticService.deleteAll();
 
         //        Search search = Search.of(searchInfo);
 
@@ -63,7 +57,6 @@ public class SearchController {
 //        log.info("크롤링 검색어 : {}", themaInfo.get("THEMA_NAME"));
 //        log.info("크롤링 검색어 퍼센트 : {}", themaInfo.get("THEMA_PERCENT"));
 //        elasticService.readThemaAnalyze(searchInfo);
-
         return "redirect:/";
     }
 }

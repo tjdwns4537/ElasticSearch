@@ -160,8 +160,6 @@ public class CrawlerService {
             for (String i : crawlingArticle) {
                 ArticleEls article = ArticleEls.of(i);
                 ArticleEls save = elasticService.save(article);
-                log.info("Data: {}", save.getTitle());
-                log.info("Data: {}", save.getId());
             }
 
 //            for (String i : crawlingArticle) {
