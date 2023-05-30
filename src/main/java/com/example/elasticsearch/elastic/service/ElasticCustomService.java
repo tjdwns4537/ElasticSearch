@@ -68,6 +68,12 @@ public class ElasticCustomService {
             String wildcardQuery = "*" + title + "*";
             boolQueryBuilder.should(QueryBuilders.wildcardQuery("title", wildcardQuery));
 
+            // Add a space query for simlar words
+            String spaceQuery = "* " + title + " *";
+            boolQueryBuilder.should(QueryBuilders.wildcardQuery("title", spaceQuery));
+
+            boolQueryBuilder.should(QueryBuilders.matchQuery("title", title).fuzziness("AUTO"));
+
             sourceBuilder.query(boolQueryBuilder);
             searchRequest.source(sourceBuilder);
 

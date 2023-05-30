@@ -63,9 +63,10 @@ class ElasticServiceTest {
 
         elasticService.deleteAll();
 
-        elasticService.save(ArticleEls.of("카카오뱅크"));
-        elasticService.save(ArticleEls.of("카카오페이"));
-        String sentence = "카카오";
+        elasticService.save(ArticleEls.of("삼성전자"));
+        elasticService.save(ArticleEls.of("삼성 전자"));
+        elasticService.save(ArticleEls.of("삼성"));
+        String sentence = "삼전";
 
         List<String> similarWords = elasticCustomService.findSimilarWords(sentence);
 

@@ -1,11 +1,14 @@
 package com.example.elasticsearch.sentiment.service;
 
 import com.example.elasticsearch.article.domain.ArticleEls;
+import com.example.elasticsearch.elastic.service.ElasticCustomService;
+import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.search.domain.Search;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.*;
@@ -18,12 +21,19 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class KoreanSentiment {
+
+    private final ElasticCustomService elasticCustomService;
 
     public Map<String,Integer> labelCheck(Map<String, Integer> map, String label) {
         if(label.equals("LABEL_1")) map.put(Indices.POSITIVE, map.getOrDefault(Indices.POSITIVE, 0)+1);
         if(label.equals("LABEL_0")) map.put(Indices.NEGATIVE, map.getOrDefault(Indices.NEGATIVE, 0)+1);
         return map;
+    }
+
+    public void similarWord(String searchInfo) {
+        List<String> similarWords = elasticCustomService.findSimilarWords(searchInfo);
     }
 
     public Map<String, Integer> articleAnalyze(List<ArticleEls> articleList) { // 단어 분석
