@@ -25,6 +25,24 @@ class CrawlerServiceTest {
     LikeStockJpaRepository likeStockJpaRepository;
 
     @Test
+    @DisplayName("구글 크롤링")
+    public void googleCrawler() {
+        String search = "카카오";
+        try {
+            for (int i = 0; i < 10; i++) {
+                String url = "https://www.google.com/search?q=" + search + "&tbm=nws&sxsrf=APwXEdf_M3-MhMZ4bGGTwdUIp4Xcy2ZIeg:1685424458306&ei=Sol1ZNivEpDr-Qad-LdY&start=" + i + "0&sa=N&ved=2ahUKEwjY_Iexp5z_AhWQdd4KHR38DQsQ8tMDegQIBBAE&biw=1440&bih=734&dpr=2";
+                Document doc = Jsoup.connect(url).get();
+                Elements titleElements = doc.getElementsByAttributeValue("class", "n0jPhd ynAwRc MBeuO nDgy9d");
+                for (Element j : titleElements) {
+                    System.out.println(j.text());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     @DisplayName("크롤링 정상 작동 테스트")
     public void crawlerImp() {
 
