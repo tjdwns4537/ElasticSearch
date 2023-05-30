@@ -152,6 +152,14 @@ class CrawlerServiceTest {
             String[] naverStockThema = naverTitle.text().split(" "); // 테마명
             String[] naverStockPercent = naverPercent.split(" "); // 테마 퍼센트
 
+            for (String i : naverStockThema) {
+                System.out.println("thema : " + i);
+            }
+
+            for (String i : naverStockPercent) {
+                System.out.println("percent : " + i);
+            }
+
             /** paxNet 종목 테마 **/
             Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");
             Elements paxNetSelect = paxNetTitleElements.select(".ellipsis");

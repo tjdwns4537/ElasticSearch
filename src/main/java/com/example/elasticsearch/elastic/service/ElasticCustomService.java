@@ -7,12 +7,22 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.AnalyzeRequest;
 import org.elasticsearch.client.indices.AnalyzeResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +50,42 @@ public class ElasticCustomService {
             client.close();
         } catch (IOException e) {
 
+        }
+    }
+
+    public List<String> findSimilarWords(String title) {
+        try {
+            SearchRequest searchRequest = new SearchRequest(Indices.ARTICLE_INDEX);
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+            // Create a BoolQuery to combine multiple queries
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+            // Add a match query for exact match
+            boolQueryBuilder.should(QueryBuilders.matchQuery("title", title));
+
+            // Add a wildcard query for similar words
+            String wildcardQuery = "*" + title + "*";
+            boolQueryBuilder.should(QueryBuilders.wildcardQuery("title", wildcardQuery));
+
+            sourceBuilder.query(boolQueryBuilder);
+            searchRequest.source(sourceBuilder);
+
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits searchHits = searchResponse.getHits();
+
+            List<String> similarWords = new ArrayList<>();
+            for (SearchHit hit : searchHits.getHits()) {
+                String similarTitle = hit.getSourceAsMap().get("title").toString();
+                similarWords.add(similarTitle);
+            }
+
+            client.close();
+
+            return similarWords;
+        } catch (IOException e) {
+            // Handle exception
+            return new ArrayList<>();
         }
     }
 }

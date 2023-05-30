@@ -36,28 +36,7 @@ public class ElasticService {
         articleElasticRepository.deleteAll();
     }
 
-
-
-//    private boolean isPositive(String word) throws IOException {
-//        BufferedReader reader = new BufferedReader(
-//                new FileReader("/Users/parksungjun/Desktop/ElasticSearchProject/ElasticSearch/src/main/resources/static/elastic/positive_words_self.txt")
-//        );
-//        return checkWords(reader, word);
-//    }
-//
-//    private boolean isNegative(String word) throws IOException {
-//        BufferedReader reader = new BufferedReader(
-//                new FileReader("/Users/parksungjun/Desktop/ElasticSearchProject/ElasticSearch/src/main/resources/static/elastic/negative_words_self.txt")
-//        );
-//        return checkWords(reader, word);
-//    }
-//
-//    private boolean checkWords(BufferedReader reader, String word) throws IOException {
-//        String str;
-//        while ((str = reader.readLine()) != null) {
-//            if(word.equals(str)) return true;
-//        }
-//        reader.close();
-//        return false;
-//    }
+    public void deleteById(String uid) {
+        articleElasticRepository.deleteById(uid);
+    }
 }
