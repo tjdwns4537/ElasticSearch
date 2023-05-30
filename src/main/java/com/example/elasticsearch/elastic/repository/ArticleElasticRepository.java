@@ -1,6 +1,7 @@
 package com.example.elasticsearch.elastic.repository;
 
 import com.example.elasticsearch.article.domain.ArticleEls;
+import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,7 @@ public interface ArticleElasticRepository extends ElasticsearchRepository<Articl
 
     @Override
     void deleteAll();
+
+    @Query("{\"bool\" : {\"must\" : {\"match\" : {\"title\" : \"keyword\"}}}}")
+    void deleteByTitle(String keyword);
 }

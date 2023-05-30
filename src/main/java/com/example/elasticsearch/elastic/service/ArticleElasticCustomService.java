@@ -3,12 +3,24 @@ package com.example.elasticsearch.elastic.service;
 import com.example.elasticsearch.helper.Indices;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.AnalyzeRequest;
 import org.elasticsearch.client.indices.AnalyzeResponse;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,22 +30,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ElasticCustomService {
+public class ArticleElasticCustomService {
 
     @Autowired
     private final RestHighLevelClient client;
 
     public void readThemaAnalyze(String searchInfo) {
-
         try {
             AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_THEMA_INDEX, "standard", searchInfo);
             AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
@@ -85,13 +90,56 @@ public class ElasticCustomService {
                 String similarTitle = hit.getSourceAsMap().get("title").toString();
                 similarWords.add(similarTitle);
             }
-
-            client.close();
-
             return similarWords;
         } catch (IOException e) {
             // Handle exception
             return new ArrayList<>();
+        }
+    }
+
+    public void close() {
+        try {
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void existCheckAndDelete() {
+        String indexName = Indices.ARTICLE_INDEX;
+        DeleteByQueryRequest delete = new DeleteByQueryRequest(indexName);
+//        DeleteRequest deleteRequest = new DeleteRequest(indexName);
+
+        try {
+//            client.delete(deleteRequest, RequestOptions.DEFAULT);
+            BulkByScrollResponse response = client.deleteByQuery(delete, RequestOptions.DEFAULT);
+            long deletedDocuments = response.getDeleted();
+            System.out.println("Deleted documents: " + deletedDocuments);
+        } catch (IOException e) {
+            // Handle exception
+        }
+    }
+
+    public void deleteAllDocuments() {
+        String indexName = Indices.ARTICLE_INDEX;
+        try {
+            GetIndexRequest getIndexRequest = new GetIndexRequest(indexName);
+            boolean indexExists = client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+
+//            GetRequest getRequest = new GetRequest(indexName);
+//            boolean indexExists = client.exists(getRequest, RequestOptions.DEFAULT);
+
+            if (indexExists) {
+                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
+                client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+
+                CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
+                client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+
+                client.indices().refresh(new RefreshRequest(indexName), RequestOptions.DEFAULT);
+            }
+        } catch (IOException e) {
+            // Handle exception
         }
     }
 }

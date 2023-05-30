@@ -1,12 +1,14 @@
 package com.example.elasticsearch.search.controller;
 
-import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.service.CrawlerService;
+import com.example.elasticsearch.elastic.service.ArticleElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
+import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
 import com.example.elasticsearch.search.repository.SearchRepository;
 import com.example.elasticsearch.sentiment.service.KoreanSentiment;
+import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -27,27 +30,25 @@ public class SearchController {
     @Autowired private final SearchRepository searchRepository;
     @Autowired private final ArticleRedisRepository articleRedisRepository;
     @Autowired private final KoreanSentiment koreanSentiment;
+    @Autowired private final ArticleElasticCustomService articleElasticCustomService;
+    @Autowired private final ThemaElasticService themaElasticService;
 
     @PostMapping("/searchInfo")
     public String extract(@RequestParam("searchInfo") String searchInfo) {
 
         if(searchInfo.isEmpty()) return "redirect:/";
 
-        List<ArticleEls> list = elasticService.ContainByKeyword(searchInfo);
+        List<String> list = articleElasticCustomService.findSimilarWords(searchInfo);
 
-        Map<String, Integer> result = koreanSentiment.articleAnalyze(list);
+        Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(list);
 
-        log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, result.getOrDefault(Indices.POSITIVE, 0), result.getOrDefault(Indices.NEGATIVE, 0));
+        log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, analyzeResult.getOrDefault(Indices.POSITIVE, 0), analyzeResult.getOrDefault(Indices.NEGATIVE, 0));
 
-//        Map<String, String> themaInfo = crawlerService.readThema(searchInfo); // 검색어 크롤링
-//
-//        if(themaInfo.isEmpty()){
-//            log.info("해당하는 테마가 없습니다. 테마명 : {}", searchInfo);
-//            return "redirect:/";
-//        }
-//
-//        log.info("크롤링 검색어 : {}", themaInfo.get("THEMA_NAME"));
-//        log.info("크롤링 검색어 퍼센트 : {}", themaInfo.get("THEMA_PERCENT"));
+        Optional<Thema> themaResult = themaElasticService.findByKeyword(searchInfo);
+
+        if(themaResult.isPresent()) log.info("{}의 퍼센트: {}",themaResult.get().getThemaName(), themaResult.get().getPercent());
+        if(!themaResult.isPresent()) log.info("해당 테마명은 없습니다.");
+
 //        elasticService.readThemaAnalyze(searchInfo);
         return "redirect:/";
     }

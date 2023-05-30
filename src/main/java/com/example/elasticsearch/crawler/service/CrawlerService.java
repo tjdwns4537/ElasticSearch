@@ -5,10 +5,12 @@ import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
 import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.elastic.service.ElasticService;
+import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
+import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -32,7 +34,7 @@ public class CrawlerService {
     @Autowired private final LiveStockRepository liveStockRepository;
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
     @Autowired private final ElasticService elasticService;
-    @Autowired private final ArticleElasticRepository articleElasticRepository;
+    @Autowired private final ThemaElasticService themaElasticService;
 
     @Value("${crawler.url}")
     String url;
@@ -154,63 +156,40 @@ public class CrawlerService {
 
             /** 뉴스기사 **/
             Elements articleTitleElements = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
-            Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
+//            Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
             List<String> crawlingArticle = articleTitleElements.eachText(); // save in list
 
             for (String i : crawlingArticle) {
                 ArticleEls article = ArticleEls.of(i);
-                elasticService.save(article);
+                elasticService.articleSave(article);
             }
 
-//            for (String i : crawlingArticle) {
-//                // Check if the article already exists in Elasticsearch before saving
-//                List<ArticleEls> existingArticles = articleElasticRepository.findByTitleContaining(i);
-//                if (existingArticles.isEmpty()) {
-//                    ArticleEls article = ArticleEls.of(i);
-//                    ArticleEls save = elasticService.save(article);
-//                    log.info("Data: {}", save.getTitle());
-//                    log.info("Data: {}", save.getId());
-//                }
-//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Map<String, String> readThema(String searchInfo) {
-        Map<String, String> result = new HashMap<>();
-
+    public void readThema() {
         try{
             Document naverDoc = Jsoup.connect(naverUrl).get();
-            Document paxNetDoc = Jsoup.connect(paxNet).get();
 
             /** 네이버 종목 테마 **/
             Elements naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2");
             Element naverTitleElement = naverDoc.getElementsByAttributeValue("class", "type_1 theme").get(0);
-
             Elements naverTitle = naverTitleElement.select(".col_type1");
 
-            String[] naverStockThema = naverTitle.text().split(" "); // 테마명
             String[] naverStockPercent = naverPercent.text().split(" "); // 테마 퍼센트
 
-            for (int i = 0; i < naverStockThema.length; i++) {
-                if (naverStockThema[i].equals(searchInfo)){
-                    result.put("THEMA_NAME", naverStockThema[i]);
-                    result.put("THEMA_PERCENT", naverStockPercent[i]);
-                    return result;
-                }
+            for (int i=1; i<naverTitle.size(); i++) {
+                Element element = naverTitle.get(i); // thema name
+                String themaName = element.text();
+                String percent = naverStockPercent[i-1]; // thema percent
+                Thema thema = Thema.of(themaName, percent);
+                themaElasticService.themaSave(thema);
             }
-//            /** paxNet 종목 테마 **/
-//            Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");
-//            Elements paxNetSelect = paxNetTitleElements.select(".ellipsis");
-//            String paxNetSelectText = paxNetSelect.text();
-//            Elements paxNetSelectPercent = paxNetTitleElements.select(".red");
-//
-//            String[] paxNetSelectStockThemaName = paxNetSelectText.split(" "); // 테마명
-//            String[] percentText = paxNetSelectPercent.text().split(" "); // 테마 퍼센트
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return result;
     }
 }

@@ -17,12 +17,14 @@ public class ElasticService {
     @Autowired
     private final ArticleElasticRepository articleElasticRepository;
 
-    public ArticleEls save(ArticleEls articleEls) {
-        ArticleEls save = articleElasticRepository.save(articleEls);
-        return save;
+    public void articleSave(ArticleEls articleEls) {
+        List<ArticleEls> existingArticles = articleElasticRepository.findByTitle(articleEls.getTitle());
+        if (existingArticles.isEmpty()) {
+            articleElasticRepository.save(articleEls);
+        }
     }
 
-    public List<ArticleEls> ContainByKeyword(String keyword) {
+    public List<ArticleEls> containByKeyword(String keyword) {
         List<ArticleEls> byTitle = articleElasticRepository.findByTitleContaining(keyword);
 
         return byTitle;

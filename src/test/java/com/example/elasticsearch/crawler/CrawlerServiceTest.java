@@ -146,14 +146,17 @@ class CrawlerServiceTest {
             /** 네이버 종목 테마 **/
             Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
             Element naverTitleElement = naverTitleElements.get(0);
+
             Elements naverTitle = naverTitleElement.select(".col_type1");
+
             String naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2").text();
 
-            String[] naverStockThema = naverTitle.text().split(" "); // 테마명
             String[] naverStockPercent = naverPercent.split(" "); // 테마 퍼센트
 
-            for (String i : naverStockThema) {
-                System.out.println("thema : " + i);
+            System.out.println(naverTitle.size() + " " + naverStockPercent.length);
+
+            for (Element i : naverTitle) {
+                System.out.println("thema : " + i.text());
             }
 
             for (String i : naverStockPercent) {

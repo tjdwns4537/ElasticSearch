@@ -9,9 +9,6 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.indices.AnalyzeRequest;
 import org.elasticsearch.client.indices.AnalyzeResponse;
 import org.elasticsearch.rest.RestStatus;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +45,7 @@ class ElasticServiceTest {
     private RestHighLevelClient client;
 
     @Autowired
-    private ElasticCustomService elasticCustomService;
+    private ArticleElasticCustomService articleElasticCustomService;
 
     @Autowired
     private ElasticService elasticService;
@@ -63,12 +60,12 @@ class ElasticServiceTest {
 
         elasticService.deleteAll();
 
-        elasticService.save(ArticleEls.of("삼성전자"));
-        elasticService.save(ArticleEls.of("삼성 전자"));
-        elasticService.save(ArticleEls.of("삼성"));
-        String sentence = "삼전";
+        elasticService.articleSave(ArticleEls.of("오늘 반도체 시장은 망했다."));
+        elasticService.articleSave(ArticleEls.of("내일 폐반도체 망했다."));
+        elasticService.articleSave(ArticleEls.of("반도체가 망했다."));
+        String sentence = "반도체";
 
-        List<String> similarWords = elasticCustomService.findSimilarWords(sentence);
+        List<String> similarWords = articleElasticCustomService.findSimilarWords(sentence);
 
         for (String similarSentence : similarWords) {
             System.out.println(similarSentence);
