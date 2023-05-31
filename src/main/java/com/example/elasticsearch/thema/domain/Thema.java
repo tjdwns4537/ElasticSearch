@@ -25,6 +25,10 @@ public class Thema {
 
     private String percent;
 
+    private String firstStock;
+
+    private String secondStock;
+
     public Thema(String themaName, String percent) {
         this.id = UUID.randomUUID().toString();
         this.themaName = themaName;

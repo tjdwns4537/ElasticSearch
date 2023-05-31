@@ -30,13 +30,15 @@ repositories {
 }
 
 dependencies {
+    // xls 엑셀 파일 읽기 쓰기
+    implementation 'org.apache.poi:poxi:4.1.2'
+
+    // xlsx 엑셀 파일 읽기 쓰기
+    implementation 'org.apache.poi:poi-oomxl:4.1.2'
+
     implementation 'org.json:json:20200518'
-//    implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-//    implementation 'org.elasticsearch:elasticsearch:7.15.2'
-//    implementation 'org.elasticsearch:elasticsearch-core:7.15.2'
-//    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.15.2'
 
     implementation 'io.lettuce:lettuce-core:6.1.5.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'

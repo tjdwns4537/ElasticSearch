@@ -38,6 +38,8 @@ public class SearchController {
 
         if(searchInfo.isEmpty()) return "redirect:/";
 
+        crawlerService.googleCrawler(searchInfo);
+
         List<String> list = articleElasticCustomService.findSimilarWords(searchInfo);
 
         Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(list);
@@ -49,7 +51,8 @@ public class SearchController {
         if(themaResult.isPresent()) log.info("{}의 퍼센트: {}",themaResult.get().getThemaName(), themaResult.get().getPercent());
         if(!themaResult.isPresent()) log.info("해당 테마명은 없습니다.");
 
-//        elasticService.readThemaAnalyze(searchInfo);
+        crawlerService.paxNetReadThema(searchInfo);
+
         return "redirect:/";
     }
 }

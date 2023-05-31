@@ -25,7 +25,7 @@ public class CrawlerController {
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
         crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
-        crawlerService.readThema(); // 테마 크롤링 후 저장
+        crawlerService.naverReadThema(); // 테마 크롤링 후 저장
 
         List<String> likeStockRanking = stockService.getLikeStockRanking();
         List<String> likeStockAll = stockService.getLikeStockAll();

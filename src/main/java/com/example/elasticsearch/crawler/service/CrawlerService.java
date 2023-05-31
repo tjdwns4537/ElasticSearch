@@ -3,7 +3,6 @@ package com.example.elasticsearch.crawler.service;
 import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
-import com.example.elasticsearch.elastic.repository.ArticleElasticRepository;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
@@ -52,7 +51,46 @@ public class CrawlerService {
     String naverUrl;
 
     @Value("${crawler.paxNetThemaUrl}")
-    String paxNet;
+    String paxNetUrl;
+
+    public Map<String, String> paxNetReadThema(String keyword) {
+        Map<String, String> result = new HashMap<>();
+        try {
+            Document paxNetDoc = Jsoup.connect(paxNetUrl).get();
+            Elements divValue = paxNetDoc.getElementsByAttributeValue("class", "table-data");
+            Element tbody = divValue.select("tbody").get(1);
+            Elements tdValue = tbody.select("td");
+
+            for (int i = 0; i < tdValue.size(); i++) {
+                if (tdValue.get(i).text().equals(keyword)) {
+                    String text1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
+                    String text2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
+                    log.info("주도주 : {}, {}", text1, text2);
+
+                    result.put("best1", text1);
+                    result.put("best2", text2);
+                }
+            }
+            return result;
+        } catch (IOException e) {
+            return new HashMap<>();
+        }
+    }
+
+    public void googleCrawler(String searchInfo) {
+        try {
+            for (int i = 0; i < 5; i++) {
+                String url = "https://www.google.com/search?q=" + searchInfo + "&tbm=nws&sxsrf=APwXEdf_M3-MhMZ4bGGTwdUIp4Xcy2ZIeg:1685424458306&ei=Sol1ZNivEpDr-Qad-LdY&start=" + i + "0&sa=N&ved=2ahUKEwjY_Iexp5z_AhWQdd4KHR38DQsQ8tMDegQIBBAE&biw=1440&bih=734&dpr=2";
+                Document doc = Jsoup.connect(url).get();
+                Elements titleElements = doc.getElementsByAttributeValue("class", "n0jPhd ynAwRc MBeuO nDgy9d");
+                for (Element j : titleElements) {
+                    elasticService.articleSave(ArticleEls.of(j.text()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void likeStockFindAll() {
         Optional<StockDbDto> saveStock = Optional.empty();
@@ -169,27 +207,30 @@ public class CrawlerService {
         }
     }
 
-    public void readThema() {
-        try{
-            Document naverDoc = Jsoup.connect(naverUrl).get();
+    public void naverReadThema() {
+        for (int i = 1; i < 8; i++) {
+            try{
+                Document naverDoc = Jsoup.connect(naverUrl).get();
+                Document paxNetDoc = Jsoup.connect(paxNetUrl).get();
 
-            /** 네이버 종목 테마 **/
-            Elements naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2");
-            Element naverTitleElement = naverDoc.getElementsByAttributeValue("class", "type_1 theme").get(0);
-            Elements naverTitle = naverTitleElement.select(".col_type1");
+                /** 네이버 테마 관련 퍼센트를 크롤링 **/
+                Elements naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2");
+                Element naverTitleElement = naverDoc.getElementsByAttributeValue("class", "type_1 theme").get(0);
+                Elements naverTitle = naverTitleElement.select(".col_type1");
 
-            String[] naverStockPercent = naverPercent.text().split(" "); // 테마 퍼센트
+                String[] naverStockPercent = naverPercent.text().split(" "); // 테마 퍼센트
 
-            for (int i=1; i<naverTitle.size(); i++) {
-                Element element = naverTitle.get(i); // thema name
-                String themaName = element.text();
-                String percent = naverStockPercent[i-1]; // thema percent
-                Thema thema = Thema.of(themaName, percent);
-                themaElasticService.themaSave(thema);
+                for (int j=1; j<naverTitle.size(); j++) {
+                    Element element = naverTitle.get(j); // thema name
+                    String themaName = element.text();
+                    String percent = naverStockPercent[j-1]; // thema percent
+                    Thema thema = Thema.of(themaName, percent);
+                    themaElasticService.themaSave(thema);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

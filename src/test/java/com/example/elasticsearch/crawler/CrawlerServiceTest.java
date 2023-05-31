@@ -54,7 +54,7 @@ class CrawlerServiceTest {
 
         try {
             for (int i = 0; i < numberArr.length; i++) {
-                Document doc = Jsoup.connect(url+numberArr[i]).get();
+                Document doc = Jsoup.connect(url + numberArr[i]).get();
 
                 Elements titleElements = doc.getElementsByAttributeValue("class", "wrap_company");
                 Element titleElement = titleElements.get(0);
@@ -73,8 +73,8 @@ class CrawlerServiceTest {
                 Elements percentSpanElements = percnetElement.select(".blind");
                 Elements selectDown = percnetElement.select(".no_down");
                 Elements selectUp = percnetElement.select(".no_up");
-                if(!selectDown.isEmpty()) percentText += "-";
-                if(!selectUp.isEmpty()) percentText += "+";
+                if (!selectDown.isEmpty()) percentText += "-";
+                if (!selectUp.isEmpty()) percentText += "+";
                 String percent = percentText + percentSpanElements.get(0).text();
 
                 Elements tradeElements = doc.getElementsByAttributeValue("class", "no_info");
@@ -103,7 +103,7 @@ class CrawlerServiceTest {
                 "https://kr.investing.com/search/?q=네이버"
         };
 
-        try{
+        try {
 
             for (String i : arr) {
                 Document doc = Jsoup.connect(i).get();
@@ -122,16 +122,16 @@ class CrawlerServiceTest {
 
         List<StockLikeDto> all = likeStockJpaRepository.findAll();
         for (StockLikeDto i : all) {
-            System.out.println("stock : "+i.getLikeStock());
+            System.out.println("stock : " + i.getLikeStock());
         }
     }
 
     @Test
     @DisplayName("실시간 차트 종목 순위")
-    void liveStock(){
+    void liveStock() {
         String url = "https://finance.naver.com/";
 
-        try{
+        try {
             Document doc = Jsoup.connect(url).get();
 
             /** 종목 이름 **/
@@ -153,21 +153,46 @@ class CrawlerServiceTest {
     }
 
     @Test
+    @DisplayName("테마주 검색에 어떤 정보가 있는지 확인")
+    public void themaPageTest() {
+        String paxNet = "http://www.paxnet.co.kr/stock/infoStock/thema";
+        try {
+            Document paxNetDoc = Jsoup.connect(paxNet).get();
+
+            Elements divValue = paxNetDoc.getElementsByAttributeValue("class", "table-data");
+
+            Element tbody = divValue.select("tbody").get(1);
+
+            Elements tdValue = tbody.select("td");
+
+            for (int i = 0; i < tdValue.size(); i++) {
+                if (tdValue.get(i).text().equals("백신여권")) {
+                    String text1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
+                    String text2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
+                    System.out.println("주도주 : " + text1 + " " + text2);
+                }
+            }
+        } catch (IOException e) {
+        }
+    }
+
+    @Test
     @DisplayName("테마주 검색")
     public void themaStock() {
         String naverUrl = "https://finance.naver.com/sise/theme.naver";
         String paxNet = "http://www.paxnet.co.kr/stock/infoStock/thema";
-        try{
+        try {
             Document naverDoc = Jsoup.connect(naverUrl).get();
             Document paxNetDoc = Jsoup.connect(paxNet).get();
 
             /** 네이버 종목 테마 **/
             Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
+
             Element naverTitleElement = naverTitleElements.get(0);
 
             Elements naverTitle = naverTitleElement.select(".col_type1");
 
-            String naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2").text();
+            String naverPercent = naverDoc.getElementsByAttributeValue("class", "number col_type2").text();
 
             String[] naverStockPercent = naverPercent.split(" "); // 테마 퍼센트
 
@@ -210,7 +235,7 @@ class CrawlerServiceTest {
 
             List<String> list = articleTitleElements1.eachText();
 
-            for(String i : list) System.out.println(i);
+            for (String i : list) System.out.println(i);
 
 //            System.out.println(articleTitleElements1);
 //            System.out.println(articleTitleElements2);
