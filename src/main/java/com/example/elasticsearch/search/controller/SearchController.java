@@ -40,18 +40,21 @@ public class SearchController {
 
         crawlerService.googleCrawler(searchInfo);
 
-        List<String> list = articleElasticCustomService.findSimilarWords(searchInfo);
+        List<String> articleList = articleElasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
 
-        Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(list);
+        Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
 
         log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, analyzeResult.getOrDefault(Indices.POSITIVE, 0), analyzeResult.getOrDefault(Indices.NEGATIVE, 0));
 
-        Optional<Thema> themaResult = themaElasticService.findByKeyword(searchInfo);
+        List<Thema> themaList = articleElasticCustomService.findSimilarThema(Indices.ARTICLE_THEMA_INDEX, searchInfo); // 테마 크롤링 정보 전부 가져오기
 
-        if(themaResult.isPresent()) log.info("{}의 퍼센트: {}",themaResult.get().getThemaName(), themaResult.get().getPercent());
-        if(!themaResult.isPresent()) log.info("해당 테마명은 없습니다.");
+        for (Thema i : themaList) {
+            log.info("테마 명 : {}",i.getThemaName());
+            log.info("테마 퍼센트",i.getPercent());
+        }
+//        Map<String, String> themaBestStock = crawlerService.paxNetReadThema(themaList); // 주도주 2개 가져오기
 
-        crawlerService.paxNetReadThema(searchInfo);
+//        log.info("주도주 : {}, {}",themaBestStock.getOrDefault("best1",""), themaBestStock.getOrDefault("best2",""));
 
         return "redirect:/";
     }

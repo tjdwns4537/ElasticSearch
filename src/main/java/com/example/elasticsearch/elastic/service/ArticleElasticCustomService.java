@@ -1,6 +1,7 @@
 package com.example.elasticsearch.elastic.service;
 
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +35,8 @@ public class ArticleElasticCustomService {
 
     @Autowired
     private final RestHighLevelClient client;
+
+    @Autowired private final ThemaElasticService themaElasticService;
 
     public void readThemaAnalyze(String searchInfo) {
         try {
@@ -58,9 +58,49 @@ public class ArticleElasticCustomService {
         }
     }
 
-    public List<String> findSimilarWords(String title) {
+    public List<Thema> findSimilarThema(String IndexName, String searchInfo) {
         try {
-            SearchRequest searchRequest = new SearchRequest(Indices.ARTICLE_INDEX);
+            SearchRequest searchRequest = new SearchRequest(IndexName);
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+            // Create a BoolQuery to combine multiple queries
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+            // Add a match query for exact match
+            boolQueryBuilder.should(QueryBuilders.matchQuery("themaName", searchInfo));
+
+            // Add a wildcard query for similar words
+            String wildcardQuery = "*" + searchInfo + "*";
+            boolQueryBuilder.should(QueryBuilders.wildcardQuery("themaName", wildcardQuery));
+
+            // Add a space query for simlar words
+            String spaceQuery = "* " + searchInfo + " *";
+            boolQueryBuilder.should(QueryBuilders.wildcardQuery("themaName", spaceQuery));
+
+            boolQueryBuilder.should(QueryBuilders.matchQuery("themaName", searchInfo).fuzziness("AUTO"));
+
+            sourceBuilder.query(boolQueryBuilder);
+            searchRequest.source(sourceBuilder);
+
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits searchHits = searchResponse.getHits();
+
+            List<Thema> similarWords = new ArrayList<>();
+            for (SearchHit hit : searchHits.getHits()) {
+                String similarTitle = hit.getSourceAsMap().get("themaName").toString();
+                Optional<Thema> thema = themaElasticService.findByKeyword(similarTitle);
+                if(thema.isPresent()) similarWords.add(thema.get());
+            }
+            return similarWords;
+        } catch (IOException e) {
+            // Handle exception
+            return new ArrayList<>();
+        }
+    }
+
+    public List<String> findSimilarWords(String IndexName, String title) {
+        try {
+            SearchRequest searchRequest = new SearchRequest(IndexName);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
             // Create a BoolQuery to combine multiple queries
@@ -94,52 +134,6 @@ public class ArticleElasticCustomService {
         } catch (IOException e) {
             // Handle exception
             return new ArrayList<>();
-        }
-    }
-
-    public void close() {
-        try {
-            client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void existCheckAndDelete() {
-        String indexName = Indices.ARTICLE_INDEX;
-        DeleteByQueryRequest delete = new DeleteByQueryRequest(indexName);
-//        DeleteRequest deleteRequest = new DeleteRequest(indexName);
-
-        try {
-//            client.delete(deleteRequest, RequestOptions.DEFAULT);
-            BulkByScrollResponse response = client.deleteByQuery(delete, RequestOptions.DEFAULT);
-            long deletedDocuments = response.getDeleted();
-            System.out.println("Deleted documents: " + deletedDocuments);
-        } catch (IOException e) {
-            // Handle exception
-        }
-    }
-
-    public void deleteAllDocuments() {
-        String indexName = Indices.ARTICLE_INDEX;
-        try {
-            GetIndexRequest getIndexRequest = new GetIndexRequest(indexName);
-            boolean indexExists = client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
-
-//            GetRequest getRequest = new GetRequest(indexName);
-//            boolean indexExists = client.exists(getRequest, RequestOptions.DEFAULT);
-
-            if (indexExists) {
-                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
-                client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-
-                CreateIndexRequest createIndexRequest = new CreateIndexRequest(indexName);
-                client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
-
-                client.indices().refresh(new RefreshRequest(indexName), RequestOptions.DEFAULT);
-            }
-        } catch (IOException e) {
-            // Handle exception
         }
     }
 }

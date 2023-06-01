@@ -3,8 +3,10 @@ package com.example.elasticsearch.crawler.service;
 import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
+import com.example.elasticsearch.elastic.service.ArticleElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
+import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -34,6 +36,7 @@ public class CrawlerService {
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
     @Autowired private final ElasticService elasticService;
     @Autowired private final ThemaElasticService themaElasticService;
+    @Autowired private final ArticleElasticCustomService articleElasticCustomService;
 
     @Value("${crawler.url}")
     String url;
@@ -53,28 +56,64 @@ public class CrawlerService {
     @Value("${crawler.paxNetThemaUrl}")
     String paxNetUrl;
 
-    public Map<String, String> paxNetReadThema(String keyword) {
+    @Value(("${crawler.naverUpJongUrl}"))
+    String naverUpjongUrl;
+
+    public void naverUpjongCrawler() {
+        try {
+            Document doc = Jsoup.connect(naverUpjongUrl).get();
+            Elements big1 = doc.getElementsByAttributeValue("class", "type_1");
+            Elements trSelect = big1.get(0).select("tr");
+
+            for (int i = 2; i < trSelect.size(); i++) {
+                Element tdSelect = trSelect.get(i).selectFirst("td");
+                Elements href = tdSelect.getElementsByAttribute("href");
+                Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 red01");
+                if (href.hasText() && percentEl.hasText() ) {
+                    String upjong = href.text();
+                    String percent = percentEl.text();
+                    String detailLink = href.attr("href");
+                    themaElasticService.themaSave(Thema.of(upjong, percent, detailLink));
+                    log.info("upjong : {}, percent : {}, detailLink : {}", upjong, percent, detailLink);
+                }
+            }
+        } catch (IOException e) {
+
+        }
+    }
+
+    public Map<String, String> paxNetReadThema() {
         Map<String, String> result = new HashMap<>();
+
         try {
             Document paxNetDoc = Jsoup.connect(paxNetUrl).get();
+
             Elements divValue = paxNetDoc.getElementsByAttributeValue("class", "table-data");
+
             Element tbody = divValue.select("tbody").get(1);
+
             Elements tdValue = tbody.select("td");
 
             for (int i = 0; i < tdValue.size(); i++) {
-                if (tdValue.get(i).text().equals(keyword)) {
-                    String text1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
-                    String text2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
-                    log.info("주도주 : {}, {}", text1, text2);
 
-                    result.put("best1", text1);
-                    result.put("best2", text2);
+                Elements themaNames = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis");
+                Elements next = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis").next();
+
+                String percent = "";
+                String thema = "";
+
+                if (next.hasText() && themaNames.hasText()) {
+                    percent = next.text();
+                    thema = themaNames.text();
+                    String best1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
+                    String best2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
+                    themaElasticService.themaSave(Thema.of(thema, percent,best1, best2));
                 }
             }
-            return result;
-        } catch (IOException e) {
-            return new HashMap<>();
         }
+        catch (IOException e) {
+        }
+        return result;
     }
 
     public void googleCrawler(String searchInfo) {
@@ -211,7 +250,6 @@ public class CrawlerService {
         for (int i = 1; i < 8; i++) {
             try{
                 Document naverDoc = Jsoup.connect(naverUrl).get();
-                Document paxNetDoc = Jsoup.connect(paxNetUrl).get();
 
                 /** 네이버 테마 관련 퍼센트를 크롤링 **/
                 Elements naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2");
@@ -224,8 +262,7 @@ public class CrawlerService {
                     Element element = naverTitle.get(j); // thema name
                     String themaName = element.text();
                     String percent = naverStockPercent[j-1]; // thema percent
-                    Thema thema = Thema.of(themaName, percent);
-                    themaElasticService.themaSave(thema);
+                    themaElasticService.themaSave(Thema.of(themaName, percent));
                 }
 
             } catch (IOException e) {

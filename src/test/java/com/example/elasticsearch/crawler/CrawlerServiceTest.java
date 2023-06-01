@@ -25,6 +25,35 @@ class CrawlerServiceTest {
     LikeStockJpaRepository likeStockJpaRepository;
 
     @Test
+    @DisplayName("네이버 업종 크롤링")
+    public void upjongCrawler() {
+        String url = "https://finance.naver.com/sise/sise_group.naver?type=upjong";
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements big1 = doc.getElementsByAttributeValue("class", "type_1");
+            Elements trSelect = big1.get(0).select("tr");
+
+            for (int i = 2; i < trSelect.size(); i++) {
+                Element tdSelect = trSelect.get(i).selectFirst("td");
+                System.out.println(tdSelect);
+                Elements href = tdSelect.getElementsByAttribute("href");
+                Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 red01");
+                String text = "";
+                String percent = "";
+                if (href.hasText() && percentEl.hasText() ) {
+                    text = href.text();
+                    percent = percentEl.text();
+                    String hrefLink = href.attr("href");
+//                    System.out.println(hrefLink);
+//                    System.out.println("업종명: " + text + " percent : " + percent);
+                }
+            }
+        } catch (IOException e) {
+
+        }
+    }
+
+    @Test
     @DisplayName("구글 크롤링")
     public void googleCrawler() {
         String search = "카카오";
@@ -165,13 +194,27 @@ class CrawlerServiceTest {
 
             Elements tdValue = tbody.select("td");
 
+//            System.out.println(tdValue);
+
+            List<String> strings1 = tbody.getElementsByAttributeValue("class", "ellipsis").eachText(); // 테마명
+            for (String i : strings1) {
+//                System.out.println(i);
+            }
+
             for (int i = 0; i < tdValue.size(); i++) {
-                if (tdValue.get(i).text().equals("백신여권")) {
+                Elements themaNames = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis");
+                Elements next = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis").next();
+                
+                if (next.hasText()) {
+                    String percent = next.text();
+                }
+                if (themaNames.equals("코로나19(화이자)")) {
                     String text1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
                     String text2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
-                    System.out.println("주도주 : " + text1 + " " + text2);
                 }
+                System.out.println("thema: " + themaNames.text());
             }
+
         } catch (IOException e) {
         }
     }

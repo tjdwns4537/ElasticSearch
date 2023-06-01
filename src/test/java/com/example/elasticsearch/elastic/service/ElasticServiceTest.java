@@ -65,7 +65,7 @@ class ElasticServiceTest {
         elasticService.articleSave(ArticleEls.of("반도체가 망했다."));
         String sentence = "반도체";
 
-        List<String> similarWords = articleElasticCustomService.findSimilarWords(sentence);
+        List<String> similarWords = articleElasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, sentence);
 
         for (String similarSentence : similarWords) {
             System.out.println(similarSentence);
