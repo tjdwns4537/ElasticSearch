@@ -3,6 +3,7 @@ package com.example.elasticsearch.crawler;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
+import com.example.elasticsearch.thema.domain.Thema;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -35,14 +36,17 @@ class CrawlerServiceTest {
 
             for (int i = 2; i < trSelect.size(); i++) {
                 Element tdSelect = trSelect.get(i).selectFirst("td");
-                System.out.println(tdSelect);
+                System.out.println(trSelect);
                 Elements href = tdSelect.getElementsByAttribute("href");
                 Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 red01");
-                String text = "";
-                String percent = "";
+
+                if(!percentEl.hasText()){
+                    percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 nv01");
+                }
+
                 if (href.hasText() && percentEl.hasText() ) {
-                    text = href.text();
-                    percent = percentEl.text();
+                    String text = href.text();
+                    String percent = percentEl.text();
                     String hrefLink = href.attr("href");
 //                    System.out.println(hrefLink);
 //                    System.out.println("업종명: " + text + " percent : " + percent);
@@ -204,15 +208,15 @@ class CrawlerServiceTest {
             for (int i = 0; i < tdValue.size(); i++) {
                 Elements themaNames = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis");
                 Elements next = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis").next();
-                
-                if (next.hasText()) {
+
+
+                if (next.hasText() && themaNames.hasText()) {
                     String percent = next.text();
+                    String thema = themaNames.text();
+                    String best1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
+                    String best2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
+                    System.out.println(percent + " " + thema + " " +best1 + " " + best2);
                 }
-                if (themaNames.equals("코로나19(화이자)")) {
-                    String text1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
-                    String text2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
-                }
-                System.out.println("thema: " + themaNames.text());
             }
 
         } catch (IOException e) {

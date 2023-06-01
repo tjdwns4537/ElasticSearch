@@ -3,7 +3,7 @@ package com.example.elasticsearch.crawler.service;
 import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
-import com.example.elasticsearch.elastic.service.ArticleElasticCustomService;
+import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
@@ -36,7 +36,7 @@ public class CrawlerService {
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
     @Autowired private final ElasticService elasticService;
     @Autowired private final ThemaElasticService themaElasticService;
-    @Autowired private final ArticleElasticCustomService articleElasticCustomService;
+    @Autowired private final ElasticCustomService elasticCustomService;
 
     @Value("${crawler.url}")
     String url;
@@ -69,12 +69,16 @@ public class CrawlerService {
                 Element tdSelect = trSelect.get(i).selectFirst("td");
                 Elements href = tdSelect.getElementsByAttribute("href");
                 Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 red01");
+
+                if(!percentEl.hasText()){ // 상승 또는 하락
+                    percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 nv01");
+                }
+
                 if (href.hasText() && percentEl.hasText() ) {
                     String upjong = href.text();
                     String percent = percentEl.text();
                     String detailLink = href.attr("href");
                     themaElasticService.themaSave(Thema.of(upjong, percent, detailLink));
-                    log.info("upjong : {}, percent : {}, detailLink : {}", upjong, percent, detailLink);
                 }
             }
         } catch (IOException e) {
@@ -99,15 +103,17 @@ public class CrawlerService {
                 Elements themaNames = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis");
                 Elements next = tdValue.get(i).getElementsByAttributeValue("class", "ellipsis").next();
 
-                String percent = "";
-                String thema = "";
-
                 if (next.hasText() && themaNames.hasText()) {
-                    percent = next.text();
-                    thema = themaNames.text();
+                    String percent = next.text();
+                    String themaName = themaNames.text();
                     String best1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
                     String best2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
-                    themaElasticService.themaSave(Thema.of(thema, percent,best1, best2));
+
+                    log.info("paxNet 저장 : {}, {} ,{} ,{}", themaName, percent, best1, best2);
+
+                    Thema thema = Thema.of(themaName, percent, best1, best2);
+
+                    themaElasticService.themaSave(thema);
                 }
             }
         }

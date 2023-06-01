@@ -5,23 +5,19 @@ import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.AnalyzeRequest;
 import org.elasticsearch.client.indices.AnalyzeResponse;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +27,16 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ArticleElasticCustomService {
+public class ElasticCustomService {
 
     @Autowired
     private final RestHighLevelClient client;
 
     @Autowired private final ThemaElasticService themaElasticService;
+
+    public void updateDocument(String index, String id, String fieldName, String updatedValue) throws IOException {
+
+    }
 
     public void readThemaAnalyze(String searchInfo) {
         try {
@@ -90,6 +90,8 @@ public class ArticleElasticCustomService {
                 String similarTitle = hit.getSourceAsMap().get("themaName").toString();
                 Optional<Thema> thema = themaElasticService.findByKeyword(similarTitle);
                 if(thema.isPresent()) similarWords.add(thema.get());
+
+                log.info("similar thema : {} , {}", thema.get().getThemaName(), thema.get().getPercent());
             }
             return similarWords;
         } catch (IOException e) {

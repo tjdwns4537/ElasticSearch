@@ -1,7 +1,7 @@
 package com.example.elasticsearch.search.controller;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
-import com.example.elasticsearch.elastic.service.ArticleElasticCustomService;
+import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -30,7 +29,7 @@ public class SearchController {
     @Autowired private final SearchRepository searchRepository;
     @Autowired private final ArticleRedisRepository articleRedisRepository;
     @Autowired private final KoreanSentiment koreanSentiment;
-    @Autowired private final ArticleElasticCustomService articleElasticCustomService;
+    @Autowired private final ElasticCustomService elasticCustomService;
     @Autowired private final ThemaElasticService themaElasticService;
 
     @PostMapping("/searchInfo")
@@ -40,17 +39,20 @@ public class SearchController {
 
         crawlerService.googleCrawler(searchInfo);
 
-        List<String> articleList = articleElasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
+        List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
 
         Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
 
         log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, analyzeResult.getOrDefault(Indices.POSITIVE, 0), analyzeResult.getOrDefault(Indices.NEGATIVE, 0));
 
-        List<Thema> themaList = articleElasticCustomService.findSimilarThema(Indices.ARTICLE_THEMA_INDEX, searchInfo); // 테마 크롤링 정보 전부 가져오기
+        List<Thema> themaList = elasticCustomService.findSimilarThema(Indices.ARTICLE_THEMA_INDEX, searchInfo); // 테마 크롤링 정보 전부 가져오기
 
         for (Thema i : themaList) {
-            log.info("테마 명 : {}",i.getThemaName());
-            log.info("테마 퍼센트",i.getPercent());
+            log.info("테마 명 : {}", i.getThemaName());
+            log.info("테마 퍼센트 : {}", i.getPercent());
+            log.info("테마 주도주1 : {}", i.getFirstStock());
+            log.info("테마 주도주2 : {}", i.getSecondStock());
+            log.info("테마 링크 : {}", i.getDetailLink());
         }
 //        Map<String, String> themaBestStock = crawlerService.paxNetReadThema(themaList); // 주도주 2개 가져오기
 
