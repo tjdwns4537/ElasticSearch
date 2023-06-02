@@ -2,10 +2,7 @@ package com.example.elasticsearch.kafka.service;
 
 import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.service.CrawlerService;
-import com.example.elasticsearch.elastic.service.ElasticService;
-import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
-import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +43,32 @@ public class KafkaService {
     public void sendNaverThemaMessage(String message) {
 
         ListenableFuture<SendResult<String, Object>> future =
-                kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC, message);
+                kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC1, message);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
 
             @Override
             public void onSuccess(SendResult<String, Object> result) {
-                crawlerService.naverReadThema(); // 테마 크롤링 후 저장
+                crawlerService.naverReadThemaConnection(message); // 테마 크롤링 후 저장
+                log.info("Sent message=[ {} ] with offset=[ {} ]",message, result.getRecordMetadata().offset());
+            }
+            @Override
+            public void onFailure(Throwable ex) {
+                log.info("Unable to send message=[ {} ] due to : {}", message, ex.getMessage());
+            }
+        });
+    }
+
+    public void sendNaverThemaMessage2(String message) {
+
+        ListenableFuture<SendResult<String, Object>> future =
+                kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC2, message);
+
+        future.addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
+
+            @Override
+            public void onSuccess(SendResult<String, Object> result) {
+                crawlerService.naverReadThemaConnection(message); // 테마 크롤링 후 저장
                 log.info("Sent message=[ {} ] with offset=[ {} ]",message, result.getRecordMetadata().offset());
             }
             @Override
@@ -64,13 +80,16 @@ public class KafkaService {
 
     @KafkaListener(topics = Indices.NAVER_ARTICLE_CRAWLER_TOPIC, groupId = Indices.NAVER_ARTICLE_CRAWLER_TOPIC_GROUPID1)
     public void listenGroupArticleGroup(ArticleEls message) {
-//        elasticService.articleSave(message);
         log.info("Received Message in group article: {}",message.getTitle());
     }
 
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID1, groupId = Indices.NAVER_ARTICLE_CRAWLER_TOPIC_GROUPID1)
-    public void listenGroupThemaGroup(Thema message) {
-//        themaElasticService.themaSave(message);
-        log.info("Received Message in group thema: {}", message.getThemaName());
+    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC1, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID1)
+    public void listenGroupThemaGroup1(String message) {
+        log.info("Received Message in group thema: {}", message);
+    }
+
+    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC2, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID2)
+    public void listenGroupThemaGroup2(String message) {
+        log.info("Received Message in group article: {}",message);
     }
 }

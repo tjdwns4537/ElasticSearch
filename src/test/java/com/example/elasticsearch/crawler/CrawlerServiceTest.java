@@ -37,6 +37,8 @@ class CrawlerServiceTest {
 
             Elements trElements = tableElements.get(0).select("tr");
 
+            System.out.println(trElements);
+
             for (int i = 0; i < trElements.size(); i++) {
                 Elements stockNameElements = trElements.get(i).getElementsByAttributeValue("class", "name_area");
                 if (stockNameElements.hasText()) {
@@ -271,38 +273,41 @@ class CrawlerServiceTest {
 
 //            System.out.println(trElements);
 
-            for (int i = 3; i < trElements.size(); i++) {
-                Element trElement = trElements.get(i);
-                Elements themaName = trElement.getElementsByAttributeValue("class", "col_type1");
-                Elements percent = trElement.getElementsByAttributeValue("class", "number col_type2");
-                Elements best1 = trElement.getElementsByAttributeValue("class", "ls col_type5");
-                Elements best2 = trElement.getElementsByAttributeValue("class", "ls col_type6");
+            Elements themaName = tbodyElements.get(0).getElementsByAttributeValue("class", "col_type1");
+            Elements percent = tbodyElements.get(0).getElementsByAttributeValue("class", "number col_type2");
+            Elements best1 = tbodyElements.get(0).getElementsByAttributeValue("class", "ls col_type5");
+            Elements best2 = tbodyElements.get(0).getElementsByAttributeValue("class", "ls col_type6");
 
-                if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
-                    String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
-                    System.out.println(attr);
-//                    System.out.println(themaName.text() + " " +  percent.text() + " " +best1.text() + " " + best2.text());
+            if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
+                for (int i=1; i<themaName.size(); i++) {
+                    String attr = themaName.get(i).getElementsByAttribute("href").attr("href");
+                    System.out.println("link: "+attr);
                 }
+                System.out.println("thema: "+themaName.text() + "\n" +  percent.text() + "\n" +best1.text() + "\n" + best2.text());
             }
 
+//            for (int i = 3; i < trElements.size(); i++) {
+//                Element trElement = trElements.get(i);
+//                Elements comp = trElement.getElementsByAttributeValue("class", "col_type1");
+//                String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
+//
+//            }
 
-            Element naverTitleElement = naverTitleElements.get(0);
 
-            Elements naverTitle = naverTitleElement.select(".col_type1");
 
-            String naverPercent = naverDoc.getElementsByAttributeValue("class", "number col_type2").text();
-
-            String[] naverStockPercent = naverPercent.split(" "); // 테마 퍼센트
-
-//            System.out.println(naverTitle.size() + " " + naverStockPercent.length);
-
-            for (Element i : naverTitle) {
-//                System.out.println("thema : " + i.text());
-            }
-
-            for (String i : naverStockPercent) {
-//                System.out.println("percent : " + i);
-            }
+//            for (int i = 3; i < trElements.size(); i++) {
+//                Element trElement = trElements.get(i);
+//                Elements themaName = trElement.getElementsByAttributeValue("class", "col_type1");
+//                Elements percent = trElement.getElementsByAttributeValue("class", "number col_type2");
+//                Elements best1 = trElement.getElementsByAttributeValue("class", "ls col_type5");
+//                Elements best2 = trElement.getElementsByAttributeValue("class", "ls col_type6");
+//
+//                if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
+//                    String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
+//                    System.out.println(attr);
+////                    System.out.println(themaName.text() + " " +  percent.text() + " " +best1.text() + " " + best2.text());
+//                }
+//            }
         } catch (IOException e) {
             e.printStackTrace();
         }

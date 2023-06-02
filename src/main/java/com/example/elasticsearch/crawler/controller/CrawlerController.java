@@ -38,7 +38,15 @@ public class CrawlerController {
         crawlerService.saveLiveStock();
 
         kafkaService.sendNaverArticleMessage("기사 크롤링 수행");
-        kafkaService.sendNaverThemaMessage("테마 크롤링 수행");
+
+        for (int i = 1; i < 4; i++) {
+            kafkaService.sendNaverThemaMessage(String.valueOf(i));
+        }
+
+        for (int i = 4; i < 8; i++) {
+            kafkaService.sendNaverThemaMessage2(String.valueOf(i));
+        }
+
 
         log.info("end timer : {}", Timer.time());
 //        crawlerService.naverUpjongCrawler(); // 업종 관련 크롤링

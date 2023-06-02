@@ -31,13 +31,20 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CrawlerService {
 
-    @Autowired private final StockJpaRepository stockJpaRepository;
-    @Autowired private final LikeStockRepository likeStockRepository;
-    @Autowired private final LiveStockRepository liveStockRepository;
-    @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
-    @Autowired private final ElasticService elasticService;
-    @Autowired private final ThemaElasticService themaElasticService;
-    @Autowired private final ElasticCustomService elasticCustomService;
+    @Autowired
+    private final StockJpaRepository stockJpaRepository;
+    @Autowired
+    private final LikeStockRepository likeStockRepository;
+    @Autowired
+    private final LiveStockRepository liveStockRepository;
+    @Autowired
+    private final LikeStockJpaRepository likeStockJpaRepository;
+    @Autowired
+    private final ElasticService elasticService;
+    @Autowired
+    private final ThemaElasticService themaElasticService;
+    @Autowired
+    private final ElasticCustomService elasticCustomService;
 
     @Value("${crawler.url}")
     String url;
@@ -60,39 +67,6 @@ public class CrawlerService {
     @Value(("${crawler.naverUpJongUrl}"))
     String naverUpjongUrl;
 
-    public List<StockElasticDto> relateCrawler(String url) {
-
-        List<StockElasticDto> list = new ArrayList<>();
-        url = liveUrl + url;
-
-        try {
-            Document doc = Jsoup.connect(url).get();
-
-            Elements tableElements = doc.getElementsByAttributeValue("class", "type_5");
-
-            Elements trElements = tableElements.get(0).select("tr");
-
-            for (int i = 0; i < trElements.size(); i++) {
-                Elements stockNameElements = trElements.get(i).getElementsByAttributeValue("class", "name_area");
-                if (stockNameElements.hasText()) {
-                    String stockNameFull = stockNameElements.text();
-                    Elements priceElements = trElements.get(i).getElementsByAttributeValue("class", "number");
-                    Element priceElement = priceElements.get(0);
-                    Element prevPriceCompareElement = priceElements.get(1);
-                    Element prevPriceComparePercentElement = priceElements.get(2);
-
-                    String stockName = stockNameFull.substring(0, stockNameFull.length() - 2);
-                    StockElasticDto stockElasticDto = StockElasticDto.of(stockName, priceElement.text(), prevPriceCompareElement.text(), prevPriceComparePercentElement.text());
-                    list.add(stockElasticDto);
-                }
-            }
-
-            return list;
-        } catch (IOException e) {
-            return new ArrayList<>();
-        }
-    }
-
     public void naverUpjongCrawler() {
         try {
             Document doc = Jsoup.connect(naverUpjongUrl).get();
@@ -102,13 +76,13 @@ public class CrawlerService {
             for (int i = 2; i < trSelect.size(); i++) {
                 Element tdSelect = trSelect.get(i).selectFirst("td");
                 Elements href = tdSelect.getElementsByAttribute("href");
-                Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 red01");
+                Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class", "tah p11 red01");
 
-                if(!percentEl.hasText()){ // 상승 또는 하락
-                    percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 nv01");
+                if (!percentEl.hasText()) { // 상승 또는 하락
+                    percentEl = trSelect.get(i).getElementsByAttributeValue("class", "tah p11 nv01");
                 }
 
-                if (href.hasText() && percentEl.hasText() ) {
+                if (href.hasText() && percentEl.hasText()) {
                     String upjong = href.text();
                     String percent = percentEl.text();
                     String detailLink = href.attr("href");
@@ -150,8 +124,7 @@ public class CrawlerService {
                     themaElasticService.themaSave(thema);
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
         return result;
     }
@@ -178,7 +151,7 @@ public class CrawlerService {
         try {
             for (StockLikeDto i : stockLikeList) {
 
-                Document doc = Jsoup.connect(url+i.getLikeStock()).get();
+                Document doc = Jsoup.connect(url + i.getLikeStock()).get();
 
                 /** 종목 이름 **/
                 Elements titleElements = doc.getElementsByAttributeValue("class", "wrap_company");
@@ -198,8 +171,8 @@ public class CrawlerService {
                 Element percnetElement = percentElements.get(0);
                 Elements selectDown = percnetElement.select(".no_down");
                 Elements selectUp = percnetElement.select(".no_up");
-                if(!selectDown.isEmpty()) percent.append("-");
-                if(!selectUp.isEmpty()) percent.append("+");
+                if (!selectDown.isEmpty()) percent.append("-");
+                if (!selectUp.isEmpty()) percent.append("+");
                 Elements percentSpanElements = percnetElement.select(".blind");
                 percent.append(String.format("%.2f", Double.parseDouble(percentSpanElements.get(1).text())));
 
@@ -233,7 +206,7 @@ public class CrawlerService {
     public String findStockNumber(String name) {
         String titleResult = "";
         String selectUrl = findUrl + name;
-        try{
+        try {
             Document doc = Jsoup.connect(selectUrl).get();
 
             /** 종목 이름 **/
@@ -249,7 +222,7 @@ public class CrawlerService {
     }
 
     public void saveLiveStock() {
-        try{
+        try {
             Document doc = Jsoup.connect(liveUrl).get();
 
             /** 종목 이름 **/
@@ -286,36 +259,63 @@ public class CrawlerService {
         }
     }
 
-    public void naverReadThema() {
+    public void relateCrawler(Thema thema, String url) {
 
-        url = liveUrl + url;
+        if (url.isBlank()) return;
 
-        for (int i = 1; i < 8; i++) {
-            try{
-                Document naverDoc = Jsoup.connect(naverUrl).get();
+        List<StockElasticDto> list = new ArrayList<>();
+        String relateUrl = liveUrl + url;
 
+        try {
+            Document doc = Jsoup.connect(relateUrl).get();
+            Elements tableElements = doc.getElementsByAttributeValue("class", "type_5");
+            Elements trElements = tableElements.get(0).select("tr");
 
-                /** 네이버 테마 관련 퍼센트를 크롤링 **/
-                Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
-                Elements tbodyElements = naverTitleElements.get(0).select("tbody");
-                Elements trElements = tbodyElements.get(0).select("tr");
+            for (int i = 0; i < trElements.size(); i++) {
+                Elements stockNameElements = trElements.get(i).getElementsByAttributeValue("class", "name_area");
+                if (stockNameElements.hasText()) {
+                    String stockNameFull = stockNameElements.text();
+                    Elements priceElements = trElements.get(i).getElementsByAttributeValue("class", "number");
+                    Element priceElement = priceElements.get(0);
+                    Element prevPriceCompareElement = priceElements.get(1);
+                    Element prevPriceComparePercentElement = priceElements.get(2);
 
-                for (int j = 3; j < trElements.size(); j++) {
-                    Element trElement = trElements.get(i);
-                    Elements themaName = trElement.getElementsByAttributeValue("class", "col_type1");
-                    Elements percent = trElement.getElementsByAttributeValue("class", "number col_type2");
-                    Elements best1 = trElement.getElementsByAttributeValue("class", "ls col_type5");
-                    Elements best2 = trElement.getElementsByAttributeValue("class", "ls col_type6");
-
-                    if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
-                        String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
-                        List<StockElasticDto> stockList = relateCrawler(attr); // 테마 관련 주식들 추가
-                        themaElasticService.themaSave(Thema.of(themaName.text(), percent.text(), best1.text(), best2.text(), stockList));
-                    }
+                    String stockName = stockNameFull.substring(0, stockNameFull.length() - 2);
+                    StockElasticDto stockElasticDto = StockElasticDto.of(stockName, priceElement.text(), prevPriceCompareElement.text(), prevPriceComparePercentElement.text());
+                    list.add(stockElasticDto);
                 }
+            }
+            thema.setFirstStock(list.get(0).getStockName());
+            thema.setSecondStock(list.get(1).getStockName());
+            thema.setRelateStock(list);
+            themaElasticService.themaSave(thema);
+        } catch (IOException e) {
+        }
+    }
 
-            } catch (IOException e) {
-                e.printStackTrace();
+    public void naverReadThemaConnection(String i) {
+        try {
+            Document naverDoc = Jsoup.connect(naverUrl+i).get();
+            naverReadThema(naverDoc);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void naverReadThema(Document naverDoc) {
+        /** 네이버 테마 관련 퍼센트를 크롤링 **/
+        Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
+        Elements tbodyElements = naverTitleElements.get(0).select("tbody");
+
+        Elements themaName = tbodyElements.get(0).getElementsByAttributeValue("class", "col_type1");
+        Elements percent = tbodyElements.get(0).getElementsByAttributeValue("class", "number col_type2");
+
+        for (int k = 1; k < themaName.size(); k++) {
+            if (themaName.get(k).hasText() && percent.get(k).hasText()) {
+                String attr = themaName.get(k).getElementsByAttribute("href").attr("href");
+                Thema thema = Thema.of(themaName.get(k).text(), percent.get(k).text());
+                relateCrawler(thema, attr); // 테마 관련 주식들 추가
+                log.info("테마 크롤링 : {}", themaName.get(k).text());
             }
         }
     }

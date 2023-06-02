@@ -38,6 +38,8 @@ public class Thema {
         this.id = UUID.randomUUID().toString();
         this.themaName = themaName;
         this.percent = percent;
+        this.firstStock = "";
+        this.secondStock = "";
     }
 
     public Thema(String themaName, String percent, String detailLink) {
