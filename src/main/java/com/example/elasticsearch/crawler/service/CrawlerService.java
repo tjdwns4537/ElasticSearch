@@ -311,10 +311,8 @@ public class CrawlerService {
 
                     if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
                         String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
-
                         List<StockElasticDto> stockList = relateCrawler(attr); // 테마 관련 주식들 추가
-
-                        themaElasticService.themaSave(Thema.of(themaName.text(), percent.text(), best1.text(), best2.text(), stockList));
+                        kafkaService.sendMessage(Thema.of(themaName.text(), percent.text(), best1.text(), best2.text(), stockList));
                     }
                 }
 
