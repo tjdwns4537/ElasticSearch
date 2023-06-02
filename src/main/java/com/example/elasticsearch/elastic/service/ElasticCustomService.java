@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.AnalyzeRequest;
@@ -17,7 +16,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +38,7 @@ public class ElasticCustomService {
 
     public void readThemaAnalyze(String searchInfo) {
         try {
-            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.ARTICLE_THEMA_INDEX, "standard", searchInfo);
+            AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.THEMA_INDEX, "standard", searchInfo);
             AnalyzeResponse response = client.indices().analyze(analyzeRequest, RequestOptions.DEFAULT);
 
             Map<String, Integer> wordCountMap = new HashMap<>();

@@ -26,6 +26,40 @@ class CrawlerServiceTest {
     LikeStockJpaRepository likeStockJpaRepository;
 
     @Test
+    @DisplayName("테마주 검색 후 관련 주식 모두 크롤링")
+    public void relateCrawlerTest() {
+        String url = "https://finance.naver.com/sise/sise_group_detail.naver?type=theme&no=513";
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            Elements tableElements = doc.getElementsByAttributeValue("class", "type_5");
+
+            Elements trElements = tableElements.get(0).select("tr");
+
+            for (int i = 0; i < trElements.size(); i++) {
+                Elements stockNameElements = trElements.get(i).getElementsByAttributeValue("class", "name_area");
+                if (stockNameElements.hasText()) {
+                    String stockName = stockNameElements.text();
+                    Elements priceElements = trElements.get(i).getElementsByAttributeValue("class", "number");
+                    Element priceElement = priceElements.get(0);
+                    Element prevPriceCompareElement = priceElements.get(1);
+                    Element prevPriceComparePercentElement = priceElements.get(2);
+
+                    System.out.println("s: " + stockName.substring(0,stockName.length()-2));
+                    System.out.println("priceElement: " +priceElement.text());
+                    System.out.println("prevPriceCompareElement: " +prevPriceCompareElement.text());
+                    System.out.println("prevPriceComparePercentElement: " +prevPriceComparePercentElement.text());
+                }
+            }
+
+        } catch (IOException e) {
+
+        }
+
+    }
+
+    @Test
     @DisplayName("네이버 업종 크롤링")
     public void upjongCrawler() {
         String url = "https://finance.naver.com/sise/sise_group.naver?type=upjong";
@@ -227,13 +261,30 @@ class CrawlerServiceTest {
     @DisplayName("테마주 검색")
     public void themaStock() {
         String naverUrl = "https://finance.naver.com/sise/theme.naver";
-        String paxNet = "http://www.paxnet.co.kr/stock/infoStock/thema";
         try {
             Document naverDoc = Jsoup.connect(naverUrl).get();
-            Document paxNetDoc = Jsoup.connect(paxNet).get();
 
             /** 네이버 종목 테마 **/
             Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
+            Elements tbodyElements = naverTitleElements.get(0).select("tbody");
+            Elements trElements = tbodyElements.get(0).select("tr");
+
+//            System.out.println(trElements);
+
+            for (int i = 3; i < trElements.size(); i++) {
+                Element trElement = trElements.get(i);
+                Elements themaName = trElement.getElementsByAttributeValue("class", "col_type1");
+                Elements percent = trElement.getElementsByAttributeValue("class", "number col_type2");
+                Elements best1 = trElement.getElementsByAttributeValue("class", "ls col_type5");
+                Elements best2 = trElement.getElementsByAttributeValue("class", "ls col_type6");
+
+                if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
+                    String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
+                    System.out.println(attr);
+//                    System.out.println(themaName.text() + " " +  percent.text() + " " +best1.text() + " " + best2.text());
+                }
+            }
+
 
             Element naverTitleElement = naverTitleElements.get(0);
 
@@ -243,26 +294,15 @@ class CrawlerServiceTest {
 
             String[] naverStockPercent = naverPercent.split(" "); // 테마 퍼센트
 
-            System.out.println(naverTitle.size() + " " + naverStockPercent.length);
+//            System.out.println(naverTitle.size() + " " + naverStockPercent.length);
 
             for (Element i : naverTitle) {
-                System.out.println("thema : " + i.text());
+//                System.out.println("thema : " + i.text());
             }
 
             for (String i : naverStockPercent) {
-                System.out.println("percent : " + i);
+//                System.out.println("percent : " + i);
             }
-
-            /** paxNet 종목 테마 **/
-            Elements paxNetTitleElements = paxNetDoc.getElementsByAttributeValue("class", "table-data");
-            Elements paxNetSelect = paxNetTitleElements.select(".ellipsis");
-            String paxNetSelectText = paxNetSelect.text();
-            Elements paxNetSelectPercent = paxNetTitleElements.select(".red");
-
-            String[] paxNetSelectStockThemaName = paxNetSelectText.split(" "); // 테마명
-            String[] percentText = paxNetSelectPercent.text().split(" "); // 테마 퍼센트
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }

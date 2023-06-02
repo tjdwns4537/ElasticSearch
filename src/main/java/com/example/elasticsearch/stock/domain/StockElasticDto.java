@@ -1,17 +1,31 @@
 package com.example.elasticsearch.stock.domain;
 
-import com.example.elasticsearch.helper.StatusEnum;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class StockElasticDto {
-    private StatusEnum statusEnum;
-    private Object data;
-    private String message;
 
-    public StockElasticDto() {
-        this.statusEnum = StatusEnum.BAD_REQUEST;
-        this.data = null;
-        this.message = null;
+    /** 키워드 제목 */
+    private String stockName;
+
+    private String price;
+
+    private String prevPriceCompare;
+
+    private String prevPriceComparePercent;
+
+    public StockElasticDto(String stockName, String price, String prevPriceCompare, String prevPriceComparePercent) {
+        this.stockName = stockName;
+        this.price = price;
+        this.prevPriceCompare = prevPriceCompare;
+        this.prevPriceComparePercent = prevPriceComparePercent;
+    }
+
+    public static StockElasticDto of(String stockName, String price, String prevPriceCompare, String prevPriceComparePercent) {
+        return new StockElasticDto(stockName, price, prevPriceCompare, prevPriceComparePercent);
     }
 }

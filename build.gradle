@@ -30,21 +30,33 @@ repositories {
 }
 
 dependencies {
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka:2.8.5'
+
     // xls 엑셀 파일 읽기 쓰기
     implementation 'org.apache.poi:poxi:4.1.2'
 
     // xlsx 엑셀 파일 읽기 쓰기
     implementation 'org.apache.poi:poi-oomxl:4.1.2'
 
+    //json
     implementation 'org.json:json:20200518'
 
+    //els
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
-    implementation 'io.lettuce:lettuce-core:6.1.5.RELEASE'
+    // crawler
+    implementation 'org.jsoup:jsoup:1.15.4'
+
+    // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // DB
+    implementation 'io.lettuce:lettuce-core:6.1.5.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'mysql:mysql-connector-java:8.0.32'
-    implementation 'org.jsoup:jsoup:1.15.4'
+
+
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'

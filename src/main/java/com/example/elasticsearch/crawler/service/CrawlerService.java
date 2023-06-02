@@ -10,6 +10,7 @@ import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
+import com.example.elasticsearch.stock.domain.StockElasticDto;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
 import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,39 @@ public class CrawlerService {
 
     @Value(("${crawler.naverUpJongUrl}"))
     String naverUpjongUrl;
+
+    public List<StockElasticDto> relateCrawler(String url) {
+
+        List<StockElasticDto> list = new ArrayList<>();
+        url = liveUrl + url;
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            Elements tableElements = doc.getElementsByAttributeValue("class", "type_5");
+
+            Elements trElements = tableElements.get(0).select("tr");
+
+            for (int i = 0; i < trElements.size(); i++) {
+                Elements stockNameElements = trElements.get(i).getElementsByAttributeValue("class", "name_area");
+                if (stockNameElements.hasText()) {
+                    String stockNameFull = stockNameElements.text();
+                    Elements priceElements = trElements.get(i).getElementsByAttributeValue("class", "number");
+                    Element priceElement = priceElements.get(0);
+                    Element prevPriceCompareElement = priceElements.get(1);
+                    Element prevPriceComparePercentElement = priceElements.get(2);
+
+                    String stockName = stockNameFull.substring(0, stockNameFull.length() - 2);
+                    StockElasticDto stockElasticDto = StockElasticDto.of(stockName, priceElement.text(), prevPriceCompareElement.text(), prevPriceComparePercentElement.text());
+                    list.add(stockElasticDto);
+                }
+            }
+
+            return list;
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
 
     public void naverUpjongCrawler() {
         try {
@@ -253,22 +287,33 @@ public class CrawlerService {
     }
 
     public void naverReadThema() {
+
+        url = liveUrl + url;
+
         for (int i = 1; i < 8; i++) {
             try{
                 Document naverDoc = Jsoup.connect(naverUrl).get();
 
+
                 /** 네이버 테마 관련 퍼센트를 크롤링 **/
-                Elements naverPercent = naverDoc.getElementsByAttributeValue("class","number col_type2");
-                Element naverTitleElement = naverDoc.getElementsByAttributeValue("class", "type_1 theme").get(0);
-                Elements naverTitle = naverTitleElement.select(".col_type1");
+                Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
+                Elements tbodyElements = naverTitleElements.get(0).select("tbody");
+                Elements trElements = tbodyElements.get(0).select("tr");
 
-                String[] naverStockPercent = naverPercent.text().split(" "); // 테마 퍼센트
+                for (int j = 3; j < trElements.size(); j++) {
+                    Element trElement = trElements.get(i);
+                    Elements themaName = trElement.getElementsByAttributeValue("class", "col_type1");
+                    Elements percent = trElement.getElementsByAttributeValue("class", "number col_type2");
+                    Elements best1 = trElement.getElementsByAttributeValue("class", "ls col_type5");
+                    Elements best2 = trElement.getElementsByAttributeValue("class", "ls col_type6");
 
-                for (int j=1; j<naverTitle.size(); j++) {
-                    Element element = naverTitle.get(j); // thema name
-                    String themaName = element.text();
-                    String percent = naverStockPercent[j-1]; // thema percent
-                    themaElasticService.themaSave(Thema.of(themaName, percent));
+                    if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
+                        String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
+
+                        List<StockElasticDto> stockList = relateCrawler(attr); // 테마 관련 주식들 추가
+
+                        themaElasticService.themaSave(Thema.of(themaName.text(), percent.text(), best1.text(), best2.text(), stockList));
+                    }
                 }
 
             } catch (IOException e) {

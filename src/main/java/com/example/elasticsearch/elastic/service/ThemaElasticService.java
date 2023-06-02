@@ -1,6 +1,5 @@
 package com.example.elasticsearch.elastic.service;
 
-import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.elastic.repository.ThemaElasticRepository;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.thema.domain.Thema;
@@ -9,14 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,6 +25,10 @@ public class ThemaElasticService {
         return themaElasticRepository.findByThemaName(thema.getThemaName());
     }
 
+    public void clear() {
+        themaElasticRepository.deleteAll();
+    }
+
     public void themaSave(Thema thema) {
         Optional<Thema> existThema = themaElasticRepository.findByThemaName(thema.getThemaName());
         if (!existThema.isPresent()) {
@@ -39,7 +38,7 @@ public class ThemaElasticService {
 
         if ((thema.getFirstStock() != null) && !thema.getFirstStock().isEmpty()) {
             try {
-                UpdateRequest updateRequest = new UpdateRequest(Indices.ARTICLE_THEMA_INDEX,
+                UpdateRequest updateRequest = new UpdateRequest(Indices.THEMA_INDEX,
                         existThema.get().getId());
 
                 updateRequest.doc("firstStock", thema.getFirstStock());
