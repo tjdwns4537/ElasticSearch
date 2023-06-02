@@ -1,5 +1,6 @@
 package com.example.elasticsearch.kafka.controller;
 
+import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.kafka.service.KafkaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ public class KafkaTestController {
 
     @GetMapping("/kafka")
     public void test() {
-        kafkaService.sendMessage("안녕 test1");
+        ArticleEls articleEls = ArticleEls.of("테스트 중 !!");
+        kafkaService.sendMessage(articleEls);
     }
 }

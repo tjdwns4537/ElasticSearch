@@ -1,5 +1,6 @@
 package com.example.elasticsearch.crawler.controller;
 
+import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
@@ -31,19 +32,13 @@ public class CrawlerController {
     public String crawlerService(Model model) {
         log.info("start timer : {}", Timer.time());
 
-        kafkaService.sendMessage("안녕 test1");
-//        kafkaService.listenGroupFoo("안녕 test1");
-
         themaElasticService.clear();
 
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
 
-        /**
-         * TODO
-         *  - kafka 테스트를 위해 크롤링 중단
-         * **/
-
+        ArticleEls articleEls = ArticleEls.of("테스트 중 !!");
+        kafkaService.sendMessage(articleEls);
 //        crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
 //        crawlerService.naverReadThema(); // 테마 크롤링 후 저장
 

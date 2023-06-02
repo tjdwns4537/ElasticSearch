@@ -7,6 +7,7 @@ import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.kafka.service.KafkaService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -38,6 +39,7 @@ public class CrawlerService {
     @Autowired private final ElasticService elasticService;
     @Autowired private final ThemaElasticService themaElasticService;
     @Autowired private final ElasticCustomService elasticCustomService;
+    @Autowired private final KafkaService kafkaService;
 
     @Value("${crawler.url}")
     String url;
@@ -278,6 +280,7 @@ public class CrawlerService {
 
             for (String i : crawlingArticle) {
                 ArticleEls article = ArticleEls.of(i);
+                kafkaService.sendMessage(article);
                 elasticService.articleSave(article);
             }
 

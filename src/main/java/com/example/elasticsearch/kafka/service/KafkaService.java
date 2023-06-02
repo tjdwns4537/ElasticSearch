@@ -1,5 +1,6 @@
 package com.example.elasticsearch.kafka.service;
 
+import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.helper.Indices;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,17 +18,17 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class KafkaService {
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendMessage(String message) {
+    public void sendMessage(ArticleEls message) {
 
-        ListenableFuture<SendResult<String, String>> future =
+        ListenableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(Indices.NAVER_CRAWLER_TOPIC, message);
 
-        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+        future.addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
 
             @Override
-            public void onSuccess(SendResult<String, String> result) {
+            public void onSuccess(SendResult<String, Object> result) {
                 log.info("Sent message=[ {} ] with offset=[ {} ]",message, result.getRecordMetadata().offset());
             }
             @Override
