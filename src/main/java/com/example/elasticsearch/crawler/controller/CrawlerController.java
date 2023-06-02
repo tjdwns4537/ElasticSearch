@@ -37,9 +37,7 @@ public class CrawlerController {
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
 
-        ArticleEls articleEls = ArticleEls.of("테스트 중 !!");
-        kafkaService.sendMessage(articleEls);
-//        crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
+        crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
 //        crawlerService.naverReadThema(); // 테마 크롤링 후 저장
 
         log.info("end timer : {}", Timer.time());

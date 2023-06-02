@@ -1,6 +1,7 @@
 package com.example.elasticsearch.kafka.service;
 
 import com.example.elasticsearch.article.domain.ArticleEls;
+import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.helper.Indices;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +18,8 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @RequiredArgsConstructor
 public class KafkaService {
 
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    @Autowired private KafkaTemplate<String, Object> kafkaTemplate;
+    @Autowired private final ElasticService elasticService;
 
     public void sendMessage(ArticleEls message) {
 
@@ -29,6 +30,7 @@ public class KafkaService {
 
             @Override
             public void onSuccess(SendResult<String, Object> result) {
+                elasticService.articleSave(message);
                 log.info("Sent message=[ {} ] with offset=[ {} ]",message, result.getRecordMetadata().offset());
             }
             @Override
@@ -39,7 +41,7 @@ public class KafkaService {
     }
 
     @KafkaListener(topics = Indices.NAVER_CRAWLER_TOPIC, groupId = Indices.NAVER_CRAWLER_TOPIC_GROUPID1)
-    public void listenGroupFoo(String message) {
+    public void listenGroupFoo(ArticleEls message) {
         System.out.println("Received Message in group foo: " + message);
     }
 }

@@ -281,7 +281,6 @@ public class CrawlerService {
             for (String i : crawlingArticle) {
                 ArticleEls article = ArticleEls.of(i);
                 kafkaService.sendMessage(article);
-                elasticService.articleSave(article);
             }
 
         } catch (IOException e) {
