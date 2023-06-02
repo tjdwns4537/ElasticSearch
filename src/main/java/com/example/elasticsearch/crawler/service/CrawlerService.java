@@ -6,7 +6,6 @@ import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
 import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
-import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.kafka.service.KafkaService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
@@ -39,7 +38,6 @@ public class CrawlerService {
     @Autowired private final ElasticService elasticService;
     @Autowired private final ThemaElasticService themaElasticService;
     @Autowired private final ElasticCustomService elasticCustomService;
-    @Autowired private final KafkaService kafkaService;
 
     @Value("${crawler.url}")
     String url;
@@ -280,7 +278,7 @@ public class CrawlerService {
 
             for (String i : crawlingArticle) {
                 ArticleEls article = ArticleEls.of(i);
-                kafkaService.sendMessage(article);
+                elasticService.articleSave(article);
             }
 
         } catch (IOException e) {
@@ -312,7 +310,7 @@ public class CrawlerService {
                     if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
                         String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
                         List<StockElasticDto> stockList = relateCrawler(attr); // 테마 관련 주식들 추가
-                        kafkaService.sendMessage(Thema.of(themaName.text(), percent.text(), best1.text(), best2.text(), stockList));
+                        themaElasticService.themaSave(Thema.of(themaName.text(), percent.text(), best1.text(), best2.text(), stockList));
                     }
                 }
 

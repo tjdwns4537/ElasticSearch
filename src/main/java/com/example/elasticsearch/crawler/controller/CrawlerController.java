@@ -37,8 +37,8 @@ public class CrawlerController {
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
 
-        crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
-        crawlerService.naverReadThema(); // 테마 크롤링 후 저장
+        kafkaService.sendNaverArticleMessage("기사 크롤링 수행");
+        kafkaService.sendNaverThemaMessage("테마 크롤링 수행");
 
         log.info("end timer : {}", Timer.time());
 //        crawlerService.naverUpjongCrawler(); // 업종 관련 크롤링

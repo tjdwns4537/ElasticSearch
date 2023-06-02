@@ -1,6 +1,7 @@
 package com.example.elasticsearch.kafka.service;
 
 import com.example.elasticsearch.article.domain.ArticleEls;
+import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
@@ -21,19 +22,18 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class KafkaService {
 
     @Autowired private KafkaTemplate<String, Object> kafkaTemplate;
-    @Autowired private final ElasticService elasticService;
-    @Autowired private final ThemaElasticService themaElasticService;
+    @Autowired private final CrawlerService crawlerService;
 
-    public void sendMessage(ArticleEls message) {
+    public void sendNaverArticleMessage(String message) {
 
         ListenableFuture<SendResult<String, Object>> future =
-                kafkaTemplate.send(Indices.NAVER_CRAWLER_TOPIC, message);
+                kafkaTemplate.send(Indices.NAVER_ARTICLE_CRAWLER_TOPIC, message);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
 
             @Override
             public void onSuccess(SendResult<String, Object> result) {
-                elasticService.articleSave(message);
+                crawlerService.readArticle(); // 뉴스 기사 크롤링 수행 -> ELS doc으로 인덱싱
                 log.info("Sent message=[ {} ] with offset=[ {} ]",message, result.getRecordMetadata().offset());
             }
             @Override
@@ -43,16 +43,16 @@ public class KafkaService {
         });
     }
 
-    public void sendMessage(Thema message) {
+    public void sendNaverThemaMessage(String message) {
 
         ListenableFuture<SendResult<String, Object>> future =
-                kafkaTemplate.send(Indices.NAVER_CRAWLER_TOPIC, message);
+                kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC, message);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
 
             @Override
             public void onSuccess(SendResult<String, Object> result) {
-                themaElasticService.themaSave(message);
+                crawlerService.naverReadThema(); // 테마 크롤링 후 저장
                 log.info("Sent message=[ {} ] with offset=[ {} ]",message, result.getRecordMetadata().offset());
             }
             @Override
@@ -62,13 +62,15 @@ public class KafkaService {
         });
     }
 
-    @KafkaListener(topics = Indices.NAVER_CRAWLER_TOPIC, groupId = Indices.NAVER_CRAWLER_TOPIC_GROUPID1)
-    public void listenGroupFoo(ArticleEls message) {
-        System.out.println("Received Message in group foo: " + message);
+    @KafkaListener(topics = Indices.NAVER_ARTICLE_CRAWLER_TOPIC, groupId = Indices.NAVER_ARTICLE_CRAWLER_TOPIC_GROUPID1)
+    public void listenGroupArticleGroup(ArticleEls message) {
+//        elasticService.articleSave(message);
+        log.info("Received Message in group article: {}",message.getTitle());
     }
 
-    @KafkaListener(topics = Indices.NAVER_CRAWLER_TOPIC, groupId = Indices.NAVER_CRAWLER_TOPIC_GROUPID1)
-    public void listenGroupFoo(Thema message) {
-        System.out.println("Received Message in group foo: " + message);
+    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID1, groupId = Indices.NAVER_ARTICLE_CRAWLER_TOPIC_GROUPID1)
+    public void listenGroupThemaGroup(Thema message) {
+//        themaElasticService.themaSave(message);
+        log.info("Received Message in group thema: {}", message.getThemaName());
     }
 }

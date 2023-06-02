@@ -26,6 +26,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic topic1() {
-        return new NewTopic(Indices.NAVER_CRAWLER_TOPIC, 1, (short) 1);
+        return new NewTopic(Indices.NAVER_ARTICLE_CRAWLER_TOPIC, 1, (short) 1);
     }
 }

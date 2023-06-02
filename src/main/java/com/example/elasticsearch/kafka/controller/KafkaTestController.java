@@ -19,6 +19,6 @@ public class KafkaTestController {
     @GetMapping("/kafka")
     public void test() {
         ArticleEls articleEls = ArticleEls.of("테스트 중 !!");
-        kafkaService.sendMessage(articleEls);
+//        kafkaService.sendMessage(articleEls);
     }
 }
