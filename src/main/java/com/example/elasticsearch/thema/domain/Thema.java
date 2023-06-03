@@ -34,19 +34,13 @@ public class Thema {
 
     private List<StockElasticDto> relateStock;
 
-    public Thema(String themaName, String percent) {
-        this.id = UUID.randomUUID().toString();
-        this.themaName = themaName;
-        this.percent = percent;
-        this.firstStock = "";
-        this.secondStock = "";
-    }
-
     public Thema(String themaName, String percent, String detailLink) {
         this.id = UUID.randomUUID().toString();
         this.themaName = themaName;
         this.percent = percent;
         this.detailLink = detailLink;
+        this.firstStock = "";
+        this.secondStock = "";
     }
 
     public Thema(String themaName, String percent, String firstStock, String secondStock) {
@@ -55,15 +49,6 @@ public class Thema {
         this.percent = percent;
         this.firstStock = firstStock;
         this.secondStock = secondStock;
-    }
-
-    public Thema(String themaName, String percent, String firstStock, String secondStock, String detailLink) {
-        this.id = UUID.randomUUID().toString();
-        this.themaName = themaName;
-        this.percent = percent;
-        this.firstStock = firstStock;
-        this.secondStock = secondStock;
-        this.detailLink = detailLink;
     }
 
     public Thema(String themaName, String percent, String firstStock, String secondStock, List<StockElasticDto> relateStock) {
@@ -75,20 +60,12 @@ public class Thema {
         this.relateStock = relateStock;
     }
 
-    public static Thema of(String themaName, String percent) {
-        return new Thema(themaName, percent);
-    }
-
     public static Thema of(String themaName, String percent, String detailLink) {
-        return new Thema(themaName, percent, detailLink);
+        return new Thema(themaName, percent,detailLink);
     }
 
     public static Thema of(String themaName, String percent, String firstStock, String secondStock) {
         return new Thema(themaName, percent, firstStock, secondStock);
-    }
-
-    public static Thema of(String themaName, String percent, String firstStock, String secondStock, String detailLink) {
-        return new Thema(themaName, percent, firstStock, secondStock, detailLink);
     }
 
     public static Thema of(String themaName, String percent, String firstStock, String secondStock, List<StockElasticDto> relateStock) {

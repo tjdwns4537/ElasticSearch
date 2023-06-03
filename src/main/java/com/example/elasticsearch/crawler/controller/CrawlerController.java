@@ -1,17 +1,15 @@
 package com.example.elasticsearch.crawler.controller;
 
-import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
-import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.helper.Timer;
-import com.example.elasticsearch.kafka.service.KafkaService;
+import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
+import com.example.elasticsearch.kafka.service.MainKafkaService;
 import com.example.elasticsearch.stock.domain.StockForm;
 import com.example.elasticsearch.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,29 +24,34 @@ public class CrawlerController {
     @Autowired private final CrawlerService crawlerService;
     @Autowired private final StockService stockService;
     @Autowired private final ThemaElasticService themaElasticService;
-    @Autowired private final KafkaService kafkaService;
+    @Autowired private final CrawlingKafkaService crawlingKafkaService;
+
 
     @GetMapping
     public String crawlerService(Model model) {
-        log.info("start timer : {}", Timer.time());
+
+        /**
+         * TODO
+         *  - 매번 크롤링을 초기화할수는 없다.
+         *  - 크롤링 초기화를 선택할 수 있게 하거나 특정한 시간대에만 하는 방법을 선택하자.
+         * **/
+
+
 
         themaElasticService.clear();
-
+        log.info("시작:{}",Timer.time());
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
+        crawlingKafkaService.sendNaverArticleMessage("기사 크롤링");
+        crawlingKafkaService.sendNaverThemaMessage1(1);
+        crawlingKafkaService.sendNaverThemaMessage2(2);
+        crawlingKafkaService.sendNaverThemaMessage3(3);
+        crawlingKafkaService.sendNaverThemaMessage4(4);
+        crawlingKafkaService.sendNaverThemaMessage5(5);
+        crawlingKafkaService.sendNaverThemaMessage6(6);
+        crawlingKafkaService.sendNaverThemaMessage7(7);
+        log.info("끝:{}",Timer.time());
 
-        kafkaService.sendNaverArticleMessage("기사 크롤링 수행");
-
-        for (int i = 1; i < 4; i++) {
-            kafkaService.sendNaverThemaMessage(String.valueOf(i));
-        }
-
-        for (int i = 4; i < 8; i++) {
-            kafkaService.sendNaverThemaMessage2(String.valueOf(i));
-        }
-
-
-        log.info("end timer : {}", Timer.time());
 //        crawlerService.naverUpjongCrawler(); // 업종 관련 크롤링
 
         /**

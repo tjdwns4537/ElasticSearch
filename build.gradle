@@ -30,6 +30,9 @@ repositories {
 }
 
 dependencies {
+    // redisson
+    implementation 'org.redisson:redisson-spring-boot-starter:3.17.7'
+
     // kafka
     implementation 'org.springframework.kafka:spring-kafka:2.8.5'
 

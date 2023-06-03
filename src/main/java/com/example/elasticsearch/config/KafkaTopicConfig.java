@@ -1,8 +1,8 @@
 package com.example.elasticsearch.config;
 
 import com.example.elasticsearch.helper.Indices;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.*;
+import org.apache.kafka.common.KafkaFuture;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,17 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic topic1() {
+    public NewTopic articleThemaTopic() {
         return new NewTopic(Indices.NAVER_ARTICLE_CRAWLER_TOPIC, 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic naverThemaTopic() {
+        return new NewTopic(Indices.NAVER_THEMA_CRAWLER_TOPIC, 8, (short) 1);
+    }
+
+    @Bean
+    public NewTopic naverMethodTopic() {
+        return new NewTopic(Indices.METHOD_TOPIC, 1, (short) 1);
     }
 }

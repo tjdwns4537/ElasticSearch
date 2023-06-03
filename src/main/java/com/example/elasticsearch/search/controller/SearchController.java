@@ -59,13 +59,6 @@ public class SearchController {
                 log.info("관련 주식 getPrevPriceComparePercent : {}", j.getPrevPriceComparePercent());
             }
         }
-
-//        crawlerService.relateCrawler()
-
-//        Map<String, String> themaBestStock = crawlerService.paxNetReadThema(themaList); // 주도주 2개 가져오기
-
-//        log.info("주도주 : {}, {}",themaBestStock.getOrDefault("best1",""), themaBestStock.getOrDefault("best2",""));
-
         return "redirect:/";
     }
 }

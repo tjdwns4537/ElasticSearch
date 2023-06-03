@@ -6,7 +6,8 @@ import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
 import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
-import com.example.elasticsearch.kafka.service.KafkaService;
+import com.example.elasticsearch.helper.Timer;
+import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
 import com.example.elasticsearch.redis.repository.LikeStockRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -85,7 +86,7 @@ public class CrawlerService {
                 if (href.hasText() && percentEl.hasText()) {
                     String upjong = href.text();
                     String percent = percentEl.text();
-                    String detailLink = href.attr("href");
+                    String detailLink = href.attr("href"); // 링크로 기능 수행
                     themaElasticService.themaSave(Thema.of(upjong, percent, detailLink));
                 }
             }
@@ -240,31 +241,58 @@ public class CrawlerService {
         }
     }
 
-    public void readArticle() {
+    public void crawlingArticle() {
         try {
             Document articleDoc = Jsoup.connect(articleUrl).get();
-
-            /** 뉴스기사 **/
-            Elements articleTitleElements = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
-//            Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
-            List<String> crawlingArticle = articleTitleElements.eachText(); // save in list
-
-            for (String i : crawlingArticle) {
-                ArticleEls article = ArticleEls.of(i);
-                elasticService.articleSave(article);
-            }
-
+            readArticle(articleDoc);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void relateCrawler(Thema thema, String url) {
+    public void readArticle(Document articleDoc) {
+        /** 뉴스기사 **/
+        Elements articleTitleElements = articleDoc.getElementsByAttributeValue("class", "cjs_dept_desc");
+//            Elements articleContentElements = articleDoc.getElementsByAttributeValue("class", "cjs_d");
+        List<String> crawlingArticle = articleTitleElements.eachText(); // save in list
 
-        if (url.isBlank()) return;
+        for (String i : crawlingArticle) {
+            ArticleEls article = ArticleEls.of(i);
+            elasticService.articleSave(article);
+        }
+    }
+
+    public void naverReadThema(int i) {
+
+
+
+
+        try {
+            Document naverDoc = Jsoup.connect(naverUrl + i).get();
+            /** 네이버 테마 관련 퍼센트를 크롤링 **/
+            Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
+            Elements tbodyElements = naverTitleElements.get(0).select("tbody");
+
+            Elements themaName = tbodyElements.get(0).getElementsByAttributeValue("class", "col_type1");
+            Elements percent = tbodyElements.get(0).getElementsByAttributeValue("class", "number col_type2");
+
+            for (int k = 1; k < themaName.size(); k++) {
+                if (themaName.get(k).hasText() && percent.get(k-1).hasText()) {
+                    String attr = themaName.get(k).getElementsByAttribute("href").attr("href");
+                    Thema thema = Thema.of(themaName.get(k).text(), percent.get(k-1).text(), attr);
+                    naverThemaCrawler(thema);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void naverThemaCrawler(Thema thema) {
+        if (thema.getDetailLink().isBlank()) return;
 
         List<StockElasticDto> list = new ArrayList<>();
-        String relateUrl = liveUrl + url;
+        String relateUrl = liveUrl + thema.getDetailLink();
 
         try {
             Document doc = Jsoup.connect(relateUrl).get();
@@ -290,33 +318,6 @@ public class CrawlerService {
             thema.setRelateStock(list);
             themaElasticService.themaSave(thema);
         } catch (IOException e) {
-        }
-    }
-
-    public void naverReadThemaConnection(String i) {
-        try {
-            Document naverDoc = Jsoup.connect(naverUrl+i).get();
-            naverReadThema(naverDoc);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void naverReadThema(Document naverDoc) {
-        /** 네이버 테마 관련 퍼센트를 크롤링 **/
-        Elements naverTitleElements = naverDoc.getElementsByAttributeValue("class", "type_1 theme");
-        Elements tbodyElements = naverTitleElements.get(0).select("tbody");
-
-        Elements themaName = tbodyElements.get(0).getElementsByAttributeValue("class", "col_type1");
-        Elements percent = tbodyElements.get(0).getElementsByAttributeValue("class", "number col_type2");
-
-        for (int k = 1; k < themaName.size(); k++) {
-            if (themaName.get(k).hasText() && percent.get(k).hasText()) {
-                String attr = themaName.get(k).getElementsByAttribute("href").attr("href");
-                Thema thema = Thema.of(themaName.get(k).text(), percent.get(k).text());
-                relateCrawler(thema, attr); // 테마 관련 주식들 추가
-                log.info("테마 크롤링 : {}", themaName.get(k).text());
-            }
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.example.elasticsearch.kafka.controller;
 
 import com.example.elasticsearch.article.domain.ArticleEls;
-import com.example.elasticsearch.kafka.service.KafkaService;
+import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class KafkaTestController {
 
     @Autowired
-    private final KafkaService kafkaService;
+    private final CrawlingKafkaService crawlingKafkaService;
 
     @GetMapping("/kafka")
     public void test() {

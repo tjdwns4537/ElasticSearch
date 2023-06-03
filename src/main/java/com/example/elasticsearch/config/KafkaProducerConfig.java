@@ -37,7 +37,6 @@ public class KafkaProducerConfig {
         configProps.put(
                 JsonDeserializer.TRUSTED_PACKAGES,
                 "*"); // Allow deserialization of all packages/classes
-//        return new DefaultKafkaProducerFactory<>(configProps);
         ObjectMapper objectMapper = new ObjectMapper();
         return new DefaultKafkaProducerFactory<>(
                 configProps,

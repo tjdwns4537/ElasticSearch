@@ -36,19 +36,19 @@ public class ThemaElasticService {
             return;
         }
 
-        if ((thema.getFirstStock() != null) && !thema.getFirstStock().isEmpty()) {
-            try {
-                UpdateRequest updateRequest = new UpdateRequest(Indices.THEMA_INDEX,
-                        existThema.get().getId());
-
-                updateRequest.doc("firstStock", thema.getFirstStock());
-                updateRequest.doc("secondStock", thema.getSecondStock());
-
-                client.update(updateRequest, RequestOptions.DEFAULT);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        if ((thema.getFirstStock() != null) && !thema.getFirstStock().isEmpty()) {
+//            try {
+//                UpdateRequest updateRequest = new UpdateRequest(Indices.THEMA_INDEX,
+//                        existThema.get().getId());
+//
+//                updateRequest.doc("firstStock", thema.getFirstStock());
+//                updateRequest.doc("secondStock", thema.getSecondStock());
+//
+//                client.update(updateRequest, RequestOptions.DEFAULT);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     public Optional<Thema> findByKeyword(String keyword) {

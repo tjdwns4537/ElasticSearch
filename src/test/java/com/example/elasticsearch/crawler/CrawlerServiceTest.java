@@ -48,10 +48,10 @@ class CrawlerServiceTest {
                     Element prevPriceCompareElement = priceElements.get(1);
                     Element prevPriceComparePercentElement = priceElements.get(2);
 
-                    System.out.println("s: " + stockName.substring(0,stockName.length()-2));
-                    System.out.println("priceElement: " +priceElement.text());
-                    System.out.println("prevPriceCompareElement: " +prevPriceCompareElement.text());
-                    System.out.println("prevPriceComparePercentElement: " +prevPriceComparePercentElement.text());
+                    System.out.println("s: " + stockName.substring(0, stockName.length() - 2));
+                    System.out.println("priceElement: " + priceElement.text());
+                    System.out.println("prevPriceCompareElement: " + prevPriceCompareElement.text());
+                    System.out.println("prevPriceComparePercentElement: " + prevPriceComparePercentElement.text());
                 }
             }
 
@@ -74,13 +74,13 @@ class CrawlerServiceTest {
                 Element tdSelect = trSelect.get(i).selectFirst("td");
                 System.out.println(trSelect);
                 Elements href = tdSelect.getElementsByAttribute("href");
-                Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 red01");
+                Elements percentEl = trSelect.get(i).getElementsByAttributeValue("class", "tah p11 red01");
 
-                if(!percentEl.hasText()){
-                    percentEl = trSelect.get(i).getElementsByAttributeValue("class","tah p11 nv01");
+                if (!percentEl.hasText()) {
+                    percentEl = trSelect.get(i).getElementsByAttributeValue("class", "tah p11 nv01");
                 }
 
-                if (href.hasText() && percentEl.hasText() ) {
+                if (href.hasText() && percentEl.hasText()) {
                     String text = href.text();
                     String percent = percentEl.text();
                     String hrefLink = href.attr("href");
@@ -251,7 +251,7 @@ class CrawlerServiceTest {
                     String thema = themaNames.text();
                     String best1 = tdValue.get(i + 6).getElementsByAttribute("href").text();
                     String best2 = tdValue.get(i + 7).getElementsByAttribute("href").text();
-                    System.out.println(percent + " " + thema + " " +best1 + " " + best2);
+                    System.out.println(percent + " " + thema + " " + best1 + " " + best2);
                 }
             }
 
@@ -275,16 +275,25 @@ class CrawlerServiceTest {
 
             Elements themaName = tbodyElements.get(0).getElementsByAttributeValue("class", "col_type1");
             Elements percent = tbodyElements.get(0).getElementsByAttributeValue("class", "number col_type2");
-            Elements best1 = tbodyElements.get(0).getElementsByAttributeValue("class", "ls col_type5");
-            Elements best2 = tbodyElements.get(0).getElementsByAttributeValue("class", "ls col_type6");
 
-            if (themaName.hasText() && percent.hasText() && best1.hasText() && best2.hasText()) {
-                for (int i=1; i<themaName.size(); i++) {
-                    String attr = themaName.get(i).getElementsByAttribute("href").attr("href");
-                    System.out.println("link: "+attr);
+            System.out.println(themaName.size());
+            System.out.println(percent.size());
+            for (int k = 1; k < themaName.size(); k++) {
+                if (themaName.get(k).hasText() && percent.get(k-1).hasText()) {
+                    String attr = themaName.get(k).getElementsByAttribute("href").attr("href");
+                    System.out.println("thema: " + themaName.get(k).text());
+                    System.out.println("percent.text(): " + percent);
+                    System.out.println("attr: " + attr);
                 }
-                System.out.println("thema: "+themaName.text() + "\n" +  percent.text() + "\n" +best1.text() + "\n" + best2.text());
             }
+
+//            if (themaName.hasText() && percent.hasText()) {
+//                for (int i = 1; i < themaName.size(); i++) {
+//                    String attr = themaName.get(i).getElementsByAttribute("href").attr("href");
+//                    System.out.println("link: " + attr);
+//                }
+//                System.out.println("thema: " + themaName.text() + "\n" + percent.text() + "\n" + best1.text() + "\n" + best2.text());
+//            }
 
 //            for (int i = 3; i < trElements.size(); i++) {
 //                Element trElement = trElements.get(i);
@@ -292,7 +301,6 @@ class CrawlerServiceTest {
 //                String attr = trElement.getElementsByAttributeValue("class", "col_type1").get(0).getElementsByAttribute("href").attr("href");
 //
 //            }
-
 
 
 //            for (int i = 3; i < trElements.size(); i++) {
