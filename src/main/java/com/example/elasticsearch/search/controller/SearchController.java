@@ -4,6 +4,7 @@ import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.redis.redisson.RedissonService;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
 import com.example.elasticsearch.search.repository.SearchRepository;
 import com.example.elasticsearch.sentiment.service.KoreanSentiment;
@@ -24,41 +25,102 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SearchController {
 
-    @Autowired private final CrawlerService crawlerService;
-    @Autowired private final ElasticService elasticService;
-    @Autowired private final SearchRepository searchRepository;
-    @Autowired private final ArticleRedisRepository articleRedisRepository;
-    @Autowired private final KoreanSentiment koreanSentiment;
-    @Autowired private final ElasticCustomService elasticCustomService;
+    @Autowired
+    private final CrawlerService crawlerService;
+    @Autowired
+    private final ElasticService elasticService;
+    @Autowired
+    private final SearchRepository searchRepository;
+    @Autowired
+    private final ArticleRedisRepository articleRedisRepository;
+    @Autowired
+    private final KoreanSentiment koreanSentiment;
+    @Autowired
+    private final ElasticCustomService elasticCustomService;
+    @Autowired
+    private final RedissonService redissonService;
+
+//    @PostMapping("/searchInfo")
+//    public String extract(@RequestParam("searchInfo") String searchInfo) {
+//
+//        if(searchInfo.isEmpty()) return "redirect:/";
+//
+//        crawlerService.googleCrawler(searchInfo);
+//
+//        List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
+//
+//        Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
+//
+//        log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, analyzeResult.getOrDefault(Indices.POSITIVE, 0), analyzeResult.getOrDefault(Indices.NEGATIVE, 0));
+//
+//        List<Thema> themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo); // 테마 크롤링 정보 전부 가져오기
+//
+//        for (Thema i : themaList) {
+//            log.info("테마 명 : {}", i.getThemaName());
+//            log.info("테마 퍼센트 : {}", i.getPercent());
+//            log.info("테마 주도주1 : {}", i.getFirstStock());
+//            log.info("테마 주도주2 : {}", i.getSecondStock());
+//            List<StockElasticDto> relateStock = i.getRelateStock();
+//            for (StockElasticDto j : relateStock) {
+//                log.info("관련 주식 getStockName : {}", j.getStockName());
+//                log.info("관련 주식 getPrice : {}", j.getPrice());
+//                log.info("관련 주식 getPrevPriceCompare : {}", j.getPrevPriceCompare());
+//                log.info("관련 주식 getPrevPriceComparePercent : {}", j.getPrevPriceComparePercent());
+//            }
+//        }
+//        return "redirect:/";
+//    }
 
     @PostMapping("/searchInfo")
     public String extract(@RequestParam("searchInfo") String searchInfo) {
-
-        if(searchInfo.isEmpty()) return "redirect:/";
+        if (searchInfo.isEmpty()) {
+            return "redirect:/";
+        }
 
         crawlerService.googleCrawler(searchInfo);
 
-        List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
+        boolean lockAcquired = false;
 
-        Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
+        try {
+            List<Thema> themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
 
-        log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, analyzeResult.getOrDefault(Indices.POSITIVE, 0), analyzeResult.getOrDefault(Indices.NEGATIVE, 0));
+            if (themaList.isEmpty()) {
+                lockAcquired = redissonService.searchLock(searchInfo);
+                if (!lockAcquired) {
+                    log.info("Failed to acquire lock for searchInfo: {}", searchInfo);
+                    return "redirect:/";  // or any other appropriate action
+                }
+            }
 
-        List<Thema> themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo); // 테마 크롤링 정보 전부 가져오기
+            List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
 
-        for (Thema i : themaList) {
-            log.info("테마 명 : {}", i.getThemaName());
-            log.info("테마 퍼센트 : {}", i.getPercent());
-            log.info("테마 주도주1 : {}", i.getFirstStock());
-            log.info("테마 주도주2 : {}", i.getSecondStock());
-            List<StockElasticDto> relateStock = i.getRelateStock();
-            for (StockElasticDto j : relateStock) {
-                log.info("관련 주식 getStockName : {}", j.getStockName());
-                log.info("관련 주식 getPrice : {}", j.getPrice());
-                log.info("관련 주식 getPrevPriceCompare : {}", j.getPrevPriceCompare());
-                log.info("관련 주식 getPrevPriceComparePercent : {}", j.getPrevPriceComparePercent());
+            Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
+
+            log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, analyzeResult.getOrDefault(Indices.POSITIVE, 0), analyzeResult.getOrDefault(Indices.NEGATIVE, 0));
+
+            for (Thema i : themaList) {
+                // Perform logging operations
+                log.info("테마 명 : {}", i.getThemaName());
+                log.info("테마 퍼센트 : {}", i.getPercent());
+                log.info("테마 주도주1 : {}", i.getFirstStock());
+                log.info("테마 주도주2 : {}", i.getSecondStock());
+                List<StockElasticDto> relateStock = i.getRelateStock();
+                for (StockElasticDto j : relateStock) {
+                    log.info("관련 주식 getStockName : {}", j.getStockName());
+                    log.info("관련 주식 getPrice : {}", j.getPrice());
+                    log.info("관련 주식 getPrevPriceCompare : {}", j.getPrevPriceCompare());
+                    log.info("관련 주식 getPrevPriceComparePercent : {}", j.getPrevPriceComparePercent());
+                }
+            }
+        } finally {
+            if (lockAcquired) {
+                redissonService.searchUnlock(searchInfo);
             }
         }
+
+
         return "redirect:/";
     }
+
+
 }

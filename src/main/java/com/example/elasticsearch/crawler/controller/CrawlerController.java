@@ -39,7 +39,6 @@ public class CrawlerController {
 
 
         themaElasticService.clear();
-        log.info("시작:{}",Timer.time());
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
         crawlingKafkaService.sendNaverArticleMessage("기사 크롤링");
@@ -50,7 +49,6 @@ public class CrawlerController {
         crawlingKafkaService.sendNaverThemaMessage5(5);
         crawlingKafkaService.sendNaverThemaMessage6(6);
         crawlingKafkaService.sendNaverThemaMessage7(7);
-        log.info("끝:{}",Timer.time());
 
 //        crawlerService.naverUpjongCrawler(); // 업종 관련 크롤링
 

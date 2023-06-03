@@ -20,6 +20,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.redisson.api.RBlockingDeque;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,8 +47,6 @@ public class CrawlerService {
     private final ElasticService elasticService;
     @Autowired
     private final ThemaElasticService themaElasticService;
-    @Autowired
-    private final ElasticCustomService elasticCustomService;
 
     @Value("${crawler.url}")
     String url;
@@ -263,10 +264,6 @@ public class CrawlerService {
     }
 
     public void naverReadThema(int i) {
-
-
-
-
         try {
             Document naverDoc = Jsoup.connect(naverUrl + i).get();
             /** 네이버 테마 관련 퍼센트를 크롤링 **/
