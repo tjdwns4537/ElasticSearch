@@ -29,15 +29,6 @@ public class CrawlerController {
 
     @GetMapping
     public String crawlerService(Model model) {
-
-        /**
-         * TODO
-         *  - 매번 크롤링을 초기화할수는 없다.
-         *  - 크롤링 초기화를 선택할 수 있게 하거나 특정한 시간대에만 하는 방법을 선택하자.
-         * **/
-
-
-
         themaElasticService.clear();
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();

@@ -10,7 +10,7 @@
     <script src="https://kit.fontawesome.com/51db22a717.js" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript"></script>
     <script th:src="@{/js/application.js}" type="text/javascript"></script>
-    <title>Google</title>
+    <title>주식 검색 사이트</title>
 </head>
 <body>
 <header class="top-header">
@@ -26,7 +26,7 @@
         <dl id="rank-list">
             <dd>
                 <ol >
-                    <li  th:each="likeStock, liveStocks:${liveStockList}" th:text="|${liveStocks.index+1}. ${likeStock}|"></li>
+                    <li th:each="likeStock, liveStocks:${liveStockList}" th:text="|${liveStocks.index+1}. ${likeStock}|"></li>
                 </ol>
             </dd>
         </dl>
