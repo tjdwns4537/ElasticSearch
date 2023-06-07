@@ -60,12 +60,11 @@ public class SearchController {
 
     @GetMapping("/searchResult")
     public String redirectView(@RequestParam("searchInfo") String searchInfo,
-                               @ModelAttribute("analyzeResult") List<ArticleVO> analyzeResult,
-                               @ModelAttribute("themaList") List<Thema> themaList,
-                               @ModelAttribute("relateStockList") List<StockElasticDto> relateStockList,
+                               @ModelAttribute("analyzeResult") ArrayList<ArticleVO> analyzeResult,
+                               @ModelAttribute("themaList") ArrayList<Thema> themaList,
+                               @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relateStockList,
                                @RequestParam("positive") Integer positive,
                                @RequestParam("negative") Integer negative,
-
                                Model model) {
 
         model.addAttribute("searchInfo", searchInfo);
