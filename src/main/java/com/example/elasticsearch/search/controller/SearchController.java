@@ -60,17 +60,17 @@ public class SearchController {
 
     @GetMapping("/searchResult")
     public String redirectView(@RequestParam("searchInfo") String searchInfo,
+                               @ModelAttribute("positiveInfo") String positiveInfo,
+                               @ModelAttribute("negativeInfo") String negativeInfo,
                                @ModelAttribute("analyzeResult") ArrayList<ArticleVO> analyzeResult,
                                @ModelAttribute("themaList") ArrayList<Thema> themaList,
                                @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relateStockList,
-                               @RequestParam("positive") Integer positive,
-                               @RequestParam("negative") Integer negative,
                                Model model) {
 
         model.addAttribute("searchInfo", searchInfo);
         model.addAttribute("analyzeResult", analyzeResult);
-        model.addAttribute("sentimentPositive", positive);
-        model.addAttribute("sentimentNegative", negative);
+        model.addAttribute("positiveInfo", positiveInfo);
+        model.addAttribute("negativeInfo", negativeInfo);
         model.addAttribute("themaList", themaList);
         model.addAttribute("relateStockList", relateStockList);
 
@@ -80,6 +80,8 @@ public class SearchController {
 
     @PostMapping("/searchInfo")
     public String extract(@RequestParam("searchInfo") String searchInfo,
+                          @ModelAttribute("positiveInfo") String positiveInfo,
+                          @ModelAttribute("negativeInfo") String negativeInfo,
                           @ModelAttribute("analyzeResult") ArrayList<ArticleVO> list,
                           @ModelAttribute("themaList") ArrayList<Thema> themalist,
                           @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relatestocklist,
@@ -90,6 +92,9 @@ public class SearchController {
         }
         boolean lockAcquired = false;
         List<StockElasticDto> relateStockList = new ArrayList<>();
+        int positive = 0;
+        int negative = 0;
+
         crawlerService.googleCrawler(searchInfo);
 
         try {
@@ -107,18 +112,11 @@ public class SearchController {
 
             List<ArticleVO> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
 
-            Map<String, Integer> map = new HashMap<>();
-
             for (ArticleVO i : analyzeResult) {
                 String label = i.getAnalyzeResult();
-                if(label.equals("LABEL_1")) map.put(Indices.POSITIVE, map.getOrDefault(Indices.POSITIVE, 0)+1);
-                if(label.equals("LABEL_0")) map.put(Indices.NEGATIVE, map.getOrDefault(Indices.NEGATIVE, 0)+1);
+                if(label.equals("긍정")) positive++;
+                if(label.equals("부정")) negative++;
             }
-
-            log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, map.getOrDefault(Indices.POSITIVE, 0), map.getOrDefault(Indices.NEGATIVE, 0));
-
-            Integer positive = map.getOrDefault(Indices.POSITIVE, 0);
-            Integer negative = map.getOrDefault(Indices.NEGATIVE, 0);
 
             for (Thema i : themaList) {
                 // Perform logging operations
@@ -134,12 +132,16 @@ public class SearchController {
                     log.info("관련 주식 getPrevPriceComparePercent : {}", j.getPrevPriceComparePercent());
                 }
             }
+
+            positiveInfo = String.valueOf(positive);
+            negativeInfo = String.valueOf(negative);
+
             redirectAttributes.addAttribute("searchInfo", searchInfo);
+            redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
+            redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
             redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
             redirectAttributes.addFlashAttribute("themaList", themaList);
             redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
-            redirectAttributes.addAttribute("positive", positive);
-            redirectAttributes.addAttribute("negative", negative);
 
             return "redirect:/searchResult";
         } finally {

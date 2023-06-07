@@ -125,9 +125,9 @@
         <h2 class="text-3xl py-4 border-b" th:text="${searchInfo} + |에 대한 기사 분석|"></h2>
 
         <span class="sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
-              th:text="|긍정 수치: | + ${sentimentPositive}"></span>
+              th:text="|긍정 수치: | + ${positiveInfo}"></span>
         <span class="sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
-              th:text="|부정 수치: | + ${sentimentNegative}"></span>
+              th:text="|부정 수치: | + ${negativeInfo}"></span>
         <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
              style="height: 250px;">
           <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
