@@ -4,6 +4,7 @@ import com.example.elasticsearch.article.domain.ArticleVO;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
+import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.redis.redisson.RedissonService;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
@@ -45,12 +46,10 @@ public class SearchController {
 
     @Autowired
     private final CrawlerService crawlerService;
+
     @Autowired
-    private final ElasticService elasticService;
-    @Autowired
-    private final SearchRepository searchRepository;
-    @Autowired
-    private final ArticleRedisRepository articleRedisRepository;
+    private final ThemaElasticService themaElasticService;
+
     @Autowired
     private final KoreanSentiment koreanSentiment;
     @Autowired
@@ -95,6 +94,7 @@ public class SearchController {
         int positive = 0;
         int negative = 0;
 
+        themaElasticService.clear();
         crawlerService.googleCrawler(searchInfo);
 
         try {
@@ -119,7 +119,6 @@ public class SearchController {
             }
 
             for (Thema i : themaList) {
-                // Perform logging operations
                 log.info("테마 명 : {}", i.getThemaName());
                 log.info("테마 퍼센트 : {}", i.getPercent());
                 log.info("테마 주도주1 : {}", i.getFirstStock());

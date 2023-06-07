@@ -1,6 +1,7 @@
 package com.example.elasticsearch.crawler.controller;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
+import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Timer;
 import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
@@ -23,13 +24,11 @@ public class CrawlerController {
 
     @Autowired private final CrawlerService crawlerService;
     @Autowired private final StockService stockService;
-    @Autowired private final ThemaElasticService themaElasticService;
     @Autowired private final CrawlingKafkaService crawlingKafkaService;
 
 
     @GetMapping
     public String crawlerService(Model model) {
-        themaElasticService.clear();
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
         crawlingKafkaService.sendNaverArticleMessage("기사 크롤링");

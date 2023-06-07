@@ -13,7 +13,6 @@
   [x-cloak] {
     display: none;
   }
-
   * {
     box-sizing:border-box;
   }
@@ -53,33 +52,17 @@
   .tabs .tab-header > div.active {
     color:#00acee;
   }
-  .tabs .tab-header div i {
-    display:inline-block;
-    margin-left:10px;
-    margin-right:5px;
-  }
+
   .tabs .tab-content {
     position:relative;
     height:100%;
     overflow:hidden;
   }
 
-  .tabs .tab-content > div > i {
-    display:inline-block;
-    width:50px;
-    height:50px;
-    background:#555;
-    color:#f5f5f5;
-    font-size:25px;
-    font-weight:600;
-    text-align:center;
-    line-height:50px;
-    border-radius:50%;
-  }
   .tabs .tab-content > div {
     position:absolute;
-    text-align:center;
-    padding:40px 20px;
+    text-align: center;
+    padding: 5px 20px;
     top:-200%;
     transition:all 500ms ease-in-out;
   }
@@ -96,10 +79,6 @@
     left:198px;
     top:80px;
     transition:all 500ms ease-in-out;
-  }
-
-  .container mx-auto py-6 px-4{
-
   }
 </style>
 <body>
@@ -120,16 +99,15 @@
   </div>
   <div class="tab-indicator"></div>
   <div class="tab-content">
-    <div class="active">
-      <div class="container mx-auto py-6 px-4" x-data="datatables()" x-cloak>
-        <h2 class="text-3xl py-4 border-b" th:text="${searchInfo} + |에 대한 기사 분석|"></h2>
-
-        <span class="sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+    <div class="movebox active">
+      <div class="container mx-auto py-2 px-4" x-data="datatables()" x-cloak>
+        <h2 class="text-3xl py-2 border-b" th:text="${searchInfo} + |에 대한 기사 분석|"></h2>
+        <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
               th:text="|긍정 수치: | + ${positiveInfo}"></span>
-        <span class="sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+        <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
               th:text="|부정 수치: | + ${negativeInfo}"></span>
         <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
-             style="height: 250px;">
+             style="height: 300px">
           <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
             <thead>
             <tr class="text-left">
@@ -169,55 +147,152 @@
                 'value': '기사제목'
               }
             ],
-            users: [{
-              "userId": 1,
-              "firstName": "Cort"
-            }, {
-              "userId": 2,
-              "firstName": "Brianne"
-            }, {
-              "userId": 3,
-              "firstName": "Isadore"
-            }, {
-              "userId": 4,
-              "firstName": "Janaya"
-            }, {
-              "userId": 5,
-              "firstName": "Freddi"
-            }, {
-              "userId": 6,
-              "firstName": "Oliy"
-            }, {
-              "userId": 7,
-              "firstName": "Tabb"
-            }, {
-              "userId": 8,
-              "firstName": "Joela"
-            }, {
-              "userId": 9,
-              "firstName": "Alistair",
-            }
-            ],
-            open: false,
-
+            open: false
           }
         }
       </script>
     </div>
 
-    <div>
-      <h2>This is about section</h2>
-      <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis eum similique quisquam officiis neque, cumque dignissimos architecto nisi totam sapiente eos et illum laborum atque vero ea perferendis consectetur veritatis.</p>
+    <div class="movebox">
+      <div class="container mx-auto py-1 px-4" x-data="datatables2()" x-cloak>
+        <h2 class="text-2xl py-1 border-b" th:text="${searchInfo} + | 테마주 |"></h2>
+        <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+             style="height: 150px;">
+          <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
+            <thead>
+            <tr class="text-left">
+              <template x-for="heading in headings">
+                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
+              </template>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="thema: ${themaList}">
+              <td class="border-dashed border-t border-gray-200 userId">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${thema.themaName}"
+                ></span>
+              </td>
+              <td class="border-dashed border-t border-gray-200 firstName">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${thema.percent}"
+                ></span>
+              </td>
+              <td class="border-dashed border-t border-gray-200 firstName">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${thema.firstStock}"
+                ></span>
+              </td>
+              <td class="border-dashed border-t border-gray-200 firstName">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${thema.secondStock}"
+                ></span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <script>
+        function datatables2() {
+          return {
+            headings: [
+              {
+                'key': '테마명',
+                'value': '테마명'
+              },
+              {
+                'key': '등락율',
+                'value': '등락율'
+              },
+              {
+                'key': '대장주1',
+                'value': '대장주1'
+              },
+              {
+                'key': '대장주2',
+                'value': '대장주2'
+              }
+            ],
+            open: false
+          }
+        }
+      </script>
+
+      <div class="container mx-auto py-2 px-4" x-data="datatables3()" x-cloak>
+        <h2 class="text-2xl py-1 border-b" th:text="${searchInfo} + | 관련주 |"></h2>
+        <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+             style="height: 150px;">
+          <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
+            <thead>
+            <tr class="text-left">
+              <template x-for="heading in headings">
+                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
+              </template>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="relateStock: ${relateStockList}">
+              <td class="border-dashed border-t border-gray-200 userId">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${relateStock.stockName}"
+                ></span>
+              </td>
+              <td class="border-dashed border-t border-gray-200 firstName">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${relateStock.price}"
+                ></span>
+              </td>
+              <td class="border-dashed border-t border-gray-200 firstName">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${relateStock.prevPriceCompare}"
+                ></span>
+              </td>
+              <td class="border-dashed border-t border-gray-200 firstName">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${relateStock.prevPriceComparePercent}"
+                ></span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <script>
+        function datatables3() {
+          return {
+            headings: [
+              {
+                'key': '주식명',
+                'value': '주식명'
+              },
+              {
+                'key': '가격',
+                'value': '가격'
+              },
+              {
+                'key': '전일대비',
+                'value': '전일대비'
+              },
+              {
+                'key': '등락율',
+                'value': '등락율'
+              }
+            ],
+            open: false
+          }
+        }
+      </script>
     </div>
 
-    <div>
-      <h2>This is services section</h2>
-      <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis eum similique quisquam officiis neque, cumque dignissimos architecto nisi totam sapiente eos et illum laborum atque vero ea perferendis consectetur veritatis.</p>
+    <div class="movebox">
+      <h2> 빈 칸 </h2>
     </div>
 
-    <div>
-      <h2>This is contact section</h2>
-      <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quis eum similique quisquam officiis neque, cumque dignissimos architecto nisi totam sapiente eos et illum laborum atque vero ea perferendis consectetur veritatis.</p>
+    <div class="movebox">
+      <h2> 새 칸 </h2>
     </div>
 
   </div>
@@ -238,7 +313,8 @@
       _class("tab-indicator")[0].style.top = `calc(80px + ${i*50}px)`;
 
       _class("tab-content")[0].getElementsByClassName("active")[0].classList.remove("active");
-      _class("tab-content")[0].getElementsByTagName("div")[i].classList.add("active");
+      _class("tab-content")[0].getElementsByClassName("movebox")[i].classList.add("active");
+
     });
   }
 </script>

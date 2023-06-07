@@ -1,5 +1,6 @@
 package com.example.elasticsearch.elastic.service;
 
+import com.example.elasticsearch.elastic.repository.ThemaElasticRepository;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,11 @@ public class ElasticCustomService {
 
     @Autowired private final ThemaElasticService themaElasticService;
 
-    public void updateDocument(String index, String id, String fieldName, String updatedValue) throws IOException {
+    @Autowired
+    private final ThemaElasticRepository themaElasticRepository;
 
+    public void clear() {
+        themaElasticRepository.deleteAll();
     }
 
     public void readThemaAnalyze(String searchInfo) {

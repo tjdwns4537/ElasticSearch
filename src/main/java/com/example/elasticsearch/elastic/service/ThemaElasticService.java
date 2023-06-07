@@ -19,11 +19,6 @@ import java.util.Optional;
 @Slf4j
 public class ThemaElasticService {
     @Autowired private final ThemaElasticRepository themaElasticRepository;
-    @Autowired private final RestHighLevelClient client;
-
-    public Optional<Thema> findByThemaName(Thema thema) {
-        return themaElasticRepository.findByThemaName(thema.getThemaName());
-    }
 
     public void clear() {
         themaElasticRepository.deleteAll();
@@ -35,20 +30,6 @@ public class ThemaElasticService {
             themaElasticRepository.save(thema);
             return;
         }
-
-//        if ((thema.getFirstStock() != null) && !thema.getFirstStock().isEmpty()) {
-//            try {
-//                UpdateRequest updateRequest = new UpdateRequest(Indices.THEMA_INDEX,
-//                        existThema.get().getId());
-//
-//                updateRequest.doc("firstStock", thema.getFirstStock());
-//                updateRequest.doc("secondStock", thema.getSecondStock());
-//
-//                client.update(updateRequest, RequestOptions.DEFAULT);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
     public Optional<Thema> findByKeyword(String keyword) {
