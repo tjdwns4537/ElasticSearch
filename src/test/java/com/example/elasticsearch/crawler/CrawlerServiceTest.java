@@ -26,6 +26,39 @@ class CrawlerServiceTest {
     LikeStockJpaRepository likeStockJpaRepository;
 
     @Test
+    @DisplayName("제무제표 분석")
+    public void calAnalyze() {
+        String url = "https://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?pGB=1&gicode=A005930&cID=&MenuYn=Y&ReportGB=&NewMenuID=103&stkGb=701";
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements sellMoney = doc.getElementsByAttributeValue("class", "ul_co1_c pd_t1");
+            Elements importBord = sellMoney.get(0).getElementsByAttributeValue("class", "rwf rowBold");
+//            System.out.println(importBord);
+
+            String 매출액_전년동기 = importBord.get(0).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
+            String 매출액_전년동기퍼센트 = importBord.get(0).getElementsByAttributeValue("class", "tcr").get(0).text();//전년 동기(%)
+
+            String 영업이익_전년동기 = importBord.get(1).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
+            String 영업이익_전년동기퍼센트 = importBord.get(1).getElementsByAttributeValue("class", "tcr").get(0).text();//전년 동기(%)
+
+            String 당기순이익_전년동기 = importBord.get(4).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
+            String 당기순이익_전년동기퍼센트 = importBord.get(4).getElementsByAttributeValue("class", "tcr").get(0).text();//전년 동기(%)
+
+            String 성장성_지표 = doc.select("#gsonikChart2").get(0).attr("src");
+
+            System.out.println("매출액_전년동기: " + 매출액_전년동기);
+            System.out.println("매출액_전년동기퍼센트: " + 매출액_전년동기퍼센트);
+            System.out.println("영업이익_전년동기: " + 영업이익_전년동기);
+            System.out.println("영업이익_전년동기퍼센트: " + 영업이익_전년동기퍼센트);
+            System.out.println("당기순이익_전년동기: " + 당기순이익_전년동기);
+            System.out.println("당기순이익_전년동기퍼센트: " + 당기순이익_전년동기퍼센트);
+            System.out.println("성장성_지표: " + 성장성_지표);
+        } catch (IOException e) {
+
+        }
+    }
+
+    @Test
     @DisplayName("테마주 검색 후 관련 주식 모두 크롤링")
     public void relateCrawlerTest() {
         String url = "https://finance.naver.com/sise/sise_group_detail.naver?type=theme&no=513";

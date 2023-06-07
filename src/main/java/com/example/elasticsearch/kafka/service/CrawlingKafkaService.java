@@ -90,7 +90,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup1(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri) {
-        log.info("partition 조회 {} key {} url {}",partition, key, 1);
         crawlerService.naverReadThema(1);
     }
 
@@ -98,7 +97,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup2(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri) {
-        log.info("partition 조회 {} key {} url {}",partition, key, 2);
         crawlerService.naverReadThema(2);
     }
 
@@ -106,7 +104,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup3(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri) {
-        log.info("partition 조회 {} key {} url {}",partition, key, 3);
         crawlerService.naverReadThema(3);
     }
 
@@ -114,7 +111,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup4(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri) {
-        log.info("partition 조회 {} key {} url {}",partition, key, 4);
         crawlerService.naverReadThema(4);
     }
 
@@ -122,21 +118,18 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup5(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri) {
-        log.info("partition 조회 {} key {} url {}",partition, key, 5);
         crawlerService.naverReadThema(5);
     }
 
     @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID6)
     public void listenGroupThemaGroup6(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        log.info("partition 조회 {} key {} url {}",partition, key, 6);
         crawlerService.naverReadThema(6);
     }
 
     @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID7)
     public void listenGroupThemaGroup7(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        log.info("partition 조회 {} key {} url {}",partition, key, 7);
         crawlerService.naverReadThema(7);
     }
 }
