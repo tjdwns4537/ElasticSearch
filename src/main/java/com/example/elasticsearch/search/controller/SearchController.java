@@ -1,5 +1,6 @@
 package com.example.elasticsearch.search.controller;
 
+import com.example.elasticsearch.article.domain.ArticleVO;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
@@ -33,6 +34,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,26 +60,31 @@ public class SearchController {
 
     @GetMapping("/searchResult")
     public String redirectView(@RequestParam("searchInfo") String searchInfo,
-                               @RequestParam("articleList") List<String> articleList,
+                               @ModelAttribute("analyzeResult") List<ArticleVO> analyzeResult,
+                               @ModelAttribute("themaList") List<Thema> themaList,
+                               @ModelAttribute("relateStockList") List<StockElasticDto> relateStockList,
                                @RequestParam("positive") Integer positive,
                                @RequestParam("negative") Integer negative,
-//                               @RequestParam("themaList") List<Thema> themaList,
-//                               @RequestParam("relateStockList") List<StockElasticDto> relateStockList,
+
                                Model model) {
 
         model.addAttribute("searchInfo", searchInfo);
-        model.addAttribute("articleList", articleList);
+        model.addAttribute("analyzeResult", analyzeResult);
         model.addAttribute("sentimentPositive", positive);
         model.addAttribute("sentimentNegative", negative);
-//        model.addAttribute("themaList", themaList);
-//        model.addAttribute("relateStockList", relateStockList);
+        model.addAttribute("themaList", themaList);
+        model.addAttribute("relateStockList", relateStockList);
 
         String redirectUrl = "result-page/result-page"; // The URL to redirect to
         return redirectUrl;
     }
 
     @PostMapping("/searchInfo")
-    public String extract(@RequestParam("searchInfo") String searchInfo, RedirectAttributes redirectAttributes) {
+    public String extract(@RequestParam("searchInfo") String searchInfo,
+                          @ModelAttribute("analyzeResult") ArrayList<ArticleVO> list,
+                          @ModelAttribute("themaList") ArrayList<Thema> themalist,
+                          @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relatestocklist,
+                          RedirectAttributes redirectAttributes) {
 
         if (searchInfo.isEmpty()) {
             return "redirect:/";
@@ -99,12 +106,20 @@ public class SearchController {
 
             List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
 
-            Map<String, Integer> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
+            List<ArticleVO> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
 
-            log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, analyzeResult.getOrDefault(Indices.POSITIVE, 0), analyzeResult.getOrDefault(Indices.NEGATIVE, 0));
+            Map<String, Integer> map = new HashMap<>();
 
-            Integer positive = analyzeResult.getOrDefault(Indices.POSITIVE, 0);
-            Integer negative = analyzeResult.getOrDefault(Indices.NEGATIVE, 0);
+            for (ArticleVO i : analyzeResult) {
+                String label = i.getAnalyzeResult();
+                if(label.equals("LABEL_1")) map.put(Indices.POSITIVE, map.getOrDefault(Indices.POSITIVE, 0)+1);
+                if(label.equals("LABEL_0")) map.put(Indices.NEGATIVE, map.getOrDefault(Indices.NEGATIVE, 0)+1);
+            }
+
+            log.info("{}의 긍정 수치 : {}, 부정 수치 : {}", searchInfo, map.getOrDefault(Indices.POSITIVE, 0), map.getOrDefault(Indices.NEGATIVE, 0));
+
+            Integer positive = map.getOrDefault(Indices.POSITIVE, 0);
+            Integer negative = map.getOrDefault(Indices.NEGATIVE, 0);
 
             for (Thema i : themaList) {
                 // Perform logging operations
@@ -120,15 +135,12 @@ public class SearchController {
                     log.info("관련 주식 getPrevPriceComparePercent : {}", j.getPrevPriceComparePercent());
                 }
             }
-
-//            AnalyzeResultSearch analyzeResultSearch = AnalyzeResultSearch.of(searchInfo, articleList, positive, negative, themaList, relateStockList);
-
             redirectAttributes.addAttribute("searchInfo", searchInfo);
-            redirectAttributes.addAttribute("articleList", articleList);
+            redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
+            redirectAttributes.addFlashAttribute("themaList", themaList);
+            redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
             redirectAttributes.addAttribute("positive", positive);
             redirectAttributes.addAttribute("negative", negative);
-//            redirectAttributes.addAttribute("themaList", themaList);
-//            redirectAttributes.addAttribute("relateStockList", relateStockList);
 
             return "redirect:/searchResult";
         } finally {

@@ -1,5 +1,6 @@
 package com.example.elasticsearch.sentiment.service;
 
+import com.example.elasticsearch.article.domain.ArticleVO;
 import com.example.elasticsearch.helper.Indices;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,15 +20,9 @@ import java.util.Map;
 @Slf4j
 public class KoreanSentiment {
 
-    public Map<String,Integer> labelCheck(Map<String, Integer> map, String label) {
-        if(label.equals("LABEL_1")) map.put(Indices.POSITIVE, map.getOrDefault(Indices.POSITIVE, 0)+1);
-        if(label.equals("LABEL_0")) map.put(Indices.NEGATIVE, map.getOrDefault(Indices.NEGATIVE, 0)+1);
-        return map;
-    }
+    public List<ArticleVO> articleAnalyze(List<String> articleList) { // 단어 분석
 
-    public Map<String, Integer> articleAnalyze(List<String> articleList) { // 단어 분석
-
-        Map<String, Integer> check = new HashMap<>();
+        List<ArticleVO> artilceList = new ArrayList<>();
 
         // 로컬 주피터 연결 환경 세팅
         RestTemplate restTemplate = new RestTemplate();
@@ -57,9 +53,10 @@ public class KoreanSentiment {
 
             log.info("응답 라벨 : {}", response);
 
-            check = labelCheck(check,response);
+            if(response.equals("LABEL_1")) artilceList.add(ArticleVO.of(i, "긍정"));
+            if(response.equals("LABEL_0")) artilceList.add(ArticleVO.of(i, "부정"));
         }
 
-        return check;
+        return artilceList;
     }
 }
