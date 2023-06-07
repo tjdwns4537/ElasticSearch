@@ -33,13 +33,6 @@ public class ElasticCustomService {
 
     @Autowired private final ThemaElasticService themaElasticService;
 
-    @Autowired
-    private final ThemaElasticRepository themaElasticRepository;
-
-    public void clear() {
-        themaElasticRepository.deleteAll();
-    }
-
     public void readThemaAnalyze(String searchInfo) {
         try {
             AnalyzeRequest analyzeRequest = AnalyzeRequest.withIndexAnalyzer(Indices.THEMA_INDEX, "standard", searchInfo);

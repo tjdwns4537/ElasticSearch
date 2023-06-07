@@ -25,10 +25,14 @@ public class CrawlerController {
     @Autowired private final CrawlerService crawlerService;
     @Autowired private final StockService stockService;
     @Autowired private final CrawlingKafkaService crawlingKafkaService;
-
+    @Autowired private final ThemaElasticService themaElasticService;
 
     @GetMapping
     public String crawlerService(Model model) {
+
+        log.info("크롤링 실행");
+
+        themaElasticService.clear();
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
         crawlingKafkaService.sendNaverArticleMessage("기사 크롤링");
@@ -41,12 +45,6 @@ public class CrawlerController {
         crawlingKafkaService.sendNaverThemaMessage7(7);
 
 //        crawlerService.naverUpjongCrawler(); // 업종 관련 크롤링
-
-        /**
-         * TODO
-         *  - 테마 관련 정보 아닐 시에 업종 관련 크롤링을 하는 조건문이 필요함
-         *      -> 이를 처리하지 않으면 관련 주식 종목을 불러올 때, null 오류를 발생시킴
-         * **/
         //        crawlerService.paxNetReadThema(); naver 크롤링에서 다 처리해줘서 기능이 필요없어짐
 
         List<String> likeStockRanking = stockService.getLikeStockRanking();

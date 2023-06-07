@@ -21,15 +21,17 @@ public class ThemaElasticService {
     @Autowired private final ThemaElasticRepository themaElasticRepository;
 
     public void clear() {
+        log.info("테마 데이터 비우기");
         themaElasticRepository.deleteAll();
     }
 
     public void themaSave(Thema thema) {
         Optional<Thema> existThema = themaElasticRepository.findByThemaName(thema.getThemaName());
-        if (!existThema.isPresent()) {
-            themaElasticRepository.save(thema);
+        if (existThema.isPresent()) {
             return;
         }
+        log.info("테마 데이터 저장: {}", thema.getThemaName());
+        themaElasticRepository.save(thema);
     }
 
     public Optional<Thema> findByKeyword(String keyword) {

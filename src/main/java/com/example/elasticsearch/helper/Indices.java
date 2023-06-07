@@ -3,8 +3,6 @@ package com.example.elasticsearch.helper;
 public final class Indices {
     public static final String ARTICLE_INDEX = "articles";
     public static final String THEMA_INDEX = "articlethema";
-    public static final String POSITIVE = "positive";
-    public static final String NEGATIVE = "negative";
     public static final String NAVER_ARTICLE_CRAWLER_TOPIC = "naverArticleCrawler";
     public static final String NAVER_ARTICLE_CRAWLER_TOPIC_GROUPID = "naverCrawler-article";
     public static final String NAVER_THEMA_CRAWLER_TOPIC = "naverThemaCrawler";

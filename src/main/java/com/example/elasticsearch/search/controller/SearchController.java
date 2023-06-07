@@ -54,6 +54,7 @@ public class SearchController {
     private final KoreanSentiment koreanSentiment;
     @Autowired
     private final ElasticCustomService elasticCustomService;
+
     @Autowired
     private final RedissonService redissonService;
 
@@ -94,7 +95,6 @@ public class SearchController {
         int positive = 0;
         int negative = 0;
 
-        themaElasticService.clear();
         crawlerService.googleCrawler(searchInfo);
 
         try {
