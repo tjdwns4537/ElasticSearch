@@ -4,13 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Repository
-public class LiveStockRepository {
+public class LiveStockRedisRepository {
 
     private final String STOCK = "LIVESTOCK";
 
@@ -18,7 +17,7 @@ public class LiveStockRepository {
     private ListOperations<String, String> listOperations;
 
     @Autowired
-    public LiveStockRepository(RedisTemplate<String, String> redisTemplate) {
+    public LiveStockRedisRepository(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.listOperations = redisTemplate.opsForList();
     }

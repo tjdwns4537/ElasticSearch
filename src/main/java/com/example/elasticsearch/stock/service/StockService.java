@@ -3,8 +3,8 @@ package com.example.elasticsearch.stock.service;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.service.CrawlerService;
-import com.example.elasticsearch.redis.repository.LikeStockRepository;
-import com.example.elasticsearch.redis.repository.LiveStockRepository;
+import com.example.elasticsearch.redis.repository.LikeStockRedisRepository;
+import com.example.elasticsearch.redis.repository.LiveStockRedisRepository;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +24,15 @@ public class StockService {
     @Autowired private final LikeStockJpaRepository likeStockJpaRepository;
     @Autowired private final CrawlerService crawlerService;
     @Autowired private final StockJpaRepository stockJpaRepository;
-    @Autowired private final LikeStockRepository likeStockRepository;
-    @Autowired private final LiveStockRepository liveStockRepository;
+    @Autowired private final LikeStockRedisRepository likeStockRedisRepository;
+    @Autowired private final LiveStockRedisRepository liveStockRedisRepository;
+
+    public List<String> findStockNumber(String stockName) {
+        return crawlerService.findStockNumber(stockName);
+    }
 
     public void deleteLikeStock(String stockName) {
-        String stockNumber = crawlerService.findStockNumber(stockName); // 주식명으로 주식넘버 조회
+        String stockNumber = crawlerService.findStockNumber(stockName).get(0); // 주식명으로 주식넘버 조회
         if(stockNumber.isEmpty()) return;
 
         StockLikeDto byLikeStockName = likeStockJpaRepository.findByLikeStockName(stockNumber); //관심목록 리스트 삭제
@@ -37,24 +41,18 @@ public class StockService {
         StockDbDto byStockName = stockJpaRepository.findByStockName(stockName); //관심목록 상세리스트 삭제
         stockJpaRepository.deleteById(byStockName.getId());
 
-        likeStockRepository.deleteLikeStock(stockName); // 실시간 레디스 목록 삭제
+        likeStockRedisRepository.deleteLikeStock(stockName); // 실시간 레디스 목록 삭제
     }
 
     public String saveStockNumber(String stockName) {
-
-        /**
-         * TODO
-         *  - update 문으로 변경 필요
-         * **/
-
         String stockNumber = "";
         try {
             Optional<StockLikeDto> byLikeStockName = Optional.of(likeStockJpaRepository.findByLikeStockName(stockName));
             likeStockJpaRepository.deleteById(byLikeStockName.get().getId());
-            stockNumber = crawlerService.findStockNumber(stockName); // 주식명으로 주식넘버 조회
+            stockNumber = crawlerService.findStockNumber(stockName).get(0); // 주식명으로 주식넘버 조회
             likeStockJpaRepository.save(StockLikeDto.of(stockNumber));
         } catch (NullPointerException e) {
-            stockNumber = crawlerService.findStockNumber(stockName); // 주식명으로 주식넘버 조회
+            stockNumber = crawlerService.findStockNumber(stockName).get(0); // 주식명으로 주식넘버 조회
             likeStockJpaRepository.save(StockLikeDto.of(stockNumber));
         }
 
@@ -71,7 +69,7 @@ public class StockService {
     }
 
     public List<String> getLikeStockRanking() {
-        List<String> likeStockRanking = likeStockRepository.getLikeStockRanking();
+        List<String> likeStockRanking = likeStockRedisRepository.getLikeStockRanking();
         List<String> list = new ArrayList<>();
 
         if(likeStockRanking.isEmpty()) return list;
@@ -83,7 +81,7 @@ public class StockService {
     }
 
     public List<String> getStockLive() {
-        return liveStockRepository.getStockLive();
+        return liveStockRedisRepository.getStockLive();
     }
 
     public String printStock(StockDbDto stockDbDto) {

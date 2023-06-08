@@ -3,26 +3,22 @@ package com.example.elasticsearch.crawler.service;
 import com.example.elasticsearch.article.domain.ArticleEls;
 import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
-import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
-import com.example.elasticsearch.helper.Timer;
-import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
-import com.example.elasticsearch.redis.repository.LikeStockRepository;
-import com.example.elasticsearch.redis.repository.LiveStockRepository;
+import com.example.elasticsearch.redis.repository.LikeStockRedisRepository;
+import com.example.elasticsearch.redis.repository.LiveStockRedisRepository;
+import com.example.elasticsearch.stock.domain.FinanceStockRedis;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockElasticDto;
 import com.example.elasticsearch.stock.domain.StockLikeDto;
 import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jboss.jandex.Index;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.redisson.api.RBlockingDeque;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,9 +34,9 @@ public class CrawlerService {
     @Autowired
     private final StockJpaRepository stockJpaRepository;
     @Autowired
-    private final LikeStockRepository likeStockRepository;
+    private final LikeStockRedisRepository likeStockRedisRepository;
     @Autowired
-    private final LiveStockRepository liveStockRepository;
+    private final LiveStockRedisRepository liveStockRedisRepository;
     @Autowired
     private final LikeStockJpaRepository likeStockJpaRepository;
     @Autowired
@@ -68,6 +64,45 @@ public class CrawlerService {
 
     @Value(("${crawler.naverUpJongUrl}"))
     String naverUpjongUrl;
+
+    public FinanceStockRedis financialCrawler(String stockName, String stockNumber) {
+        String prefix = "https://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?pGB=1&gicode=A";
+        String suffix = "&cID=&MenuYn=Y&ReportGB=&NewMenuID=103&stkGb=701";
+        String url = prefix + stockNumber + suffix;
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements sellMoney = doc.getElementsByAttributeValue("class", "ul_co1_c pd_t1");
+            Elements importBord = sellMoney.get(0).getElementsByAttributeValue("class", "rwf rowBold");
+            String sales = importBord.get(0).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
+            String salesPercent = importBord.get(0).getElementsByAttributeValue("class", "r cle").get(0).text();//전년 동기(%)
+            log.info("매출액_전년동기퍼센트: {}", salesPercent);
+
+            String profit = importBord.get(1).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
+            String profitPercent = importBord.get(1).getElementsByAttributeValue("class", "r cle").get(0).text();//전년 동기(%)
+
+            String currentProfit = importBord.get(4).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
+            String currentProfitPercent = importBord.get(4).getElementsByAttributeValue("class", "r cle").get(0).text();//전년 동기(%)
+
+            String potential = doc.select("#sonikChart2").get(0).attr("src");
+
+            log.info("매출액_전년동기: {}", sales);
+            log.info("매출액_전년동기퍼센트: {}", salesPercent);
+            log.info("영업이익_전년동기: {}", profit);
+            log.info("영업이익_전년동기퍼센트: {}", profitPercent);
+            log.info("당기순이익_전년동기: {}", currentProfit);
+            log.info("당기순이익_전년동기퍼센트: {}", currentProfitPercent);
+            log.info("성장성_지표: {}", potential);
+
+            return FinanceStockRedis.of(stockName, stockNumber, sales, salesPercent, profitPercent, profitPercent, currentProfit, currentProfitPercent, potential);
+
+        } catch (IOException e) {
+            return new FinanceStockRedis();
+        } catch (IndexOutOfBoundsException e) {
+            log.error("stockName : {} 인덱스 에러 - 크롤링 태그가 다름", stockName);
+            return new FinanceStockRedis();
+        }
+    }
 
     public void naverUpjongCrawler() {
         try {
@@ -185,10 +220,6 @@ public class CrawlerService {
 
                 StockDbDto stock = StockDbDto.of(titleResult, priceResult, percent.toString(), tradeResult);
 
-                /**
-                 * TODO
-                 *  - Update 쿼리로 수정 필요
-                 * **/
                 try {
                     StockDbDto findStock = stockJpaRepository.findByStockName(titleResult);
                     stockJpaRepository.deleteById(findStock.getId());
@@ -197,7 +228,7 @@ public class CrawlerService {
                     saveStock = Optional.of(stockJpaRepository.save(stock));
                 }
 
-                likeStockRepository.setStockRanking(saveStock.get()); // redis 에 저장
+                likeStockRedisRepository.setStockRanking(saveStock.get()); // redis 에 저장
             }
 
         } catch (IOException e) {
@@ -205,22 +236,28 @@ public class CrawlerService {
         }
     }
 
-    public String findStockNumber(String name) {
-        String titleResult = "";
+    public List<String> findStockNumber(String name) {
+        List<String> titleResult = new ArrayList<>();
         String selectUrl = findUrl + name;
         try {
             Document doc = Jsoup.connect(selectUrl).get();
 
             /** 종목 이름 **/
             Elements titleElements = doc.getElementsByAttributeValue("class", "js-inner-all-results-quote-item row");
+
             Element titleElement = titleElements.get(0);
             Elements title = titleElement.select(".second");
-            titleResult = title.get(0).text();
+            titleResult = title.eachText();
+            return titleResult;
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
+            titleResult.add(name);
+            return titleResult;
+        } catch (IndexOutOfBoundsException e){
+            log.error("INDEX ERROR : {} - 네이버 주식명과 주식 번호 검색 사이트의 기업 네이밍이 다를 확률 있음", name);
+            titleResult.add(name);
+            return titleResult;
         }
-        return titleResult;
     }
 
     public void saveLiveStock() {
@@ -235,7 +272,7 @@ public class CrawlerService {
 
             String[] splitResult = titleResult.split("% ");
             for (int i = 0; i < splitResult.length; i++) {
-                liveStockRepository.setStockLive(splitResult[i] + "%");
+                liveStockRedisRepository.setStockLive(splitResult[i] + "%");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -304,8 +341,10 @@ public class CrawlerService {
                     Element priceElement = priceElements.get(0);
                     Element prevPriceCompareElement = priceElements.get(1);
                     Element prevPriceComparePercentElement = priceElements.get(2);
-
-                    String stockName = stockNameFull.substring(0, stockNameFull.length() - 2);
+                    String stockName = stockNameFull;
+                    if(stockNameFull.contains("*")){
+                        stockName = stockNameFull.substring(0, stockNameFull.length() - 2);
+                    }
                     StockElasticDto stockElasticDto = StockElasticDto.of(stockName, priceElement.text(), prevPriceCompareElement.text(), prevPriceComparePercentElement.text());
                     list.add(stockElasticDto);
                 }

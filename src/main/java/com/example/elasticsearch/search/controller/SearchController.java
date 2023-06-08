@@ -10,8 +10,11 @@ import com.example.elasticsearch.redis.redisson.RedissonService;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
 import com.example.elasticsearch.search.domain.AnalyzeResultSearch;
 import com.example.elasticsearch.search.repository.SearchRepository;
+import com.example.elasticsearch.search.service.SearchService;
 import com.example.elasticsearch.sentiment.service.KoreanSentiment;
+import com.example.elasticsearch.stock.domain.FinanceStockRedis;
 import com.example.elasticsearch.stock.domain.StockElasticDto;
+import com.example.elasticsearch.stock.service.StockService;
 import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
@@ -48,7 +52,7 @@ public class SearchController {
     private final CrawlerService crawlerService;
 
     @Autowired
-    private final ThemaElasticService themaElasticService;
+    private final StockService stockService;
 
     @Autowired
     private final KoreanSentiment koreanSentiment;
@@ -58,6 +62,9 @@ public class SearchController {
     @Autowired
     private final RedissonService redissonService;
 
+    @Autowired
+    private final SearchService searchService;
+
     @GetMapping("/searchResult")
     public String redirectView(@RequestParam("searchInfo") String searchInfo,
                                @ModelAttribute("positiveInfo") String positiveInfo,
@@ -65,6 +72,7 @@ public class SearchController {
                                @ModelAttribute("analyzeResult") ArrayList<ArticleVO> analyzeResult,
                                @ModelAttribute("themaList") ArrayList<Thema> themaList,
                                @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relateStockList,
+                               @ModelAttribute("potentialStockList") ArrayList<FinanceStockRedis> potentialStockList,
                                Model model) {
 
         model.addAttribute("searchInfo", searchInfo);
@@ -73,6 +81,7 @@ public class SearchController {
         model.addAttribute("negativeInfo", negativeInfo);
         model.addAttribute("themaList", themaList);
         model.addAttribute("relateStockList", relateStockList);
+        model.addAttribute("potentialStockList", potentialStockList);
 
         String redirectUrl = "result-page/result-page"; // The URL to redirect to
         return redirectUrl;
@@ -85,6 +94,7 @@ public class SearchController {
                           @ModelAttribute("analyzeResult") ArrayList<ArticleVO> list,
                           @ModelAttribute("themaList") ArrayList<Thema> themalist,
                           @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relatestocklist,
+                          @ModelAttribute("potentialStockList") ArrayList<FinanceStockRedis> potentialList,
                           RedirectAttributes redirectAttributes) {
 
         if (searchInfo.isEmpty()) {
@@ -114,8 +124,8 @@ public class SearchController {
 
             for (ArticleVO i : analyzeResult) {
                 String label = i.getAnalyzeResult();
-                if(label.equals("긍정")) positive++;
-                if(label.equals("부정")) negative++;
+                if (label.equals("긍정")) positive++;
+                if (label.equals("부정")) negative++;
             }
 
             for (Thema i : themaList) {
@@ -124,6 +134,7 @@ public class SearchController {
                 log.info("테마 주도주1 : {}", i.getFirstStock());
                 log.info("테마 주도주2 : {}", i.getSecondStock());
                 relateStockList = i.getRelateStock();
+                searchService.saveBestStock(relateStockList);
                 for (StockElasticDto j : relateStockList) {
                     log.info("관련 주식 getStockName : {}", j.getStockName());
                     log.info("관련 주식 getPrice : {}", j.getPrice());
@@ -135,12 +146,21 @@ public class SearchController {
             positiveInfo = String.valueOf(positive);
             negativeInfo = String.valueOf(negative);
 
+            List<Object> financeStockList = searchService.extractBestStock();
+            List<FinanceStockRedis> potentialStockList = new ArrayList<>();
+
+            for (Object obj : financeStockList) {
+                if (obj instanceof FinanceStockRedis) {
+                    potentialStockList.add((FinanceStockRedis) obj);
+                }
+            }
             redirectAttributes.addAttribute("searchInfo", searchInfo);
             redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
             redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
             redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
             redirectAttributes.addFlashAttribute("themaList", themaList);
             redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
+            redirectAttributes.addFlashAttribute("potentialStockList", potentialStockList);
 
             return "redirect:/searchResult";
         } finally {

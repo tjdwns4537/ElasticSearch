@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public class LikeStockRepository {
+public class LikeStockRedisRepository {
 
     private final String STOCK = "LIKESTOCK";
 
@@ -21,7 +20,7 @@ public class LikeStockRepository {
     private ZSetOperations<String, String> ZSetOperations;
 
     @Autowired
-    public LikeStockRepository(RedisTemplate<String, String> redisTemplate) {
+    public LikeStockRedisRepository(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.ZSetOperations = redisTemplate.opsForZSet();
 
