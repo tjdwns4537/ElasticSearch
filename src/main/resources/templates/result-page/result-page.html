@@ -1,592 +1,555 @@
 <!DOCTYPE html>
 <html lang="ko"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:align-items="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEARCH-RESULT</title>
-  <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
-  <link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css">
-  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEARCH-RESULT</title>
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net"/>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
 </head>
 <style>
-  [x-cloak] {
-    display: none;
-  }
-  * {
-    box-sizing:border-box;
-  }
-  body {
-    background:#ddd;
-    font-family:"Raleway";
-  }
-  .tabs {
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    width:900px;
-    height:500px;
-    padding:30px 20px;
-    background:#f5f5f5;
-    box-shadow:5px 5px 10px 5px #ccc;
-    overflow:hidden;
-  }
-  .tabs .tab-header {
-    float:left;
-    width:180px;
-    height:100%;
-    border-right:1px solid #ccc;
-    padding:50px 0px;
-  }
-  .tabs .tab-header > div {
-    height:50px;
-    line-height:50px;
-    font-size:16px;
-    font-weight:600;
-    color:#888;
-    cursor:pointer;
-    padding-left:10px;
-  }
-  .tabs .tab-header > div:hover,
-  .tabs .tab-header > div.active {
-    color:#00acee;
-  }
-
-  .tabs .tab-content {
-    position:relative;
-    height:100%;
-    overflow:hidden;
-  }
-
-  .tabs .tab-content > div {
-    position:absolute;
-    text-align: center;
-    padding: 5px 20px;
-    top:-200%;
-    transition:all 500ms ease-in-out;
-  }
-  .tabs .tab-content > div.active {
-    top:0px;
-    width: 100%;
-  }
-
-  .tabs .tab-indicator {
-    position:absolute;
-    width:4px;
-    height:50px;
-    background:#00acee;
-    left:198px;
-    top:80px;
-    transition:all 500ms ease-in-out;
-  }
-
-  @import url("https://fonts.googleapis.com/css2?family=Gorditas&display=swap");
-
-  .container2 {
-    display: grid;
-    grid-template: "container" 1fr;
-    place-items: center;
-    place-content: center;
-    overflow: hidden;
-    max-height: clamp(450px, 50vh, 600px);
-  }
-
-  .container2 > * {
-    grid-area: container;
-    max-width: 1000px;
-  }
-
-  .title {
-    place-self: start center;
-  }
-
-  .carousel-control.prev {
-    place-self: center left;
-  }
-
-  .carousel-control.next {
-    place-self: center right;
-  }
-
-  .carousel-dots {
-    place-self: end center;
-  }
-
-  /* Other element styles */
-
-  /** {*/
-  /*  box-sizing: border-box;*/
-  /*}*/
-
-  /*body {*/
-  /*  --space: 6rem;*/
-  /*  --bg-color: papayawhip;*/
-  /*  display: grid;*/
-  /*  place-items: center;*/
-  /*  padding: var(--space) 0;*/
-  /*  grid-gap: var(--space);*/
-  /*  background-color: var(--bg-color);*/
-  /*  font-family: "Helvetica", sans-serif;*/
-  /*  line-height: 1.2;*/
-  /*}*/
-
-  /*.checkbox {*/
-  /*  position: fixed;*/
-  /*  top: 0;*/
-  /*  left: 0;*/
-  /*  z-index: 1;*/
-  /*  cursor: pointer;*/
-  /*  user-select: none;*/
-  /*  background-color: inherit;*/
-  /*  padding: 1rem;*/
-  /*  opacity: 0.9;*/
-  /*}*/
-
-  .container2 {
-    --border: 4px dashed dodgerblue;
-    position: relative;
-    border-top: var(--border);
-    border-bottom: var(--border);
-    margin: 0 auto;
-    width: 100%;
-    color: white;
-  }
-
-  .title2 {
-    position: relative;
-    font-family: "Gorditas", sans-serif;
-    font-size: clamp(1rem, 4vw, 2.5rem);
-    padding: 1rem;
-    text-align: center;
-    z-index: 1;
-  }
-
-  .carousel-viewport {
-    position: relative;
-    overflow: hidden;
-    margin: 0 auto;
-    z-index: -1;
-  }
-
-  .carousel-viewport .items {
-    position: relative;
-    display: flex;
-    transition: transform 500ms cubic-bezier(0.25, 1, 0.5, 1);
-  }
-
-  .carousel-viewport .item {
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 16 / 9;
-    min-width: 100%;
-    transform: translateZ(0);
-  }
-
-  .carousel-viewport img {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    user-select: none;
-  }
-
-  .carousel-control {
-    --size: clamp(2.5rem, 8vw, 4rem);
-
-    position: relative;
-    cursor: pointer;
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    color: white;
-    fill: currentcolor;
-    background: dodgerblue;
-    border: none;
-    width: var(--size);
-    height: var(--size);
-    padding: 0.25rem;
-    touch-action: manipulation;
-    transform: translateY(0);
-  }
-
-  .carousel-control:active {
-    transform: translateY(1px);
-  }
-
-  .carousel-control svg {
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  .carousel-dots {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-  }
-
-  .carousel-dots .dot {
-    --size: 1rem;
-    padding: 0;
-    font-size: 0;
-    color: transparent;
-    border: 3px solid white;
-    background-color: white;
-    border-radius: 50%;
-    width: var(--size);
-    height: var(--size);
-  }
-
-  .carousel-dots .dot.active {
-    background-color: dodgerblue;
-  }
-
-  /* aspect-ratio fallback */
-  @supports not (aspect-ratio: 16 / 9) {
-    .carousel-viewport .item::before {
-      content: "";
-      float: left;
-      padding-top: 56.25%;
+    [x-cloak] {
+        display: none;
     }
 
-    .carousel-viewport .item::after {
-      content: "";
-      display: block;
-      clear: both;
+    * {
+        box-sizing: border-box;
     }
-  }
+
+    body {
+        background: #ddd;
+        font-family: "Raleway";
+    }
+
+    .tabs {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 900px;
+        height: 500px;
+        padding: 30px 20px;
+        background: #f5f5f5;
+        box-shadow: 5px 5px 10px 5px #ccc;
+        overflow: hidden;
+    }
+
+    .tabs .tab-header {
+        float: left;
+        width: 180px;
+        height: 100%;
+        border-right: 1px solid #ccc;
+        padding: 50px 0px;
+    }
+
+    .tabs .tab-header > div {
+        height: 50px;
+        line-height: 50px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #888;
+        cursor: pointer;
+        padding-left: 10px;
+    }
+
+    .tabs .tab-header > div:hover,
+    .tabs .tab-header > div.active {
+        color: #00acee;
+    }
+
+    .tabs .tab-content {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .tabs .tab-content > div {
+        position: absolute;
+        text-align: center;
+        padding: 5px 20px;
+        top: -200%;
+        transition: all 500ms ease-in-out;
+    }
+
+    .tabs .tab-content > div.active {
+        top: 0px;
+        width: 100%;
+    }
+
+    .tabs .tab-indicator {
+        position: absolute;
+        width: 4px;
+        height: 50px;
+        background: #00acee;
+        left: 198px;
+        top: 80px;
+        transition: all 500ms ease-in-out;
+    }
+
+    ul, li, ol {
+        list-style: none;
+    }
+
+    @import url("https://fonts.googleapis.com/css2?family=Gorditas&display=swap");
+
+    .container2 {
+        display: grid;
+        grid-template: "container" 1fr;
+        place-items: center;
+        place-content: center;
+        overflow: hidden;
+        max-height: clamp(450px, 50vh, 600px);
+    }
+
+    .container2 > * {
+        grid-area: container;
+        max-width: 1000px;
+    }
+
+    .carousel-control.prev {
+        place-self: center left;
+    }
+
+    .carousel-control.next {
+        place-self: center right;
+    }
+
+    .carousel-dots {
+        place-self: end center;
+    }
+
+    .container2 {
+        position: relative;
+        margin: 0 auto;
+        width: 100%;
+        color: white;
+    }
+
+    .title2 {
+        position: absolute;
+        top: 0%;
+        font-family: "Gorditas", sans-serif;
+        font-size: clamp(1rem, 4vw, 2.5rem);
+        padding: 1rem;
+        text-align: center;
+        z-index: 1;
+        color: #333333;
+    }
+
+    .carousel-viewport {
+        position: relative;
+        overflow: hidden;
+        margin: 100px 0 0 0;
+        z-index: -1;
+    }
+
+    .carousel-viewport .items {
+        position: relative;
+        display: flex;
+        transition: transform 500ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .carousel-viewport .item {
+        position: relative;
+        min-width: 100%;
+        color: #333333;
+        background: white;
+    }
+
+    .carousel-viewport .item li {
+        position: relative;
+        left: 50%;
+        transform: translate(-50%, 50%);
+    }
+
+    .carousel-viewport .item .fi_img {
+        width: 300px;
+        height: 200px;
+        user-select: none;
+        margin-top: 50px;
+    }
+
+    .carousel-viewport .item .fi_title {
+        margin-bottom: 20px;
+    }
+
+    .carousel-viewport .item .fi_text {
+        line-height: 5px;
+    }
+
+
+    .carousel-control {
+        --size: clamp(2.5rem, 8vw, 4rem);
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        color: white;
+        fill: currentcolor;
+        background: #5F6368;
+        border: none;
+        width: 50px;
+        height: 50px;
+        padding: 0.25rem;
+        touch-action: manipulation;
+        transform: translateY(0);
+        margin: 100px 0 0 0;
+    }
+
+    .carousel-control:act {
+        transform: translateY(1px);
+    }
+
+    .carousel-control svg {
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .carousel-dots {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .carousel-dots .dot {
+        --size: 1rem;
+        padding: 0;
+        font-size: 0;
+        color: transparent;
+        border: 3px solid white;
+        background-color: #5F6368;
+        border-radius: 50%;
+        width: var(--size);
+        height: var(--size);
+    }
+
+    .carousel-dots .dot.act {
+        background-color: #ffa34f;
+    }
+
+    /* aspect-ratio fallback */
+    @supports not (aspect-ratio: 16 / 9) {
+        .carousel-viewport .item::before {
+            content: "";
+            float: left;
+            padding-top: 56.25%;
+        }
+
+        .carousel-viewport .item::after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+    }
 </style>
 <body>
 <div class="tabs">
-  <div class="tab-header">
-    <div class="active">
-      <i class="fa fa-code"></i> 관련 기사 분석 결과
+    <div class="tab-header">
+        <div class="active">
+            <i class="fa fa-code"></i> 관련 기사 분석 결과
+        </div>
+        <div>
+            <i class="fa fa-pencil-square"></i> 관련 주식 분석
+        </div>
+        <div>
+            <i class="fa fa-bar-chart"></i> 기대 성장주
+        </div>
+        <div>
+            <i class="fa fa-envelope"></i> 관련 테마 종목 정보
+        </div>
     </div>
-    <div>
-      <i class="fa fa-pencil-square"></i> 관련 주식 분석
-    </div>
-    <div>
-      <i class="fa fa-bar-chart"></i> 기대 성장주
-    </div>
-    <div>
-      <i class="fa fa-envelope"></i> 관련 테마 종목 정보
-    </div>
-  </div>
-  <div class="tab-indicator"></div>
-  <div class="tab-content">
-    <div class="movebox active">
-      <div class="container mx-auto py-2 px-4" x-data="datatables()" x-cloak>
-        <h2 class="text-3xl py-2 border-b" th:text="${searchInfo} + |에 대한 기사 분석|"></h2>
-        <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
-              th:text="|긍정 수치: | + ${positiveInfo}"></span>
-        <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
-              th:text="|부정 수치: | + ${negativeInfo}"></span>
-        <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
-             style="height: 300px">
-          <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
-            <thead>
-            <tr class="text-left">
-              <template x-for="heading in headings">
-                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
-                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
-              </template>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="article: ${analyzeResult}">
-              <td class="border-dashed border-t border-gray-200 userId">
+    <div class="tab-indicator"></div>
+    <div class="tab-content">
+        <div class="movebox active">
+            <div class="container mx-auto py-2 px-4" x-data="datatables()" x-cloak>
+                <h2 class="text-3xl py-2 border-b" th:text="${searchInfo} + |에 대한 기사 분석|"></h2>
+                <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                      th:text="|긍정 수치: | + ${positiveInfo}"></span>
+                <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                      th:text="|부정 수치: | + ${negativeInfo}"></span>
+                <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+                     style="height: 300px">
+                    <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
+                        <thead>
+                        <tr class="text-left">
+                            <template x-for="heading in headings">
+                                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
+                            </template>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="article: ${analyzeResult}">
+                            <td class="border-dashed border-t border-gray-200 userId">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${article.analyzeResult}"
                 ></span>
-              </td>
-              <td class="border-dashed border-t border-gray-200 firstName">
+                            </td>
+                            <td class="border-dashed border-t border-gray-200 firstName">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${article.title}"
                 ></span>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                function datatables() {
+                    return {
+                        headings: [
+                            {
+                                'key': 'userId',
+                                'value': '감정 분석 결과'
+                            },
+                            {
+                                'key': 'firstName',
+                                'value': '기사제목'
+                            }
+                        ],
+                        open: false
+                    }
+                }
+            </script>
         </div>
-      </div>
-      <script>
-        function datatables() {
-          return {
-            headings: [
-              {
-                'key': 'userId',
-                'value': '감정 분석 결과'
-              },
-              {
-                'key': 'firstName',
-                'value': '기사제목'
-              }
-            ],
-            open: false
-          }
-        }
-      </script>
-    </div>
 
-    <div class="movebox">
-      <div class="container mx-auto py-1 px-4" x-data="datatables2()" x-cloak>
-        <h2 class="text-2xl py-1 border-b" th:text="${searchInfo} + | 테마주 |"></h2>
-        <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
-             style="height: 150px;">
-          <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
-            <thead>
-            <tr class="text-left">
-              <template x-for="heading in headings">
-                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
-                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
-              </template>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="thema: ${themaList}">
-              <td class="border-dashed border-t border-gray-200 userId">
+        <div class="movebox">
+            <div class="container mx-auto py-1 px-4" x-data="datatables2()" x-cloak>
+                <h2 class="text-2xl py-1 border-b" th:text="${searchInfo} + | 테마주 |"></h2>
+                <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+                     style="height: 150px;">
+                    <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
+                        <thead>
+                        <tr class="text-left">
+                            <template x-for="heading in headings">
+                                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
+                            </template>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="thema: ${themaList}">
+                            <td class="border-dashed border-t border-gray-200 userId">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${thema.themaName}"
                 ></span>
-              </td>
-              <td class="border-dashed border-t border-gray-200 firstName">
+                            </td>
+                            <td class="border-dashed border-t border-gray-200 firstName">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${thema.percent}"
                 ></span>
-              </td>
-              <td class="border-dashed border-t border-gray-200 firstName">
+                            </td>
+                            <td class="border-dashed border-t border-gray-200 firstName">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${thema.firstStock}"
                 ></span>
-              </td>
-              <td class="border-dashed border-t border-gray-200 firstName">
+                            </td>
+                            <td class="border-dashed border-t border-gray-200 firstName">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${thema.secondStock}"
                 ></span>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <script>
-        function datatables2() {
-          return {
-            headings: [
-              {
-                'key': '테마명',
-                'value': '테마명'
-              },
-              {
-                'key': '등락율',
-                'value': '등락율'
-              },
-              {
-                'key': '대장주1',
-                'value': '대장주1'
-              },
-              {
-                'key': '대장주2',
-                'value': '대장주2'
-              }
-            ],
-            open: false
-          }
-        }
-      </script>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                function datatables2() {
+                    return {
+                        headings: [
+                            {
+                                'key': '테마명',
+                                'value': '테마명'
+                            },
+                            {
+                                'key': '등락율',
+                                'value': '등락율'
+                            },
+                            {
+                                'key': '대장주1',
+                                'value': '대장주1'
+                            },
+                            {
+                                'key': '대장주2',
+                                'value': '대장주2'
+                            }
+                        ],
+                        open: false
+                    }
+                }
+            </script>
 
-      <div class="container mx-auto py-2 px-4" x-data="datatables3()" x-cloak>
-        <h2 class="text-2xl py-1 border-b" th:text="${searchInfo} + | 관련주 |"></h2>
-        <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
-             style="height: 150px;">
-          <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
-            <thead>
-            <tr class="text-left">
-              <template x-for="heading in headings">
-                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
-                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
-              </template>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="relateStock: ${relateStockList}">
-              <td class="border-dashed border-t border-gray-200 userId">
+            <div class="container mx-auto py-2 px-4" x-data="datatables3()" x-cloak>
+                <h2 class="text-2xl py-1 border-b" th:text="${searchInfo} + | 관련주 |"></h2>
+                <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+                     style="height: 150px;">
+                    <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
+                        <thead>
+                        <tr class="text-left">
+                            <template x-for="heading in headings">
+                                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
+                            </template>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="relateStock: ${relateStockList}">
+                            <td class="border-dashed border-t border-gray-200 userId">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${relateStock.stockName}"
                 ></span>
-              </td>
-              <td class="border-dashed border-t border-gray-200 firstName">
+                            </td>
+                            <td class="border-dashed border-t border-gray-200 firstName">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${relateStock.price}"
                 ></span>
-              </td>
-              <td class="border-dashed border-t border-gray-200 firstName">
+                            </td>
+                            <td class="border-dashed border-t border-gray-200 firstName">
                 <span class="text-gray-700 px-6 py-3 flex items-center"
                       th:text="${relateStock.prevPriceComparePercent}"
                 ></span>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                function datatables3() {
+                    return {
+                        headings: [
+                            {
+                                'key': '주식명',
+                                'value': '주식명'
+                            },
+                            {
+                                'key': '가격',
+                                'value': '가격'
+                            },
+                            {
+                                'key': '등락율',
+                                'value': '등락율'
+                            }
+                        ],
+                        open: false
+                    }
+                }
+            </script>
         </div>
-      </div>
-      <script>
-        function datatables3() {
-          return {
-            headings: [
-              {
-                'key': '주식명',
-                'value': '주식명'
-              },
-              {
-                'key': '가격',
-                'value': '가격'
-              },
-              {
-                'key': '등락율',
-                'value': '등락율'
-              }
-            ],
-            open: false
-          }
-        }
-      </script>
-    </div>
 
-    <div class="movebox">
-      <div class="container2">
-        <h2 class="title2"> 기대주 분석 </h2>
-        <div class="carousel-viewport">
-          <ul class="items" th:each="potentialStock:${potentialStockList}">
-            <li class="item">
-              <img th:src="${potentialStock.potential}" src='https://images.unsplash.com/photo-1611003228577-e610e9a727c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMjgzMzExNw&ixlib=rb-1.2.1&q=80&w=1200' width="1200" height="675" alt=''>
-              <h4 th:text="${potentialStock.stockName}"></h4>
-              <span th:text="${potentialStock.sales}"></span>
-              <span th:text="${potentialStock.salesPercent}"></span>
-              <span th:text="${potentialStock.profit}"></span>
-              <span th:text="${potentialStock.profitPercent}"></span>
-              <span th:text="${potentialStock.currentProfit}"></span>
-              <span th:text="${potentialStock.currentProfitPercent}"></span>
-            </li>
+        <div class="movebox">
+            <div class="container2">
+                <h2 class="title2"> 기대주 분석 </h2>
+                <div class="carousel-viewport">
+                    <ul class="items">
+                        <li class="item" th:each="financeStock:${financeStockList}" style="height: 300px;">
+                            <!-- 각각의 li 요소의 데이터 -->
+                            <div class="img_box" style="display: inline-block; justify-content: center;">
+                                <img class="fi_img" th:src="${financeStock.potential}">
+                            </div>
+                            <div class="text_box" style="display: inline-block; text-align: left; margin-left: 30px;">
+                                <h2 class="fi_title" style="font-weight: bold;" th:text="|주식명: ${financeStock.stockName}|"></h2>
+                                <p><span class="fi_text" th:text="|매출액(단위: 억원): ${financeStock.sales}|"></span></p>
+                                <p><span class="fi_text" th:text="|매출액 전년 동기(%): ${financeStock.salesPercent}|"></span></p>
+                                <p><span class="fi_text" th:text="|영업 이익(단위: 억원):  ${financeStock.profit}|"></span></p>
+                                <p><span class="fi_text" th:text="|영업 이익 전년 동기(%): ${financeStock.profitPercent}|"></span></p>
+                                <p><span class="fi_text" th:text="|당기 순 이익(단위: 억원): ${financeStock.currentProfit}|"></span></p>
+                                <p><span class="fi_text" th:text="|당기 순 이익(%): ${financeStock.currentProfitPercent}|"></span></p>
+                            </div>
 
-            <li class="item">
-              <img th:src="${potentialStock.potential}" src='https://images.unsplash.com/photo-1611003228577-e610e9a727c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMjgzMzExNw&ixlib=rb-1.2.1&q=80&w=1200' width="1200" height="675" alt=''>
-              <h4 th:text="${potentialStock.stockName}"></h4>
-              <span th:text="${potentialStock.sales}"></span>
-              <span th:text="${potentialStock.salesPercent}"></span>
-              <span th:text="${potentialStock.profit}"></span>
-              <span th:text="${potentialStock.profitPercent}"></span>
-              <span th:text="${potentialStock.currentProfit}"></span>
-              <span th:text="${potentialStock.currentProfitPercent}"></span>
-            </li>
+                        </li>
+                    </ul>
+                </div>
+                <button class="carousel-control prev" title="Go to previous item">
+                    <svg viewBox="0 0 256 512">
+                        <path d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z"/>
+                    </svg>
+                </button>
+                <button class="carousel-control next" title="Go to next item">
+                    <svg viewBox="0 0 256 512">
+                        <path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/>
+                    </svg>
+                </button>
+                <ol class="carousel-dots">
+                    <li class="dot act"
+                        th:each="financeStock, financeStockStat:${financeStockList}"
+                        th:text="${financeStockStat.index+1}">1</li>
+                </ol>
+            </div>
 
-            <li class="item">
-              <img th:src="${potentialStock.potential}" src='https://images.unsplash.com/photo-1611003228577-e610e9a727c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMjgzMzExNw&ixlib=rb-1.2.1&q=80&w=1200' width="1200" height="675" alt=''>
-              <h4 th:text="${potentialStock.stockName}"></h4>
-              <span th:text="${potentialStock.sales}"></span>
-              <span th:text="${potentialStock.salesPercent}"></span>
-              <span th:text="${potentialStock.profit}"></span>
-              <span th:text="${potentialStock.profitPercent}"></span>
-              <span th:text="${potentialStock.currentProfit}"></span>
-              <span th:text="${potentialStock.currentProfitPercent}"></span>
-            </li>
+            <script>
+                /* Carousel */
+                const items = document.querySelector(".items");
+                const dots = document.querySelectorAll(".dot");
+                const prev = document.querySelector(".prev");
+                const next = document.querySelector(".next");
+                // const total = items.children.length - 1;
+                const total = 2;
+                const act = "act";
+                let current = 0;
 
-            <li class="item">
-              <img th:src="${potentialStock.potential}" src='https://images.unsplash.com/photo-1611003228577-e610e9a727c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMjgzMzExNw&ixlib=rb-1.2.1&q=80&w=1200' width="1200" height="675" alt=''>
-              <h4 th:text="${potentialStock.stockName}"></h4>
-              <span th:text="${potentialStock.sales}"></span>
-              <span th:text="${potentialStock.salesPercent}"></span>
-              <span th:text="${potentialStock.profit}"></span>
-              <span th:text="${potentialStock.profitPercent}"></span>
-              <span th:text="${potentialStock.currentProfit}"></span>
-              <span th:text="${potentialStock.currentProfitPercent}"></span>
-            </li>
-          </ul>
+                const setActiveDot = () => {
+                    dots.forEach((button, i) => {
+                        i === current
+                            ? button.classList.add(act)
+                            : button.classList.remove(act);
+                    });
+                };
+
+                const scrollToCurrent = () => {
+                    items.style.transform = `translateX(${current * -100}%`;
+                    setActiveDot();
+                };
+
+                const scrollPrev = () => {
+                    if (current === 0) return;
+                    current--;
+                    scrollToCurrent();
+                };
+
+                const scrollNext = () => {
+                    if (current === total) return;
+                    current++;
+                    scrollToCurrent();
+                };
+
+                prev.addEventListener("click", scrollPrev);
+                next.addEventListener("click", scrollNext);
+            </script>
         </div>
-        <button class="carousel-control prev" title="Go to previous item">
-          <svg viewBox="0 0 256 512">
-            <path d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z" />
-          </svg>
-        </button>
-        <button class="carousel-control next" title="Go to next item">
-          <svg viewBox="0 0 256 512">
-            <path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z" />
-          </svg>
-        </button>
-        <ol class="carousel-dots" th:each="i:${potentialStockList}">
-          <li class="dot act" th:text="i.count">1</li>
-          <li class="dot" th:text="i.count">2</li>
-          <li class="dot" th:text="i.count">3</li>
-          <li class="dot" th:text="i.count">4</li>
-        </ol>
-      </div>
 
-      <script>
-        /* Carousel */
-        const items = document.querySelector(".items");
-        const dots = document.querySelectorAll(".dot");
-        const prev = document.querySelector(".prev");
-        const next = document.querySelector(".next");
-        const total = items.children.length - 1;
-        const act = "act";
-        let current = 0;
+        <div class="movebox">
+            <h2> 새 칸 </h2>
+        </div>
 
-        const setActiveDot = () => {
-          dots.forEach((button, i) => {
-            i === current
-                    ? button.classList.add(act)
-                    : button.classList.remove(act);
-          });
-        };
-
-        const scrollToCurrent = () => {
-          items.style.transform = `translateX(${current * -100}%`;
-          setActiveDot();
-        };
-
-        const scrollPrev = () => {
-          if (current === 0) return;
-          current--;
-          scrollToCurrent();
-        };
-
-        const scrollNext = () => {
-          if (current === total) return;
-          current++;
-          scrollToCurrent();
-        };
-
-        prev.addEventListener("click", scrollPrev);
-        next.addEventListener("click", scrollNext);
-      </script>
     </div>
-
-    <div class="movebox">
-      <h2> 새 칸 </h2>
-    </div>
-
-  </div>
 </div>
 </body>
 <script>
-  function _class(name){
-    return document.getElementsByClassName(name);
-  }
+    function _class(name) {
+        return document.getElementsByClassName(name);
+    }
 
-  let tabPanes = _class("tab-header")[0].getElementsByTagName("div");
+    let tabPanes = _class("tab-header")[0].getElementsByTagName("div");
 
-  for(let i=0;i<tabPanes.length;i++){
-    tabPanes[i].addEventListener("click",function(){
-      _class("tab-header")[0].getElementsByClassName("active")[0].classList.remove("active");
-      tabPanes[i].classList.add("active");
+    for (let i = 0; i < tabPanes.length; i++) {
+        tabPanes[i].addEventListener("click", function () {
+            _class("tab-header")[0].getElementsByClassName("active")[0].classList.remove("active");
+            tabPanes[i].classList.add("active");
 
-      _class("tab-indicator")[0].style.top = `calc(80px + ${i*50}px)`;
+            _class("tab-indicator")[0].style.top = `calc(80px + ${i * 50}px)`;
 
-      _class("tab-content")[0].getElementsByClassName("active")[0].classList.remove("active");
-      _class("tab-content")[0].getElementsByClassName("movebox")[i].classList.add("active");
+            _class("tab-content")[0].getElementsByClassName("active")[0].classList.remove("active");
+            _class("tab-content")[0].getElementsByClassName("movebox")[i].classList.add("active");
 
-    });
-  }
+        });
+    }
 </script>
 
 </html>

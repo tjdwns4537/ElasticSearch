@@ -18,13 +18,13 @@ import java.util.Set;
 public class RecommendStockRedisRepo {
     private final String STOCK = "RECOMMEND_STOCK";
 
-    private RedisTemplate<String, Object> redisObjectTemplate;
+    private RedisTemplate<String, FinanceStockRedis> redisObjectTemplate;
 
-    private ZSetOperations<String, Object> zSetOperations;
+    private ZSetOperations<String, FinanceStockRedis> zSetOperations;
 
 
     @Autowired
-    public RecommendStockRedisRepo(RedisTemplate<String, Object> redisObjectTemplate) {
+    public RecommendStockRedisRepo(RedisTemplate<String, FinanceStockRedis> redisObjectTemplate) {
         this.redisObjectTemplate = redisObjectTemplate;
         this.zSetOperations = redisObjectTemplate.opsForZSet();
     }
@@ -37,20 +37,20 @@ public class RecommendStockRedisRepo {
     public void saveStockRanking(FinanceStockRedis financeStockRedis) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >
         try{
             double percent = Double.parseDouble(financeStockRedis.getProfitPercent());
-            zSetOperations.add(STOCK, financeStockRedis.getStockName(), percent);
-            log.info("redis save : {}, {}", financeStockRedis.getStockName(), percent);
+            zSetOperations.add(STOCK, financeStockRedis, percent);
+            log.info("redis save : {}, {}", financeStockRedis, percent);
         }
         catch (NumberFormatException e){
-            zSetOperations.add(STOCK, financeStockRedis.getStockName(), -99999.0);
+            zSetOperations.add(STOCK, financeStockRedis, -99999.0);
             log.info("redis save : {}, {}", financeStockRedis.getStockName(), -99999.0);
         }
     }
 
-    public List<Object> getStockRanking() { // 출력
-        Set<Object> range = zSetOperations.reverseRange(STOCK, 0, -1);
-        List<Object> list = new ArrayList<>(range);
+    public ArrayList<FinanceStockRedis> getStockRanking() { // 출력
+        Set<FinanceStockRedis> range = zSetOperations.reverseRange(STOCK, 0, -1);
+        ArrayList<FinanceStockRedis> list = new ArrayList<>(range);
         if(list.size() > 3){
-            return list.subList(0, 3);
+            return new ArrayList<>(list.subList(0, 3));
         }
         return list;
     }

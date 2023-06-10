@@ -1,0 +1,81 @@
+<!--                    <ul class="items">-->
+<!--                        <li class="item">-->
+<!--                            <img src='https://cdn.fnguide.com/SVO2/chartImg/03_02/A200670_D_D_03_02.png'-->
+<!--                                 width="1200" height="675" alt=''>-->
+<!--                        </li>-->
+<!--                        <li class="item">-->
+<!--                            <img src='https://cdn.fnguide.com/SVO2/chartImg/03_02/A200670_D_D_03_02.png'-->
+<!--                                 width="1200" height="675" alt=''>-->
+<!--                        </li>-->
+<!--                        <li class="item">-->
+<!--                            <img src='https://images.unsplash.com/photo-1611003228577-e610e9a727c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTYyMjgzMzExNw&ixlib=rb-1.2.1&q=80&w=1200'-->
+<!--                                 width="1200" height="675" alt=''>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+
+<div class="container mx-auto py-2 px-4" x-data="datatables3()" x-cloak>
+  <h2 class="text-2xl py-1 border-b" th:text="${searchInfo} + | 관련주 |"></h2>
+  <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+       style="height: 150px;">
+    <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
+      <thead>
+      <tr class="text-left">
+        <template x-for="heading in headings">
+          <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+              x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
+        </template>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="potential: ${potentialList}">
+        <td class="border-dashed border-t border-gray-200 userId">
+          <span class="text-gray-700 px-6 py-3 flex items-center" th:text="${potential.stockName}"></span>
+        </td>
+        <td class="border-dashed border-t border-gray-200 firstName">
+          <span class="text-gray-700 px-6 py-3 flex items-center" th:text="${potential.salesPercent}"></span>
+        </td>
+        <td class="border-dashed border-t border-gray-200 firstName">
+          <span class="text-gray-700 px-6 py-3 flex items-center" th:text="${potential.currentProfitPercent}"></span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function datatables3() {
+    return {
+      headings: [
+        {
+          'key': '주식명',
+          'value': '주식명'
+        },
+        {
+          'key': '가격',
+          'value': '가격'
+        },
+        {
+          'key': '등락율',
+          'value': '등락율'
+        }
+      ],
+      open: false
+    }
+  }
+</script>

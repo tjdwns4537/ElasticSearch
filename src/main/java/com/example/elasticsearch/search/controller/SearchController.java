@@ -72,8 +72,13 @@ public class SearchController {
                                @ModelAttribute("analyzeResult") ArrayList<ArticleVO> analyzeResult,
                                @ModelAttribute("themaList") ArrayList<Thema> themaList,
                                @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relateStockList,
-                               @ModelAttribute("potentialStockList") ArrayList<FinanceStockRedis> potentialStockList,
+                               @ModelAttribute("financeStockList") ArrayList<FinanceStockRedis> financeStockList,
                                Model model) {
+
+        for (FinanceStockRedis i : financeStockList) {
+            log.info("last check : {}",i.getStockName());
+            log.info("last check : {}",i.getProfit());
+        }
 
         model.addAttribute("searchInfo", searchInfo);
         model.addAttribute("analyzeResult", analyzeResult);
@@ -81,7 +86,7 @@ public class SearchController {
         model.addAttribute("negativeInfo", negativeInfo);
         model.addAttribute("themaList", themaList);
         model.addAttribute("relateStockList", relateStockList);
-        model.addAttribute("potentialStockList", potentialStockList);
+        model.addAttribute("potentialList", financeStockList);
 
         String redirectUrl = "result-page/result-page"; // The URL to redirect to
         return redirectUrl;
@@ -94,7 +99,7 @@ public class SearchController {
                           @ModelAttribute("analyzeResult") ArrayList<ArticleVO> list,
                           @ModelAttribute("themaList") ArrayList<Thema> themalist,
                           @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relatestocklist,
-                          @ModelAttribute("potentialStockList") ArrayList<FinanceStockRedis> potentialList,
+                          @ModelAttribute("financeStockList") ArrayList<FinanceStockRedis> financeStockList,
                           RedirectAttributes redirectAttributes) {
 
         if (searchInfo.isEmpty()) {
@@ -146,21 +151,20 @@ public class SearchController {
             positiveInfo = String.valueOf(positive);
             negativeInfo = String.valueOf(negative);
 
-            List<Object> financeStockList = searchService.extractBestStock();
-            List<FinanceStockRedis> potentialStockList = new ArrayList<>();
+            financeStockList = searchService.extractBestStock();
 
-            for (Object obj : financeStockList) {
-                if (obj instanceof FinanceStockRedis) {
-                    potentialStockList.add((FinanceStockRedis) obj);
-                }
+            for (FinanceStockRedis i : financeStockList) {
+                log.info("first check : {}", i.getStockName());
+                log.info("first check : {}", i.getProfit());
             }
+
             redirectAttributes.addAttribute("searchInfo", searchInfo);
             redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
             redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
             redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
             redirectAttributes.addFlashAttribute("themaList", themaList);
             redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
-            redirectAttributes.addFlashAttribute("potentialStockList", potentialStockList);
+            redirectAttributes.addFlashAttribute("financeStockList", financeStockList);
 
             return "redirect:/searchResult";
         } finally {
