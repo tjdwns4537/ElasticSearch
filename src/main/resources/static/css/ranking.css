@@ -17,7 +17,7 @@ body {
 
 #rank-list {
     overflow: hidden;
-    width: 500px;
+    width: 400px;
     height: 60px;
     margin: 0;
 }
@@ -28,18 +28,18 @@ body {
 
 #rank-list dd {
     position: relative;
+    /*width: 500px;*/
+    /*height: 20px;*/
 }
 
 #rank-list ol {
     position: absolute;
     list-style-type: none;
+    width: 500px;
 }
 
 #rank-list li {
-    width: 500px;
-    height: 20px;
     line-height: 20px;
-    text-align: center;
     color: #dee0e5;
 }
 

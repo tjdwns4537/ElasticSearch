@@ -17,16 +17,16 @@
 
     <nav class="top-nav">
         <div class="one">
-            <h1> Stock </h1>
+            <h1 style="font-weight: bold"> Stock </h1>
         </div>
     </nav>
 
-    <div id="content">
-        <h4> 거래량 상위 목록 </h4>
+    <div id="content" style="background: slategrey;">
+        <h4 style="color: #f5f5dc; margin-bottom: 10px;"> 거래량 상위 목록 </h4>
         <dl id="rank-list">
             <dd>
-                <ol >
-                    <li th:each="likeStock, liveStocks:${liveStockList}" th:text="|${liveStocks.index+1}. ${likeStock}|"></li>
+                <ol>
+                    <li th:each="likeStock, liveStocks:${liveStockList}" th:text="|${liveStocks.index+1}. ${likeStock}|">
                 </ol>
             </dd>
         </dl>
@@ -36,7 +36,7 @@
 <section class="main-section">
 
     <div class="logo-wrap">
-        <img class="logo-img" src="image/logo.png">
+        <img class="logo-img" style="width: 180px; height: 210px;" src="image/logo2.png">
         <div class="like">
             <form class="like-form" th:action="@{/likeStock}" th:object="${stockForm}" method="post">
                 <div class="like-wrap">

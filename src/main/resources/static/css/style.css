@@ -47,7 +47,6 @@
 }
 
 .main-section .logo-img{
-    height: 150px;
     float: left;
 }
 
@@ -62,9 +61,11 @@
 }
 
 .main-section .logo-wrap .like-list{
+    margin-top: 10px;
     height: 165px;
     align-content: center;
-    border: 1px solid #717271;
+    border-top: 4px solid #717271;
+    border-bottom: 4px solid #717271;
     align-content: center;
     text-align: center;
 }
@@ -106,6 +107,7 @@
     align-content: center;
     padding-left: 8px;
     padding-right: 8px;
+    margin-top: 20px;
 }
 
 .main-section .searchbar-wrap i{
@@ -205,6 +207,7 @@ h1 {
     text-transform: uppercase;
     padding-bottom: 5px;
 }
+
 .one h1:before {
     width: 28px;
     height: 5px;
@@ -214,8 +217,9 @@ h1 {
     bottom: 3px;
     left: 50%;
     margin-left: -14px;
-    background-color: #b80000;
+    background-color: #000000;
 }
+
 .one h1:after {
     width: 100px;
     height: 1px;
@@ -225,5 +229,5 @@ h1 {
     margin-top: 25px;
     left: 50%;
     margin-left: -50px;
-    background-color: #b80000;
+    background-color: #000000;
 }
