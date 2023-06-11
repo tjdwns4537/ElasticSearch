@@ -254,12 +254,10 @@ public class CrawlerService {
             return titleResult;
         } catch (IOException e) {
             e.printStackTrace();
-            titleResult.add(name);
-            return titleResult;
+            return new ArrayList<>();
         } catch (IndexOutOfBoundsException e){
             log.error("INDEX ERROR : {} - 네이버 주식명과 주식 번호 검색 사이트의 기업 네이밍이 다를 확률 있음", name);
-            titleResult.add(name);
-            return titleResult;
+            return new ArrayList<>();
         }
     }
 
@@ -332,7 +330,7 @@ public class CrawlerService {
     public void naverThemaCrawler(Thema thema) {
         if (thema.getDetailLink().isBlank()) return;
 
-        List<StockElasticDto> list = new ArrayList<>();
+        ArrayList<StockElasticDto> list = new ArrayList<>();
         String relateUrl = liveUrl + thema.getDetailLink();
 
         try {

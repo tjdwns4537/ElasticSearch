@@ -6,8 +6,11 @@ import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
 import com.example.elasticsearch.redis.redisson.RedissonService;
 import com.example.elasticsearch.redis.repository.ArticleRedisRepository;
+import com.example.elasticsearch.redis.repository.RecommendStockRedisRepo;
+import com.example.elasticsearch.redis.repository.ThemaRedisRepo;
 import com.example.elasticsearch.search.domain.AnalyzeResultSearch;
 import com.example.elasticsearch.search.repository.SearchRepository;
 import com.example.elasticsearch.search.service.SearchService;
@@ -19,6 +22,8 @@ import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -41,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Controller
@@ -50,20 +56,20 @@ public class SearchController {
 
     @Autowired
     private final CrawlerService crawlerService;
-
-    @Autowired
-    private final StockService stockService;
-
     @Autowired
     private final KoreanSentiment koreanSentiment;
     @Autowired
     private final ElasticCustomService elasticCustomService;
-
     @Autowired
     private final RedissonService redissonService;
-
     @Autowired
     private final SearchService searchService;
+    @Autowired
+    private final RecommendStockRedisRepo recommendStockRedisRepo;
+    @Autowired
+    private final CrawlingKafkaService crawlingKafkaService;
+    @Autowired
+    private final RedissonClient redissonClient;
 
     @GetMapping("/searchResult")
     public String redirectView(@RequestParam("searchInfo") String searchInfo,
@@ -76,8 +82,8 @@ public class SearchController {
                                Model model) {
 
         for (FinanceStockRedis i : financeStockList) {
-            log.info("last check : {}",i.getStockName());
-            log.info("last check : {}",i.getProfit());
+            log.info("FinanceStockRedis check : {}", i.getStockName());
+            log.info("FinanceStockRedis check : {}", i.getProfit());
         }
 
         model.addAttribute("searchInfo", searchInfo);
@@ -97,24 +103,23 @@ public class SearchController {
                           @ModelAttribute("positiveInfo") String positiveInfo,
                           @ModelAttribute("negativeInfo") String negativeInfo,
                           @ModelAttribute("analyzeResult") ArrayList<ArticleVO> list,
-                          @ModelAttribute("themaList") ArrayList<Thema> themalist,
-                          @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relatestocklist,
+                          @ModelAttribute("themaList") ArrayList<Thema> themaList,
+                          @ModelAttribute("relateStockList") ArrayList<StockElasticDto> relateStockList,
                           @ModelAttribute("financeStockList") ArrayList<FinanceStockRedis> financeStockList,
                           RedirectAttributes redirectAttributes) {
 
         if (searchInfo.isEmpty()) {
             return "redirect:/";
         }
+
         boolean lockAcquired = false;
-        List<StockElasticDto> relateStockList = new ArrayList<>();
         int positive = 0;
         int negative = 0;
 
+        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
         crawlerService.googleCrawler(searchInfo);
 
         try {
-            List<Thema> themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
-
             if (themaList.isEmpty()) {
                 lockAcquired = redissonService.searchLock(searchInfo);
                 if (!lockAcquired) {
@@ -122,6 +127,8 @@ public class SearchController {
                     return "redirect:/";  // or any other appropriate action
                 }
             }
+
+            themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
 
             List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
 
@@ -133,30 +140,21 @@ public class SearchController {
                 if (label.equals("부정")) negative++;
             }
 
-            for (Thema i : themaList) {
-                log.info("테마 명 : {}", i.getThemaName());
-                log.info("테마 퍼센트 : {}", i.getPercent());
-                log.info("테마 주도주1 : {}", i.getFirstStock());
-                log.info("테마 주도주2 : {}", i.getSecondStock());
-                relateStockList = i.getRelateStock();
-                searchService.saveBestStock(relateStockList);
-                for (StockElasticDto j : relateStockList) {
-                    log.info("관련 주식 getStockName : {}", j.getStockName());
-                    log.info("관련 주식 getPrice : {}", j.getPrice());
-                    log.info("관련 주식 getPrevPriceCompare : {}", j.getPrevPriceCompare());
-                    log.info("관련 주식 getPrevPriceComparePercent : {}", j.getPrevPriceComparePercent());
+            for (int i = 0; i < themaList.size(); i++) {
+                relateStockList = themaList.get(i).getRelateStock();
+                log.info("테마 관련 주식 기능 수행중");
+
+                for (int j = 0; j < relateStockList.size(); j++) {
+                    StockElasticDto stock = relateStockList.get(j);
+                    searchService.saveBestStock(stock.getStockName());
                 }
             }
+            log.info("테마 관련 주식 기능 수행 끝");
 
             positiveInfo = String.valueOf(positive);
             negativeInfo = String.valueOf(negative);
 
             financeStockList = searchService.extractBestStock();
-
-            for (FinanceStockRedis i : financeStockList) {
-                log.info("first check : {}", i.getStockName());
-                log.info("first check : {}", i.getProfit());
-            }
 
             redirectAttributes.addAttribute("searchInfo", searchInfo);
             redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);

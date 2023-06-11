@@ -29,20 +29,19 @@ public class RecommendStockRedisRepo {
         this.zSetOperations = redisObjectTemplate.opsForZSet();
     }
 
-    @PostConstruct
-    public void init() {
+    public void deleteAll() {
         redisObjectTemplate.delete(STOCK);
     }
 
     public void saveStockRanking(FinanceStockRedis financeStockRedis) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >
-        try{
+        try {
             double percent = Double.parseDouble(financeStockRedis.getProfitPercent());
             zSetOperations.add(STOCK, financeStockRedis, percent);
-            log.info("redis save : {}, {}", financeStockRedis, percent);
-        }
-        catch (NumberFormatException e){
-            zSetOperations.add(STOCK, financeStockRedis, -99999.0);
-            log.info("redis save : {}, {}", financeStockRedis.getStockName(), -99999.0);
+            log.info("redis save : {}, {}", financeStockRedis.getStockName(), percent);
+        } catch (NumberFormatException e) {
+            log.info("redis exception : {}, {}", financeStockRedis.getStockName());
+        } catch (NullPointerException e) {
+            log.info("redis exception : {}, {}", financeStockRedis.getStockName());
         }
     }
 

@@ -38,4 +38,9 @@ public class KafkaTopicConfig {
     public NewTopic naverMethodTopic() {
         return new NewTopic(Indices.METHOD_TOPIC, 1, (short) 1);
     }
+
+    @Bean
+    public NewTopic naverThemaArticleTopic() {
+        return new NewTopic(Indices.TA_TOPIC, 2, (short) 1);
+    }
 }

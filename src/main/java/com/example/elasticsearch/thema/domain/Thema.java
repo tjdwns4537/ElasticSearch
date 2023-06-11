@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ public class Thema {
 
     private String detailLink;
 
-    private List<StockElasticDto> relateStock;
+    private ArrayList<StockElasticDto> relateStock;
 
     public Thema(String themaName, String percent, String detailLink) {
         this.id = UUID.randomUUID().toString();
@@ -51,7 +52,7 @@ public class Thema {
         this.secondStock = secondStock;
     }
 
-    public Thema(String themaName, String percent, String firstStock, String secondStock, List<StockElasticDto> relateStock) {
+    public Thema(String themaName, String percent, String firstStock, String secondStock, ArrayList<StockElasticDto> relateStock) {
         this.id = UUID.randomUUID().toString();
         this.themaName = themaName;
         this.percent = percent;
@@ -68,7 +69,7 @@ public class Thema {
         return new Thema(themaName, percent, firstStock, secondStock);
     }
 
-    public static Thema of(String themaName, String percent, String firstStock, String secondStock, List<StockElasticDto> relateStock) {
+    public static Thema of(String themaName, String percent, String firstStock, String secondStock, ArrayList<StockElasticDto> relateStock) {
         return new Thema(themaName, percent, firstStock, secondStock, relateStock);
     }
 

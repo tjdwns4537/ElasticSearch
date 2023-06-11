@@ -53,7 +53,7 @@ public class ElasticCustomService {
         }
     }
 
-    public List<Thema> findSimilarThema(String IndexName, String searchInfo) {
+    public ArrayList<Thema> findSimilarThema(String IndexName, String searchInfo) {
         try {
             SearchRequest searchRequest = new SearchRequest(IndexName);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
@@ -80,7 +80,7 @@ public class ElasticCustomService {
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             SearchHits searchHits = searchResponse.getHits();
 
-            List<Thema> similarWords = new ArrayList<>();
+            ArrayList<Thema> similarWords = new ArrayList<>();
             for (SearchHit hit : searchHits.getHits()) {
                 String similarTitle = hit.getSourceAsMap().get("themaName").toString();
                 Optional<Thema> thema = themaElasticService.findByKeyword(similarTitle);
@@ -88,6 +88,8 @@ public class ElasticCustomService {
 
                 log.info("similar thema : {} , {}", thema.get().getThemaName(), thema.get().getPercent());
             }
+            log.info("test log : {}",similarWords.get(0));
+            log.info("test log : {}",similarWords.size());
             return similarWords;
         } catch (IOException e) {
             // Handle exception

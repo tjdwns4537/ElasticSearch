@@ -1,7 +1,12 @@
 package com.example.elasticsearch.config;
 
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.stock.domain.RelativeStockKafkaDto;
+import com.example.elasticsearch.stock.domain.StockElasticDto;
+import com.example.elasticsearch.stock.domain.StockElasticDtoDeserializer;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +38,8 @@ public class KafkaConsumerConfig {
     String themaGroupId5 = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID5;
     String themaGroupId6 = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID6;
     String themaGroupId7 = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID7;
+    String TAGROUPID1 = Indices.TA_GROUPID;
+    String TAGROUPID2 = Indices.TA_GROUPID2;
 
     @Bean
     public ConsumerFactory<String, Object> consumerArticleFactoryGroup1() {
@@ -75,10 +82,27 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
+    public ConsumerFactory<String, Object> consumerFactoryTAGroup1() {
+        return factory(TAGROUPID1);
+    }
+
+    @Bean
+    public ConsumerFactory<String, Object> consumerFactoryTAGroup2() {
+        return factory(TAGROUPID2);
+    }
+
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupTA() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryTAGroup1());
+        return factory;
+    }
+
+    @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupArticle() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerArticleFactoryGroup1());
-        // Configure other properties as needed
         return factory;
     }
 
@@ -153,6 +177,7 @@ public class KafkaConsumerConfig {
         props.put(
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 JsonDeserializer.class);
+
         props.put(
                 JsonDeserializer.TRUSTED_PACKAGES,
                 "*");
@@ -164,12 +189,4 @@ public class KafkaConsumerConfig {
                 new JsonDeserializer<>(Object.class, objectMapper)
         );
     }
-
-
-//    @Bean
-//    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
-//        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-//        factory.setConsumerFactory(consumerFactory());
-//        return factory;
-//    }
 }

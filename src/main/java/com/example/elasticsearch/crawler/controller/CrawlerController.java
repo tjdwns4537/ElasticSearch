@@ -44,7 +44,8 @@ public class CrawlerController {
 
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
-        crawlingKafkaService.sendNaverArticleMessage("기사 크롤링");
+        crawlerService.crawlingArticle();
+//        crawlingKafkaService.sendNaverArticleMessage("기사 크롤링");
         crawlerService.naverReadThema(true,1);
 
 //        crawlerService.naverUpjongCrawler(); // 업종 관련 크롤링

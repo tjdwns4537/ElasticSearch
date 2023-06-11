@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class StockElasticDto {
+public class StockElasticDto implements Serializable {
 
     /** 키워드 제목 */
     private String stockName;
