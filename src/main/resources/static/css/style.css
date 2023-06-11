@@ -141,6 +141,23 @@
     font-size: 12px;
 }
 
+.thema-all{
+    position: fixed;
+    top: 50px;
+    left: 50px;
+    border: 1px solid #333333;
+    padding: 10px;
+}
+
+.like-all h4{
+    text-align: center;
+}
+
+.like-all li{
+    list-style-type: none;
+    line-height: 30px;
+}
+
 .like-all{
     position: fixed;
     top: 50px;

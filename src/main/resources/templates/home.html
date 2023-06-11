@@ -27,12 +27,29 @@
             <dd>
                 <ol>
                     <li th:each="likeStock, liveStocks:${liveStockList}" th:text="|${liveStocks.index+1}. ${likeStock}|">
+                    </li>
                 </ol>
             </dd>
         </dl>
     </div>
 
 </header>
+
+<div class="thema-all">
+    <h4 style="font-size: 12px; font-weight: bold; border-bottom: 2px solid black; line-height: 30px; text-align: center"> 주요 테마 목록 </h4>
+    <dl class="like-all-list" style="margin-top: 10px">
+        <dd>
+            <ol>
+                <li style="list-style: none; line-height: 25px;"
+                    th:each="thema, i:${themaList}">
+                    <span style="color: black; font-weight: bold" th:text="|${i.index+1}. [테마명] ${thema.themaName}"></span>
+                    <span style="color: darkblue" th:text="|[등락율] ${thema.percent}|"></span>
+                </li>
+            </ol>
+        </dd>
+    </dl>
+</div>
+
 <section class="main-section">
 
     <div class="logo-wrap">
@@ -62,7 +79,7 @@
         <form th:action="@{/searchInfo}" method="post" >
             <div class="searchbar-wrap">
                 <i class="fas fa-search"></i>
-                <input class="search-input" type="text" name="searchInfo" placeholder="검색어 입력"/>
+                <input class="search-input" type="text" name="searchInfo" placeholder="테마 입력"/>
                 <button type="submit"> 검색 </button>
             </div>
         </form>

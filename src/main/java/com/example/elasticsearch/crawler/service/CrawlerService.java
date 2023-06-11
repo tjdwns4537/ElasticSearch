@@ -7,6 +7,7 @@ import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.redis.repository.LikeStockRedisRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRedisRepository;
+import com.example.elasticsearch.redis.repository.ThemaRedisRepo;
 import com.example.elasticsearch.stock.domain.FinanceStockRedis;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockElasticDto;
@@ -43,6 +44,8 @@ public class CrawlerService {
     private final ElasticService elasticService;
     @Autowired
     private final ThemaElasticService themaElasticService;
+    @Autowired
+    private final ThemaRedisRepo themaRedisRepo;
 
     @Value("${crawler.url}")
     String url;
@@ -300,7 +303,7 @@ public class CrawlerService {
         }
     }
 
-    public void naverReadThema(int i) {
+    public void naverReadThema(boolean check, int i) {
         try {
             Document naverDoc = Jsoup.connect(naverUrl + i).get();
             /** 네이버 테마 관련 퍼센트를 크롤링 **/
@@ -310,11 +313,15 @@ public class CrawlerService {
             Elements themaName = tbodyElements.get(0).getElementsByAttributeValue("class", "col_type1");
             Elements percent = tbodyElements.get(0).getElementsByAttributeValue("class", "number col_type2");
 
+
             for (int k = 1; k < themaName.size(); k++) {
                 if (themaName.get(k).hasText() && percent.get(k-1).hasText()) {
                     String attr = themaName.get(k).getElementsByAttribute("href").attr("href");
                     Thema thema = Thema.of(themaName.get(k).text(), percent.get(k-1).text(), attr);
-                    naverThemaCrawler(thema);
+                    if(!check) naverThemaCrawler(thema);
+                    if(check) {
+                        themaRedisRepo.saveThema(thema);
+                    }
                 }
             }
         } catch (IOException e) {

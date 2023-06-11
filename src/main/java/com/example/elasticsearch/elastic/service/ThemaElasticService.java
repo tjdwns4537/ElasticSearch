@@ -2,6 +2,7 @@ package com.example.elasticsearch.elastic.service;
 
 import com.example.elasticsearch.elastic.repository.ThemaElasticRepository;
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.redis.repository.ThemaRedisRepo;
 import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
