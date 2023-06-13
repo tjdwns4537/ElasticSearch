@@ -12,6 +12,7 @@ import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,15 +24,15 @@ public class CrawlingKafkaService {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
-    private final CrawlerService crawlerService;
+    private KafkaTemplate<String, String> kafkaTemplateString;
 
-//    @Autowired
-//    private final SearchService searchService;
+    @Autowired
+    private final CrawlerService crawlerService;
 
     public void sendNaverThemaMessage(int uri, int p) {kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC, p,"T",uri);}
 
-    public void sendTAMessage(int stockNumberArg, int p) {
-        kafkaTemplate.send(Indices.TA_TOPIC, p,"TA", stockNumberArg);
+    public void sendTAMessage(String stockNumberArg, int p) {
+        kafkaTemplateString.send(Indices.TA_TOPIC, p,"TA",  stockNumberArg);
     }
 
     @KafkaListener(topicPartitions = {
@@ -40,9 +41,8 @@ public class CrawlingKafkaService {
             groupId = Indices.TA_GROUPID)
     public void listenGroupTAGroup1(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                    int stockNumberArg, int p) {
+                                    String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-
         log.info("kafka test1 : {}",stockNumberArg);
         log.info("partition test1 : {}",partition);
     }
@@ -53,7 +53,7 @@ public class CrawlingKafkaService {
             groupId = Indices.TA_GROUPID2)
     public void listenGroupTAGroup2(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                    int stockNumberArg, int p) {
+                                    String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
         log.info("kafka test2 : {}",stockNumberArg);
         log.info("partition test2 : {}",partition);
@@ -65,7 +65,7 @@ public class CrawlingKafkaService {
             groupId = Indices.TA_GROUPID3)
     public void listenGroupTAGroup3(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                    int stockNumberArg, int p) {
+                                    String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
         log.info("kafka test3 : {}",stockNumberArg);
         log.info("partition test3 : {}",partition);
@@ -77,7 +77,7 @@ public class CrawlingKafkaService {
             groupId = Indices.TA_GROUPID3)
     public void listenGroupTAGroup4(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                    int stockNumberArg, int p) {
+                                    String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
         log.info("kafka test4 : {}",stockNumberArg);
         log.info("partition test4 : {}",partition);
@@ -89,7 +89,7 @@ public class CrawlingKafkaService {
             groupId = Indices.TA_GROUPID3)
     public void listenGroupTAGroup5(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                    int stockNumberArg, int p) {
+                                    String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
         log.info("kafka test5 : {}",stockNumberArg);
         log.info("partition test5 : {}",partition);

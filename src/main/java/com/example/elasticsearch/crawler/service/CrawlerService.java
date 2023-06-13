@@ -71,7 +71,7 @@ public class CrawlerService {
     @Value(("${crawler.naverUpJongUrl}"))
     String naverUpjongUrl;
 
-    public FinanceStockRedis financialCrawler(int stockNumber) {
+    public FinanceStockRedis financialCrawler(String stockNumber) {
         String prefix = "https://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?pGB=1&gicode=A";
         String suffix = "&cID=&MenuYn=Y&ReportGB=&NewMenuID=103&stkGb=701";
         String url = prefix + stockNumber + suffix;

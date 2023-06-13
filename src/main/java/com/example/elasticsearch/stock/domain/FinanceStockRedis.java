@@ -13,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FinanceStockRedis implements Serializable {
     private String stockName;
-    private int stockNumber;
+    private String stockNumber;
     private String sales;
     private String salesPercent;
     private String profit;
@@ -22,7 +22,7 @@ public class FinanceStockRedis implements Serializable {
     private String currentProfitPercent;
     private String potential;
 
-    public static FinanceStockRedis of(String stockName, int stockNumber, String sales, String salesPercent, String profit, String profitPercent, String currentProfit, String currentProfitPercent, String potential) {
+    public static FinanceStockRedis of(String stockName, String stockNumber, String sales, String salesPercent, String profit, String profitPercent, String currentProfit, String currentProfitPercent, String potential) {
         return new FinanceStockRedis(stockName, stockNumber, sales, salesPercent, profit, profitPercent, currentProfit, currentProfitPercent, potential);
     }
 }

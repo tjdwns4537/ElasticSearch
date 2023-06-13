@@ -46,14 +46,6 @@ public class SearchService {
         searchRepository.save(search);
     }
 
-    public Optional<Search> findById(Long id) {
-        return searchRepository.findById(id);
-    }
-
-    public List<Search> findByAll() {
-       return searchRepository.findAll();
-    }
-
     public static boolean isNumeric(String strNum) {
         if (strNum == null) {
             return false;
@@ -77,7 +69,7 @@ public class SearchService {
                 log.info("주식 넘버 조회 : {}", j);
                 if(isNumeric(j)){
                     try {
-                        int stockNumberArg = Integer.parseInt(j);
+                        String stockNumberArg = j;
                         int partition = i % 5;
                         crawlingKafkaService.sendTAMessage(stockNumberArg, partition);
                         log.info("조회 성공 : {}", stockNumberArg);

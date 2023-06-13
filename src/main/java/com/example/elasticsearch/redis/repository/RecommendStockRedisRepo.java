@@ -48,7 +48,7 @@ public class RecommendStockRedisRepo {
             zSetOperations.add(STOCK, financeStockRedis, percent);
             log.info("redis save : {}, {}", financeStockRedis.getStockName(), percent);
         } catch (NumberFormatException e) {
-            log.info("redis exception : {}, {}", financeStockRedis.getStockName());
+            log.info("redis exception : {}, {}", financeStockRedis.getStockName(), financeStockRedis.getProfitPercent());
         } catch (NullPointerException e) {
             log.info("redis exception : {}, {}", financeStockRedis.getStockName());
         }
