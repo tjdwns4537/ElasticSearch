@@ -36,7 +36,6 @@ public class ThemaRedisRepo {
         String extractPercent = thema.getPercent().substring(0, thema.getPercent().length() - 1);
         double percent = Double.parseDouble(extractPercent);
         zSetOperations.add(STOCK, thema, percent);
-        log.info("redis save : {}, {}", thema.getThemaName(), percent);
     }
 
     public ArrayList<Thema> getThemaRanking() { // 출력

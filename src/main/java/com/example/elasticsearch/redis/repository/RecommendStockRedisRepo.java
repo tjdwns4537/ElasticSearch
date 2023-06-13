@@ -18,19 +18,28 @@ import java.util.Set;
 public class RecommendStockRedisRepo {
     private final String STOCK = "RECOMMEND_STOCK";
 
-    private RedisTemplate<String, FinanceStockRedis> redisObjectTemplate;
+    private RedisTemplate<String, FinanceStockRedis> redisFinanceStockRedisTemplate;
 
     private ZSetOperations<String, FinanceStockRedis> zSetOperations;
 
 
     @Autowired
-    public RecommendStockRedisRepo(RedisTemplate<String, FinanceStockRedis> redisObjectTemplate) {
-        this.redisObjectTemplate = redisObjectTemplate;
-        this.zSetOperations = redisObjectTemplate.opsForZSet();
+    public RecommendStockRedisRepo(RedisTemplate<String, FinanceStockRedis> redisFinanceStockRedisTemplate) {
+        this.redisFinanceStockRedisTemplate = redisFinanceStockRedisTemplate;
+        this.zSetOperations = redisFinanceStockRedisTemplate.opsForZSet();
     }
 
     public void deleteAll() {
-        redisObjectTemplate.delete(STOCK);
+        redisFinanceStockRedisTemplate.delete(STOCK);
+    }
+
+    public Boolean completeCheck(ArrayList<FinanceStockRedis> list) {
+        try {
+            if(list.size() < 1) return false;
+            return true;
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 
     public void saveStockRanking(FinanceStockRedis financeStockRedis) { //Redis orderSet 저장 < 종목이름, 가격, 등락율 >

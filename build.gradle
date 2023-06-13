@@ -30,6 +30,8 @@ repositories {
 }
 
 dependencies {
+    testImplementation group: 'org.springframework.kafka', name: 'spring-kafka-test', version: '2.8.5'
+
     // redisson
     implementation 'org.redisson:redisson-spring-boot-starter:3.17.7'
 

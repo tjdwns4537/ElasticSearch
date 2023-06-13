@@ -31,7 +31,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic naverThemaTopic() {
-        return new NewTopic(Indices.NAVER_THEMA_CRAWLER_TOPIC, 8, (short) 1);
+        return new NewTopic(Indices.NAVER_THEMA_CRAWLER_TOPIC, 7, (short) 1);
     }
 
     @Bean
@@ -41,6 +41,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic naverThemaArticleTopic() {
-        return new NewTopic(Indices.TA_TOPIC, 2, (short) 1);
+        return new NewTopic(Indices.TA_TOPIC, 5, (short) 1);
     }
 }

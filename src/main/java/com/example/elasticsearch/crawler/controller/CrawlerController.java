@@ -62,13 +62,13 @@ public class CrawlerController {
         model.addAttribute("stockForm", new StockForm());
         model.addAttribute("themaList", themaList);
 
-        crawlingKafkaService.sendNaverThemaMessage1(1);
-        crawlingKafkaService.sendNaverThemaMessage2(2);
-        crawlingKafkaService.sendNaverThemaMessage3(3);
-        crawlingKafkaService.sendNaverThemaMessage4(4);
-        crawlingKafkaService.sendNaverThemaMessage5(5);
-        crawlingKafkaService.sendNaverThemaMessage6(6);
-        crawlingKafkaService.sendNaverThemaMessage7(7);
+        crawlingKafkaService.sendNaverThemaMessage(1,0);
+        crawlingKafkaService.sendNaverThemaMessage(2,1);
+        crawlingKafkaService.sendNaverThemaMessage(3,2);
+        crawlingKafkaService.sendNaverThemaMessage(4,3);
+        crawlingKafkaService.sendNaverThemaMessage(5,4);
+        crawlingKafkaService.sendNaverThemaMessage(6,5);
+        crawlingKafkaService.sendNaverThemaMessage(7,6);
 
         return "home";
     }

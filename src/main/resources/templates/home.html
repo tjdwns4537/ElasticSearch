@@ -76,7 +76,7 @@
     </div>
 
     <div class="buttons">
-        <form th:action="@{/searchInfo}" method="post" >
+        <form th:action="@{/searchInfo}" method="post">
             <div class="searchbar-wrap">
                 <i class="fas fa-search"></i>
                 <input class="search-input" type="text" name="searchInfo" placeholder="테마 입력"/>
@@ -84,6 +84,33 @@
             </div>
         </form>
     </div>
+
+    <script>
+        // Function to check the Kafka processing status
+        function checkKafkaProcessingStatus() {
+            // Send an AJAX request to the server to check the status
+            fetch('/checkKafkaProcessing')
+                .then(response => response.text())
+                .then(result => {
+                    if (result === 'Processing completed') {
+                        // Processing is complete, redirect to the searchResult page
+                        window.location.href = '/searchResult';
+                    } else {
+                        // Processing is still in progress, continue checking after a delay
+                        setTimeout(checkKafkaProcessingStatus, 5000); // Check again after 5 seconds
+                    }
+                })
+                .catch(error => {
+                    // Handle any errors during the request or response
+                    console.error('Error checking Kafka processing status:', error);
+                });
+        }
+
+        // Start checking the Kafka processing status when the page loads
+        window.addEventListener('load', checkKafkaProcessingStatus);
+    </script>
+
+
 </section>
 
 <div class="like-all">

@@ -2,6 +2,7 @@ package com.example.elasticsearch.search.service;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
+import com.example.elasticsearch.redis.redisson.RedissonService;
 import com.example.elasticsearch.redis.repository.RecommendStockRedisRepo;
 import com.example.elasticsearch.search.domain.Search;
 import com.example.elasticsearch.search.repository.SearchRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,11 @@ public class SearchService {
     @Autowired
     private final CrawlerService crawlerService;
 
+    @Autowired
+    private final RedissonService redissonService;
+
+    @Autowired
+    private final CrawlingKafkaService crawlingKafkaService;
     public void save(Search search) {
         searchRepository.save(search);
     }
@@ -47,21 +54,66 @@ public class SearchService {
        return searchRepository.findAll();
     }
 
-    public void saveBestStock(String stock) {
-        List<String> stockNumber = stockService.findStockNumber(stock);
-        log.info("best stock stockNumber : {}", stockNumber);
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
         try {
-            String stockNameArg = stock;
-            String stockNumberArg = stockNumber.get(0);
-            RelativeStockKafkaDto relativeStockKafkaDto = RelativeStockKafkaDto.of(stockNameArg, stockNumberArg);
-            FinanceStockRedis financeStockRedis = crawlerService.financialCrawler(relativeStockKafkaDto.getStockName(), relativeStockKafkaDto.getStockNumber());
-            recommendStockRedisRepo.saveStockRanking(financeStockRedis);
-        } catch (IndexOutOfBoundsException e) {
-            log.error("Index Error - findStockNumber 과정에서 주식 이름을 찾지 못해 에러가 발생했을 확률 높음");
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            log.info("false : {}", strNum);
+            return false;
+        }
+        return true;
+    }
+
+    public void saveBestStock(List<StockElasticDto> stocks) {
+        for (int i=0; i<stocks.size(); i++) {
+            String stockNameArg = stocks.get(i).getStockName();
+            List<String> stockNumber = stockService.findStockNumber(stockNameArg);
+
+            log.info("best stock stockNumber : {}", stockNumber);
+            for (String j : stockNumber) {
+                log.info("주식 넘버 조회 : {}", j);
+                if(isNumeric(j)){
+                    try {
+                        int stockNumberArg = Integer.parseInt(j);
+                        int partition = i % 5;
+                        crawlingKafkaService.sendTAMessage(stockNumberArg, partition);
+                        log.info("조회 성공 : {}", stockNumberArg);
+                    } catch (IndexOutOfBoundsException e) {
+                        log.error("Index Error - findStockNumber 과정에서 주식 이름을 찾지 못해 에러가 발생했을 확률 높음");
+                    }
+                }
+            }
         }
     }
 
     public ArrayList<FinanceStockRedis> extractBestStock() {
-        return recommendStockRedisRepo.getStockRanking();
+        boolean lockAcquired = false;
+        ArrayList<FinanceStockRedis> stockRanking = recommendStockRedisRepo.getStockRanking();
+        for (FinanceStockRedis i : stockRanking) {
+            log.info("stock name : {}",i.getStockName());
+        }
+        try {
+            if (stockRanking.isEmpty()) {
+                log.info("lock 획득");
+                lockAcquired = redissonService.fiLock("fi", 15, TimeUnit.SECONDS); // 락 획득 시도에 timeout 적용
+                if (!lockAcquired) {
+                    log.info("Failed to acquire lock for searchInfo: {}", "fi");
+                    // lock을 획득하지 못한 경우에 대한 처리를 수행 (예: 재시도, 예외 처리 등)
+                }
+            }
+        } finally {
+            if (lockAcquired) {
+                redissonService.Unlock("fi");
+            }
+        }
+
+        for (FinanceStockRedis i : stockRanking) {
+            log.info("lock 해체 : {}", i.getStockName());
+        }
+        return stockRanking;
     }
+
 }

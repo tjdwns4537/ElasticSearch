@@ -7,6 +7,7 @@ import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.redis.repository.LikeStockRedisRepository;
 import com.example.elasticsearch.redis.repository.LiveStockRedisRepository;
+import com.example.elasticsearch.redis.repository.RecommendStockRedisRepo;
 import com.example.elasticsearch.redis.repository.ThemaRedisRepo;
 import com.example.elasticsearch.stock.domain.FinanceStockRedis;
 import com.example.elasticsearch.stock.domain.StockDbDto;
@@ -46,6 +47,8 @@ public class CrawlerService {
     private final ThemaElasticService themaElasticService;
     @Autowired
     private final ThemaRedisRepo themaRedisRepo;
+    @Autowired
+    private final RecommendStockRedisRepo recommendStockRedisRepo;
 
     @Value("${crawler.url}")
     String url;
@@ -68,13 +71,15 @@ public class CrawlerService {
     @Value(("${crawler.naverUpJongUrl}"))
     String naverUpjongUrl;
 
-    public FinanceStockRedis financialCrawler(String stockName, String stockNumber) {
+    public FinanceStockRedis financialCrawler(int stockNumber) {
         String prefix = "https://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?pGB=1&gicode=A";
         String suffix = "&cID=&MenuYn=Y&ReportGB=&NewMenuID=103&stkGb=701";
         String url = prefix + stockNumber + suffix;
 
         try {
             Document doc = Jsoup.connect(url).get();
+            String stockName = doc.getElementsByAttributeValue("class", "corp_group1").select("#giName").get(0).text();
+
             Elements sellMoney = doc.getElementsByAttributeValue("class", "ul_co1_c pd_t1");
             Elements importBord = sellMoney.get(0).getElementsByAttributeValue("class", "rwf rowBold");
             String sales = importBord.get(0).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
@@ -97,12 +102,15 @@ public class CrawlerService {
             log.info("당기순이익_전년동기퍼센트: {}", currentProfitPercent);
             log.info("성장성_지표: {}", potential);
 
-            return FinanceStockRedis.of(stockName, stockNumber, sales, salesPercent, profitPercent, profitPercent, currentProfit, currentProfitPercent, potential);
+            FinanceStockRedis financeStockRedis = FinanceStockRedis.of(stockName, stockNumber, sales, salesPercent, profitPercent, profitPercent, currentProfit, currentProfitPercent, potential);
+            recommendStockRedisRepo.saveStockRanking(financeStockRedis);
+
+            return financeStockRedis;
 
         } catch (IOException e) {
             return new FinanceStockRedis();
         } catch (IndexOutOfBoundsException e) {
-            log.error("stockName : {} 인덱스 에러 - 크롤링 태그가 다름", stockName);
+            log.error("인덱스 에러 - 크롤링 태그가 다름");
             return new FinanceStockRedis();
         }
     }
@@ -240,7 +248,7 @@ public class CrawlerService {
     }
 
     public List<String> findStockNumber(String name) {
-        List<String> titleResult = new ArrayList<>();
+        List<String> titleResult;
         String selectUrl = findUrl + name;
         try {
             Document doc = Jsoup.connect(selectUrl).get();

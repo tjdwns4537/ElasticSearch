@@ -40,6 +40,9 @@ public class KafkaConsumerConfig {
     String themaGroupId7 = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID7;
     String TAGROUPID1 = Indices.TA_GROUPID;
     String TAGROUPID2 = Indices.TA_GROUPID2;
+    String TAGROUPID3 = Indices.TA_GROUPID3;
+    String TAGROUPID4 = Indices.TA_GROUPID4;
+    String TAGROUPID5 = Indices.TA_GROUPID5;
 
     @Bean
     public ConsumerFactory<String, Object> consumerArticleFactoryGroup1() {
@@ -91,11 +94,50 @@ public class KafkaConsumerConfig {
         return factory(TAGROUPID2);
     }
 
+    @Bean
+    public ConsumerFactory<String, Object> consumerFactoryTAGroup3() {
+        return factory(TAGROUPID3);
+    }
+    public ConsumerFactory<String, Object> consumerFactoryTAGroup4() {
+        return factory(TAGROUPID4);
+    }
+    public ConsumerFactory<String, Object> consumerFactoryTAGroup5() {
+        return factory(TAGROUPID5);
+    }
+
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupTA() {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupTA1() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryTAGroup1());
+        return factory;
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupTA2() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryTAGroup2());
+        return factory;
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupTA3() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryTAGroup3());
+        return factory;
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupTA4() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryTAGroup4());
+        return factory;
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactoryGroupTA5() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryTAGroup5());
         return factory;
     }
 

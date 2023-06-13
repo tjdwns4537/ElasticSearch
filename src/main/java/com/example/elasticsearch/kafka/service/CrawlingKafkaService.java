@@ -2,20 +2,17 @@ package com.example.elasticsearch.kafka.service;
 
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.helper.Indices;
-import com.example.elasticsearch.redis.repository.RecommendStockRedisRepo;
 import com.example.elasticsearch.search.service.SearchService;
-import com.example.elasticsearch.stock.service.StockService;
+import com.example.elasticsearch.stock.domain.FinanceStockRedis;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Service
 @Slf4j
@@ -28,100 +25,147 @@ public class CrawlingKafkaService {
     @Autowired
     private final CrawlerService crawlerService;
 
-    @Autowired
-    private final SearchService searchService;
+//    @Autowired
+//    private final SearchService searchService;
 
-    public void sendNaverThemaMessage1(int uri) {kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC,"p1",uri);}
+    public void sendNaverThemaMessage(int uri, int p) {kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC, p,"T",uri);}
 
-    public void sendNaverThemaMessage2(int uri) {kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC,"p2", uri);}
-
-    public void sendNaverThemaMessage3(int uri) {
-        kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC,"p3",uri);
+    public void sendTAMessage(int stockNumberArg, int p) {
+        kafkaTemplate.send(Indices.TA_TOPIC, p,"TA", stockNumberArg);
     }
 
-    public void sendNaverThemaMessage4(int uri) {
-        kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC,"p4",uri);
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"0"})
+    },
+            groupId = Indices.TA_GROUPID)
+    public void listenGroupTAGroup1(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    int stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+
+        log.info("kafka test1 : {}",stockNumberArg);
+        log.info("partition test1 : {}",partition);
     }
 
-    public void sendNaverThemaMessage5(int uri) {
-        kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC,"p5",uri);
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"1"})
+    },
+            groupId = Indices.TA_GROUPID2)
+    public void listenGroupTAGroup2(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    int stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test2 : {}",stockNumberArg);
+        log.info("partition test2 : {}",partition);
     }
 
-    public void sendNaverThemaMessage6(int uri) {
-        kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC,"p6",uri);
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"2"})
+    },
+            groupId = Indices.TA_GROUPID3)
+    public void listenGroupTAGroup3(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    int stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test3 : {}",stockNumberArg);
+        log.info("partition test3 : {}",partition);
     }
 
-    public void sendNaverThemaMessage7(int uri) {
-        kafkaTemplate.send(Indices.NAVER_THEMA_CRAWLER_TOPIC,"p7",uri);
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"3"})
+    },
+            groupId = Indices.TA_GROUPID3)
+    public void listenGroupTAGroup4(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    int stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test4 : {}",stockNumberArg);
+        log.info("partition test4 : {}",partition);
     }
 
-    public void sendTAMessage1(String stock) {
-        kafkaTemplate.send(Indices.TA_TOPIC,"ta1", stock);
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"4"})
+    },
+            groupId = Indices.TA_GROUPID3)
+    public void listenGroupTAGroup5(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    int stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test5 : {}",stockNumberArg);
+        log.info("partition test5 : {}",partition);
     }
 
-    public void sendTAMessage2(String stock2) {
-        kafkaTemplate.send(Indices.TA_TOPIC,"ta2", stock2);
-    }
-
-    @KafkaListener(topics = Indices.TA_TOPIC, groupId = Indices.TA_GROUPID)
-    public void listenGroupTAGroup1(String stock) {
-        searchService.saveBestStock(stock);
-    }
-
-    @KafkaListener(topics = Indices.TA_TOPIC, groupId = Indices.TA_GROUPID2)
-    public void listenGroupTAGroup2(String stock2) {
-        searchService.saveBestStock(stock2);
-    }
-
-    @KafkaListener(topics = Indices.NAVER_ARTICLE_CRAWLER_TOPIC, groupId = Indices.NAVER_ARTICLE_CRAWLER_TOPIC_GROUPID)
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_ARTICLE_CRAWLER_TOPIC, partitions = {"0"})
+    },
+            groupId = Indices.NAVER_ARTICLE_CRAWLER_TOPIC_GROUPID)
     public void listenGroupArticleGroup(String message) {
         crawlerService.crawlingArticle();
     }
 
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID1)
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_THEMA_CRAWLER_TOPIC, partitions = {"0"})
+    },
+            groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID1)
     public void listenGroupThemaGroup1(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                       int uri) {
-        crawlerService.naverReadThema(false,1);
+                                       int uri, int p) {
+        log.info("thema-partition : {}", partition);
+        crawlerService.naverReadThema(false,uri);
     }
 
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID2)
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_THEMA_CRAWLER_TOPIC, partitions = {"1"})
+    },
+            groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID2)
     public void listenGroupThemaGroup2(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                       int uri) {
-        crawlerService.naverReadThema(false,2);
+                                       int uri, int p) {
+        log.info("thema-partition : {}", partition);
+        crawlerService.naverReadThema(false,uri);
     }
 
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID3)
-    public void listenGroupThemaGroup3(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-                                       @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                       int uri) {
-        crawlerService.naverReadThema(false,3);
-    }
-
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID4)
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_THEMA_CRAWLER_TOPIC, partitions = {"3"})
+    },
+            groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID3)
     public void listenGroupThemaGroup4(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                       int uri) {
-        crawlerService.naverReadThema(false,4);
+                                       int uri, int p) {
+        log.info("thema-partition : {}", partition);
+        crawlerService.naverReadThema(false,uri);
     }
 
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID5)
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_THEMA_CRAWLER_TOPIC, partitions = {"4"})
+    },
+            groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID4)
     public void listenGroupThemaGroup5(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
-                                       int uri) {
-        crawlerService.naverReadThema(false,5);
+                                       int uri, int p) {
+        log.info("thema-partition : {}", partition);
+        crawlerService.naverReadThema(false,uri);
     }
 
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID6)
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_THEMA_CRAWLER_TOPIC, partitions = {"5"})
+    },
+            groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID5)
     public void listenGroupThemaGroup6(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-                                       @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        crawlerService.naverReadThema(false,6);
+                                       @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                       int uri, int p) {
+        log.info("thema-partition : {}", partition);
+        crawlerService.naverReadThema(false,uri);
     }
 
-    @KafkaListener(topics = Indices.NAVER_THEMA_CRAWLER_TOPIC, groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID7)
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_THEMA_CRAWLER_TOPIC, partitions = {"6"})
+    },
+            groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID6)
     public void listenGroupThemaGroup7(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
-                                       @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        crawlerService.naverReadThema(false,7);
+                                       @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                       int uri, int p) {
+        log.info("thema-partition : {}", partition);
+        crawlerService.naverReadThema(false,uri);
     }
 }
