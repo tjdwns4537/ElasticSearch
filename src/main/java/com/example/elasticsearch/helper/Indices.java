@@ -19,6 +19,11 @@ public final class Indices {
     public static final String TA_GROUPID3 = "naverCrawler-thema-article3";
     public static final String TA_GROUPID4 = "naverCrawler-thema-article4";
     public static final String TA_GROUPID5 = "naverCrawler-thema-article5";
+    public static final String TA_GROUPID6 = "naverCrawler-thema-article6";
+    public static final String TA_GROUPID7 = "naverCrawler-thema-article7";
+    public static final String TA_GROUPID8 = "naverCrawler-thema-article8";
+    public static final String TA_GROUPID9 = "naverCrawler-thema-article9";
+    public static final String TA_GROUPID10 = "naverCrawler-thema-article10";
 
     public static final String METHOD_TOPIC = "method";
     public static final String METHOD_TOPIC_GROUPID = "method-group";

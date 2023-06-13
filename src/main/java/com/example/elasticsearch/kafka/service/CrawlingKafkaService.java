@@ -74,7 +74,7 @@ public class CrawlingKafkaService {
     @KafkaListener(topicPartitions = {
             @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"3"})
     },
-            groupId = Indices.TA_GROUPID3)
+            groupId = Indices.TA_GROUPID4)
     public void listenGroupTAGroup4(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
@@ -86,7 +86,7 @@ public class CrawlingKafkaService {
     @KafkaListener(topicPartitions = {
             @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"4"})
     },
-            groupId = Indices.TA_GROUPID3)
+            groupId = Indices.TA_GROUPID5)
     public void listenGroupTAGroup5(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
@@ -94,6 +94,71 @@ public class CrawlingKafkaService {
         log.info("kafka test5 : {}",stockNumberArg);
         log.info("partition test5 : {}",partition);
     }
+
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"5"})
+    },
+            groupId = Indices.TA_GROUPID6)
+    public void listenGroupTAGroup6(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    String stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test6 : {}",stockNumberArg);
+        log.info("partition test6 : {}",partition);
+    }
+
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"6"})
+    },
+            groupId = Indices.TA_GROUPID7)
+    public void listenGroupTAGroup7(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    String stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test7 : {}",stockNumberArg);
+        log.info("partition test7 : {}",partition);
+    }
+
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"7"})
+    },
+            groupId = Indices.TA_GROUPID8)
+    public void listenGroupTAGroup8(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    String stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test8 : {}",stockNumberArg);
+        log.info("partition test8 : {}",partition);
+    }
+
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"8"})
+    },
+            groupId = Indices.TA_GROUPID9)
+    public void listenGroupTAGroup9(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    String stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test9 : {}",stockNumberArg);
+        log.info("partition test9 : {}",partition);
+    }
+
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.TA_TOPIC, partitions = {"9"})
+    },
+            groupId = Indices.TA_GROUPID10)
+    public void listenGroupTAGroup10(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                    @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                    String stockNumberArg, int p) {
+        crawlerService.financialCrawler(stockNumberArg);
+        log.info("kafka test10 : {}",stockNumberArg);
+        log.info("partition test10 : {}",partition);
+    }
+
+
+
+
+
 
     @KafkaListener(topicPartitions = {
             @TopicPartition(topic = Indices.NAVER_ARTICLE_CRAWLER_TOPIC, partitions = {"0"})

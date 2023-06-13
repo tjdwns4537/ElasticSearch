@@ -72,7 +72,7 @@ public class ElasticCustomService {
             String spaceQuery = "* " + searchInfo + " *";
             boolQueryBuilder.should(QueryBuilders.wildcardQuery("themaName", spaceQuery));
 
-            boolQueryBuilder.should(QueryBuilders.matchQuery("themaName", searchInfo).fuzziness("AUTO"));
+//            boolQueryBuilder.should(QueryBuilders.matchQuery("themaName", searchInfo).fuzziness("AUTO"));
 
             sourceBuilder.query(boolQueryBuilder);
             searchRequest.source(sourceBuilder);

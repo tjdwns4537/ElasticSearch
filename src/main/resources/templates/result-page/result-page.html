@@ -141,7 +141,7 @@
     .carousel-viewport {
         position: relative;
         overflow: hidden;
-        margin: 100px 0 0 0;
+        margin: 80px 0 0 0;
         z-index: -1;
     }
 
@@ -187,9 +187,8 @@
         display: flex;
         align-content: center;
         justify-content: center;
-        color: white;
+        color: #555555;
         fill: currentcolor;
-        background: #5F6368;
         border: none;
         width: 50px;
         height: 50px;
@@ -221,7 +220,7 @@
         font-size: 0;
         color: transparent;
         border: 3px solid white;
-        background-color: #5F6368;
+        background-color: #555555;
         border-radius: 50%;
         width: var(--size);
         height: var(--size);
@@ -264,7 +263,8 @@
         <div class="movebox active">
             <div class="container mx-auto py-2 px-4" x-data="datatables()" x-cloak>
                 <h2 class="text-3xl py-2 border-b" th:text="${searchInfo} + |에 대한 기사 분석|"></h2>
-                <span style="margin-top: 10px;" class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                <span style="margin-top: 10px;"
+                      class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
                       th:text="|긍정 수치: | + ${positiveInfo}"></span>
                 <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
                       th:text="|부정 수치: | + ${negativeInfo}"></span>
@@ -442,27 +442,31 @@
 
         <div class="movebox">
             <div class="container2">
-                <h2 class="title2"> 기대주 분석 </h2>
-                <div class="carousel-viewport">
+                <h2 class="title2"> 오늘의 기대주 </h2>
+                <div class="carousel-viewport" style="border-bottom: 3px solid #555555; border-top: 3px solid #555555;">
                     <ul class="items">
                         <li class="item" th:each="financeStock:${financeStockList}" style="height: 325px;">
                             <!-- 각각의 li 요소의 데이터 -->
                             <div class="img_box" style="display: inline-block; justify-content: center;">
                                 <img class="fi_img" th:src="${financeStock.potential}">
                             </div>
-                            <div class="text_box" style="display: inline-block; text-align: left; margin-left: 30px;">
-                                <h2 class="fi_title" style="font-weight: bold;" th:text="|주식명: ${financeStock.stockName}|"></h2>
-                                <p><span class="fi_text" th:text="|매출액(단위: 억원): ${financeStock.sales}|"></span></p>
-                                <p><span class="fi_text" th:text="|매출액 전년 동기(%): ${financeStock.salesPercent}|"></span></p>
-                                <p><span class="fi_text" th:text="|영업 이익(단위: 억원):  ${financeStock.profit}|"></span></p>
-                                <p><span style="font-weight: bold; color: darkred;" class="fi_text" th:text="|영업 이익 전년 동기(%): ${financeStock.profitPercent}|"></span></p>
-                                <p><span class="fi_text" th:text="|당기 순 이익(단위: 억원): ${financeStock.currentProfit}|"></span></p>
-                                <p><span class="fi_text" th:text="|당기 순 이익(%): ${financeStock.currentProfitPercent}|"></span></p>
+                            <div class="text_box"
+                                 style="padding: 20px;
+                                 display: inline-block; text-align: left; margin-left: 8px; border: 2px solid #dee0e5">
+                                <h2 class="fi_title"
+                                    style="border-bottom: 3px solid #dee0e5; font-weight: bold; text-align: center; line-height: 30px"
+                                    th:text="|주식명: ${financeStock.stockName}|"></h2>
+                                <p><span class="fi_text" th:text="|&gt 매출액(단위: 억원): ${financeStock.sales}|"></span></p>
+                                <p><span class="fi_text" th:text="|&gt 매출액 전년 동기(%): ${financeStock.salesPercent}|"></span></p>
+                                <p><span class="fi_text" th:text="|&gt 영업 이익(단위: 억원):  ${financeStock.profit}|"></span></p>
+                                <p><span style="font-weight: bold; color: darkred;" class="fi_text" th:text="|&gt 영업 이익 전년 동기(%): ${financeStock.profitPercent}|"></span></p>
+                                <p><span class="fi_text" th:text="|&gt 당기 순 이익(단위: 억원): ${financeStock.currentProfit}|"></span></p>
+                                <p><span class="fi_text" th:text="|&gt 당기 순 이익(%): ${financeStock.currentProfitPercent}|"></span></p>
                             </div>
-
                         </li>
                     </ul>
                 </div>
+
                 <button class="carousel-control prev" title="Go to previous item">
                     <svg viewBox="0 0 256 512">
                         <path d="M31.7 239l136-136c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9L127.9 256l96.4 96.4c9.4 9.4 9.4 24.6 0 33.9L201.7 409c-9.4 9.4-24.6 9.4-33.9 0l-136-136c-9.5-9.4-9.5-24.6-.1-34z"/>
@@ -476,7 +480,8 @@
                 <ol class="carousel-dots">
                     <li class="dot act"
                         th:each="financeStock, financeStockStat:${financeStockList}"
-                        th:text="${financeStockStat.index+1}">1</li>
+                        th:text="${financeStockStat.index+1}">1
+                    </li>
                 </ol>
             </div>
 

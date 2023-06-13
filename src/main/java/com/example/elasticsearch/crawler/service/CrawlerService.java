@@ -110,7 +110,7 @@ public class CrawlerService {
         } catch (IOException e) {
             return new FinanceStockRedis();
         } catch (IndexOutOfBoundsException e) {
-            log.error("인덱스 에러 - 크롤링 태그가 다름");
+            log.error("인덱스 에러 - 크롤링 태그가 다름: {}", stockNumber);
             return new FinanceStockRedis();
         }
     }
