@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org" xmlns:align-items="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEARCH-RESULT</title>
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net"/>
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
+</head>
+<style>
+    [x-cloak] {
+        display: none;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #ddd;
+        font-family: "Raleway";
+    }
+
+    .tabs {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 900px;
+        height: 500px;
+        padding: 30px 20px;
+        background: #f5f5f5;
+        box-shadow: 5px 5px 10px 5px #ccc;
+        overflow: hidden;
+    }
+
+    .tabs .tab-header {
+        float: left;
+        width: 180px;
+        height: 100%;
+        border-right: 1px solid #ccc;
+        padding: 50px 0px;
+    }
+
+    .tabs .tab-header > div {
+        height: 50px;
+        line-height: 50px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #888;
+        cursor: pointer;
+        padding-left: 10px;
+    }
+
+    .tabs .tab-header > div:hover,
+    .tabs .tab-header > div.active {
+        color: #00acee;
+    }
+
+    .tabs .tab-content {
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .tabs .tab-content > div {
+        position: absolute;
+        text-align: center;
+        padding: 5px 20px;
+        top: -200%;
+        transition: all 500ms ease-in-out;
+    }
+
+    .tabs .tab-content > div.active {
+        top: 0px;
+        width: 100%;
+    }
+
+    .tabs .tab-indicator {
+        position: absolute;
+        width: 4px;
+        height: 50px;
+        background: #00acee;
+        left: 198px;
+        top: 80px;
+        transition: all 500ms ease-in-out;
+    }
+
+    ul, li, ol {
+        list-style: none;
+    }
+</style>
+<body>
+<div class="tabs">
+    <div class="tab-header">
+        <div class="active">
+            <i class="fa fa-code"></i> 관련 기사 분석 결과
+        </div>
+    </div>
+    <div class="tab-indicator"></div>
+    <div class="tab-content">
+        <div class="movebox active">
+            <div class="container mx-auto py-2 px-4" x-data="datatables()" x-cloak>
+                <h2 class="text-3xl py-2 border-b" th:text="${searchInfo} + |에 대한 기사 분석|"></h2>
+                <span style="margin-top: 10px;"
+                      class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                      th:text="|긍정 수치: | + ${positiveInfo}"></span>
+                <span class="sticky top-0 border-b border-gray-200 px-6 py-3 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                      th:text="|부정 수치: | + ${negativeInfo}"></span>
+                <div class="overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative"
+                     style="height: 300px; margin-top: 10px">
+                    <table class="border-collapse table-auto w-full whitespace-no-wrap bg-white table-striped relative">
+                        <thead>
+                        <tr class="text-left">
+                            <template x-for="heading in headings">
+                                <th class="bg-gray-100 sticky top-0 border-b border-gray-200 px-6 py-2 text-gray-600 font-bold tracking-wider uppercase text-xs"
+                                    x-text="heading.value" :x-ref="heading.key" :class="{ [heading.key]: true }"></th>
+                            </template>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="article: ${analyzeResult}">
+                            <td class="border-dashed border-t border-gray-200 userId">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${article.analyzeResult}"
+                ></span>
+                            </td>
+                            <td class="border-dashed border-t border-gray-200 firstName">
+                <span class="text-gray-700 px-6 py-3 flex items-center"
+                      th:text="${article.title}"
+                ></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                function datatables() {
+                    return {
+                        headings: [
+                            {
+                                'key': 'userId',
+                                'value': '감정 분석 결과'
+                            },
+                            {
+                                'key': 'firstName',
+                                'value': '기사제목'
+                            }
+                        ],
+                        open: false
+                    }
+                }
+            </script>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    function _class(name) {
+        return document.getElementsByClassName(name);
+    }
+
+    let tabPanes = _class("tab-header")[0].getElementsByTagName("div");
+
+    for (let i = 0; i < tabPanes.length; i++) {
+        tabPanes[i].addEventListener("click", function () {
+            _class("tab-header")[0].getElementsByClassName("active")[0].classList.remove("active");
+            tabPanes[i].classList.add("active");
+
+            _class("tab-indicator")[0].style.top = `calc(80px + ${i * 50}px)`;
+
+            _class("tab-content")[0].getElementsByClassName("active")[0].classList.remove("active");
+            _class("tab-content")[0].getElementsByClassName("movebox")[i].classList.add("active");
+
+        });
+    }
+</script>
+
+</html>

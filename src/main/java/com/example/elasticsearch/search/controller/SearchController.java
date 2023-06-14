@@ -71,6 +71,22 @@ public class SearchController {
         return redirectUrl;
     }
 
+    @GetMapping("/searchResult-inc")
+    public String redirectViewInc(@RequestParam("searchInfo") String searchInfo,
+                               @ModelAttribute("positiveInfo") String positiveInfo,
+                               @ModelAttribute("negativeInfo") String negativeInfo,
+                               @ModelAttribute("analyzeResult") ArrayList<ArticleVO> analyzeResult,
+                               Model model) {
+
+        model.addAttribute("searchInfo", searchInfo);
+        model.addAttribute("analyzeResult", analyzeResult);
+        model.addAttribute("positiveInfo", positiveInfo);
+        model.addAttribute("negativeInfo", negativeInfo);
+
+        String redirectUrl = "result-page/result-page-inc"; // The URL to redirect to
+        return redirectUrl;
+    }
+
     @PostMapping("/searchInfo")
     public String extract(@RequestParam("searchInfo") String searchInfo,
                           @ModelAttribute("positiveInfo") String positiveInfo,
@@ -85,60 +101,53 @@ public class SearchController {
             return "redirect:/";
         }
 
-        boolean lockAcquired = false;
+        // 감정 분석 시작
         int positive = 0;
         int negative = 0;
 
-        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
         crawlerService.googleCrawler(searchInfo);
+        List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
+        List<ArticleVO> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
 
-        themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
+        for (ArticleVO i : analyzeResult) {
+            String label = i.getAnalyzeResult();
+            if (label.equals("긍정")) positive++;
+            if (label.equals("부정")) negative++;
+        }
 
-        try {
-            if (themaList.isEmpty()) {
-                lockAcquired = redissonService.searchLock(searchInfo);
-                if (!lockAcquired) {
-                    log.info("Failed to acquire lock for searchInfo: {}", searchInfo);
-                    return "redirect:/";  // or any other appropriate action
-                }
-            }
+        positiveInfo = String.valueOf(positive);
+        negativeInfo = String.valueOf(negative);
 
-
-            List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
-
-            List<ArticleVO> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
-
-            for (ArticleVO i : analyzeResult) {
-                String label = i.getAnalyzeResult();
-                if (label.equals("긍정")) positive++;
-                if (label.equals("부정")) negative++;
-            }
-
-            for (int i = 0; i < themaList.size(); i++) {
-                relateStockList = themaList.get(i).getRelateStock();
-                searchService.saveBestStock(relateStockList);
-            }
-
-            financeStockList = searchService.extractBestStock();
-
-            log.info("테마 관련 주식 기능 수행 끝");
-
-            positiveInfo = String.valueOf(positive);
-            negativeInfo = String.valueOf(negative);
-
-
+        if(themaList.isEmpty()){
             redirectAttributes.addAttribute("searchInfo", searchInfo);
             redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
             redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
             redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
-            redirectAttributes.addFlashAttribute("themaList", themaList);
-            redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
-            redirectAttributes.addFlashAttribute("financeStockList", financeStockList);
-            return "redirect:/searchResult";
-        } finally {
-            if (lockAcquired) {
-                redissonService.Unlock(searchInfo);
-            }
+            return "redirect:/searchResult-inc";
         }
+
+        // 테마 관련 기능 시작
+        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
+        themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
+
+        for (int i = 0; i < themaList.size(); i++) {
+            relateStockList = themaList.get(i).getRelateStock();
+            searchService.saveBestStock(relateStockList);
+        }
+
+        financeStockList = searchService.extractBestStock();
+
+        log.info("테마 관련 주식 기능 수행 끝");
+
+        redirectAttributes.addAttribute("searchInfo", searchInfo);
+        redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
+        redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
+        redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
+        redirectAttributes.addFlashAttribute("themaList", themaList);
+        redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
+        redirectAttributes.addFlashAttribute("financeStockList", financeStockList);
+
+
+        return "redirect:/searchResult";
     }
 }
