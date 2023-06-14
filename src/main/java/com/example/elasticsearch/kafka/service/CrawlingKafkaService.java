@@ -43,8 +43,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test1 : {}",stockNumberArg);
-        log.info("partition test1 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -55,8 +53,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test2 : {}",stockNumberArg);
-        log.info("partition test2 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -67,8 +63,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test3 : {}",stockNumberArg);
-        log.info("partition test3 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -79,8 +73,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test4 : {}",stockNumberArg);
-        log.info("partition test4 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -91,8 +83,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test5 : {}",stockNumberArg);
-        log.info("partition test5 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -103,8 +93,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test6 : {}",stockNumberArg);
-        log.info("partition test6 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -115,8 +103,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test7 : {}",stockNumberArg);
-        log.info("partition test7 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -127,8 +113,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test8 : {}",stockNumberArg);
-        log.info("partition test8 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -139,8 +123,6 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test9 : {}",stockNumberArg);
-        log.info("partition test9 : {}",partition);
     }
 
     @KafkaListener(topicPartitions = {
@@ -151,14 +133,7 @@ public class CrawlingKafkaService {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                     String stockNumberArg, int p) {
         crawlerService.financialCrawler(stockNumberArg);
-        log.info("kafka test10 : {}",stockNumberArg);
-        log.info("partition test10 : {}",partition);
     }
-
-
-
-
-
 
     @KafkaListener(topicPartitions = {
             @TopicPartition(topic = Indices.NAVER_ARTICLE_CRAWLER_TOPIC, partitions = {"0"})
@@ -175,7 +150,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup1(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri, int p) {
-        log.info("thema-partition : {}", partition);
         crawlerService.naverReadThema(false,uri);
     }
 
@@ -186,7 +160,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup2(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri, int p) {
-        log.info("thema-partition : {}", partition);
         crawlerService.naverReadThema(false,uri);
     }
 
@@ -197,7 +170,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup4(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri, int p) {
-        log.info("thema-partition : {}", partition);
         crawlerService.naverReadThema(false,uri);
     }
 
@@ -208,7 +180,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup5(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri, int p) {
-        log.info("thema-partition : {}", partition);
         crawlerService.naverReadThema(false,uri);
     }
 
@@ -219,7 +190,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup6(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri, int p) {
-        log.info("thema-partition : {}", partition);
         crawlerService.naverReadThema(false,uri);
     }
 
@@ -230,7 +200,6 @@ public class CrawlingKafkaService {
     public void listenGroupThemaGroup7(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
                                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
                                        int uri, int p) {
-        log.info("thema-partition : {}", partition);
         crawlerService.naverReadThema(false,uri);
     }
 }

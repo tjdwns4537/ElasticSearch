@@ -4,6 +4,7 @@ import com.example.elasticsearch.article.domain.ArticleVO;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticCustomService;
 import com.example.elasticsearch.helper.Indices;
+import com.example.elasticsearch.helper.Timer;
 import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
 import com.example.elasticsearch.redis.redisson.RedissonService;
 import com.example.elasticsearch.redis.repository.RecommendStockRedisRepo;
@@ -54,10 +55,10 @@ public class SearchController {
                                @ModelAttribute("financeStockList") ArrayList<FinanceStockRedis> financeStockList,
                                Model model) {
 
-        for (FinanceStockRedis i : financeStockList) {
-            log.info("FinanceStockRedis check : {}", i.getStockName());
-            log.info("FinanceStockRedis check : {}", i.getProfit());
-        }
+//        for (FinanceStockRedis i : financeStockList) {
+//            log.info("FinanceStockRedis check : {}", i.getStockName());
+//            log.info("FinanceStockRedis check : {}", i.getProfit());
+//        }
 
         model.addAttribute("searchInfo", searchInfo);
         model.addAttribute("analyzeResult", analyzeResult);
@@ -101,6 +102,8 @@ public class SearchController {
             return "redirect:/";
         }
 
+        log.info("검색 시작 : {} keyword, time : {}", searchInfo, Timer.time());
+
         // 감정 분석 시작
         int positive = 0;
         int negative = 0;
@@ -118,6 +121,10 @@ public class SearchController {
         positiveInfo = String.valueOf(positive);
         negativeInfo = String.valueOf(negative);
 
+        // 테마 관련 기능 시작
+        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
+        themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
+
         if(themaList.isEmpty()){
             redirectAttributes.addAttribute("searchInfo", searchInfo);
             redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
@@ -125,10 +132,6 @@ public class SearchController {
             redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
             return "redirect:/searchResult-inc";
         }
-
-        // 테마 관련 기능 시작
-        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
-        themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
 
         for (int i = 0; i < themaList.size(); i++) {
             relateStockList = themaList.get(i).getRelateStock();
@@ -147,6 +150,7 @@ public class SearchController {
         redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
         redirectAttributes.addFlashAttribute("financeStockList", financeStockList);
 
+        log.info("검색 끝 : {} keyword, time : {}", searchInfo, Timer.time());
 
         return "redirect:/searchResult";
     }

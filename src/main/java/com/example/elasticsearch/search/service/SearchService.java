@@ -64,15 +64,12 @@ public class SearchService {
             String stockNameArg = stocks.get(i).getStockName();
             List<String> stockNumber = stockService.findStockNumber(stockNameArg);
 
-            log.info("best stock stockNumber : {}", stockNumber);
             for (String j: stockNumber) {
-                log.info("주식 넘버 조회 : {}", j);
                 if(isNumeric(j)){
                     try {
                         String stockNumberArg = j;
                         int partition = i % 9;
                         crawlingKafkaService.sendTAMessage(stockNumberArg, partition);
-                        log.info("조회 성공 : {}", stockNumberArg);
                     } catch (IndexOutOfBoundsException e) {
                         log.error("Index Error - findStockNumber 과정에서 주식 이름을 찾지 못해 에러가 발생했을 확률 높음");
                     }
@@ -80,23 +77,6 @@ public class SearchService {
             }
         }
     }
-
-//    public void anayzeBestStock(String stockName) {
-//        StringBuilder strN = new StringBuilder();
-//        StringBuilder i = new StringBuilder();
-//        strN.append(stockName.substring(0, stockName.length() - 1));
-//        i.append(stockName.substring(stockName.length() - 1, stockName.length()));
-//        log.info("주식 넘버 조회 : {}", stockName);
-//        if(isNumeric(stockName)){
-//            try {
-//                int partition = Integer.parseInt(i.toString()) % 9;
-//                crawlingKafkaService.sendTAMessage(stockName, partition);
-//                log.info("조회 성공 : {}", stockName);
-//            } catch (IndexOutOfBoundsException e) {
-//                log.error("Index Error - findStockNumber 과정에서 주식 이름을 찾지 못해 에러가 발생했을 확률 높음");
-//            }
-//        }
-//    }
 
     public ArrayList<FinanceStockRedis> extractBestStock() {
         boolean lockAcquired = false;

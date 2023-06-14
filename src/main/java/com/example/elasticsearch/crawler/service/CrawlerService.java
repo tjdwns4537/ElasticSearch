@@ -84,7 +84,6 @@ public class CrawlerService {
             Elements importBord = sellMoney.get(0).getElementsByAttributeValue("class", "rwf rowBold");
             String sales = importBord.get(0).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
             String salesPercent = importBord.get(0).getElementsByAttributeValue("class", "r cle").get(0).text();//전년 동기(%)
-            log.info("매출액_전년동기퍼센트: {}", salesPercent);
 
             String profit = importBord.get(1).getElementsByAttributeValue("class", "r").get(4).text();//전년 동기
             String profitPercent = importBord.get(1).getElementsByAttributeValue("class", "r cle").get(0).text();//전년 동기(%)
@@ -94,15 +93,15 @@ public class CrawlerService {
 
             String potential = doc.select("#sonikChart2").get(0).attr("src");
 
-            log.info("매출액_전년동기: {}", sales);
-            log.info("매출액_전년동기퍼센트: {}", salesPercent);
-            log.info("영업이익_전년동기: {}", profit);
-            log.info("영업이익_전년동기퍼센트: {}", profitPercent);
-            log.info("당기순이익_전년동기: {}", currentProfit);
-            log.info("당기순이익_전년동기퍼센트: {}", currentProfitPercent);
-            log.info("성장성_지표: {}", potential);
+//            log.info("매출액_전년동기: {}", sales);
+//            log.info("매출액_전년동기퍼센트: {}", salesPercent);
+//            log.info("영업이익_전년동기: {}", profit);
+//            log.info("영업이익_전년동기퍼센트: {}", profitPercent);
+//            log.info("당기순이익_전년동기: {}", currentProfit);
+//            log.info("당기순이익_전년동기퍼센트: {}", currentProfitPercent);
+//            log.info("성장성_지표: {}", potential);
 
-            FinanceStockRedis financeStockRedis = FinanceStockRedis.of(stockName, stockNumber, sales, salesPercent, profitPercent, profitPercent, currentProfit, currentProfitPercent, potential);
+            FinanceStockRedis financeStockRedis = FinanceStockRedis.of(stockName, stockNumber, sales, salesPercent, profit, profitPercent, currentProfit, currentProfitPercent, potential);
             recommendStockRedisRepo.saveStockRanking(financeStockRedis);
 
             return financeStockRedis;
