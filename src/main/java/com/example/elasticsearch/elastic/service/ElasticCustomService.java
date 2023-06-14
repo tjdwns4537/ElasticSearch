@@ -84,15 +84,18 @@ public class ElasticCustomService {
             for (SearchHit hit : searchHits.getHits()) {
                 String similarTitle = hit.getSourceAsMap().get("themaName").toString();
                 Optional<Thema> thema = themaElasticService.findByKeyword(similarTitle);
-                if(thema.isPresent()) similarWords.add(thema.get());
+                if (thema.isPresent()) similarWords.add(thema.get());
 
                 log.info("similar thema : {} , {}", thema.get().getThemaName(), thema.get().getPercent());
             }
-            log.info("test log : {}",similarWords.get(0));
-            log.info("test log : {}",similarWords.size());
+            log.info("test log : {}", similarWords.get(0));
+            log.info("test log : {}", similarWords.size());
             return similarWords;
         } catch (IOException e) {
             // Handle exception
+            return new ArrayList<>();
+        } catch (IndexOutOfBoundsException e) {
+            log.error("기사에 관련 내용이 없습니다.");
             return new ArrayList<>();
         }
     }
