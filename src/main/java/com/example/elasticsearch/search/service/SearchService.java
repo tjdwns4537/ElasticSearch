@@ -66,8 +66,6 @@ public class SearchService {
 
             log.info("best stock stockNumber : {}", stockNumber);
             for (String j: stockNumber) {
-                crawlingKafkaService.sendSTMessage(j, i%3);
-
                 log.info("주식 넘버 조회 : {}", j);
                 if(isNumeric(j)){
                     try {
