@@ -61,7 +61,7 @@ https://docs.google.com/presentation/d/1QMBBblm1YjWw7Bjly6ThhGGXV86cxrUAzUoeHN1-
 - 엘라스틱 서치 자료 조사 : https://github.com/tjdwns4537/StockTotalService/wiki/%EC%97%98%EB%9D%BC%EC%8A%A4%ED%8B%B1-%EC%84%9C%EC%B9%98-%EC%9E%90%EB%A3%8C%EC%A1%B0%EC%82%AC
 - 도커 환경 구성 : https://github.com/tjdwns4537/StockTotalService/wiki/Docker%EC%97%90-ElasticSearch-%EC%84%A4%EC%B9%98
 - 엘라스틱 서치 서버 구성 및 연결 테스트 : https://github.com/tjdwns4537/StockTotalService/wiki/Elastic-Search-%EC%A0%81%EC%9A%A9-%ED%85%8C%EC%8A%A4%ED%8A%B8
-- 엘라스틱 서치 환경 구성 및 개발 : https://github.com/tjdwns4537/StockTotalService/wiki/%EC%97%98%EB%9D%BC%EC%8A%A4%ED%8B%B1-%EC%84%9C%EC%B9%98-%ED%99%98%EA%B2%BD-%EA%B5%AC%EC%84%B1
+- 엘라스틱 서치 환경 구성 및 개발 : https://github.com/tjdwns4537/StockTotalService/wiki/%EC%97%98%EB%9D%BC%EC%8A%A4%ED%8B%B1-%EC%84%9C%EC%B9%98-%ED%99%98%EA%B2%BD-%EA%B5%AC%EC%84%B1-%EB%B0%8F-%EA%B0%9C%EB%B0%9C-%EC%BD%94%EB%93%9C
 - 크롤링 구현 : https://github.com/tjdwns4537/StockTotalService/wiki/%ED%81%AC%EB%A1%A4%EB%A7%81-%EA%B5%AC%ED%98%84
 - 실시간 순위 레디스 구현 : https://github.com/tjdwns4537/StockTotalService/wiki/%EB%A0%88%EB%94%94%EC%8A%A4-%EC%84%9C%EB%B2%84-%EA%B5%AC%EC%B6%95-%EB%B0%8F-%EC%8B%A4%EC%8B%9C%EA%B0%84-%EC%88%9C%EC%9C%84-%EC%82%AC%EC%9D%B4%ED%8A%B8-%EA%B5%AC%ED%98%84
 - 엘라스틱 서치 초기 구성 : https://github.com/tjdwns4537/StockTotalService/wiki/%EC%97%98%EB%9D%BC%EC%8A%A4%ED%8B%B1-%EC%84%9C%EC%B9%98-%EB%89%B4%EC%8A%A4-%EA%B8%B0%EC%82%AC-%EB%B6%84%EC%84%9D%EC%9D%84-%EC%9C%84%ED%95%9C-%EA%B5%AC%EC%84%B1
