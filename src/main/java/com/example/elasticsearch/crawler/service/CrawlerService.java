@@ -5,10 +5,7 @@ import com.example.elasticsearch.crawler.repository.StockJpaRepository;
 import com.example.elasticsearch.crawler.repository.LikeStockJpaRepository;
 import com.example.elasticsearch.elastic.service.ElasticService;
 import com.example.elasticsearch.elastic.service.ThemaElasticService;
-import com.example.elasticsearch.redis.repository.LikeStockRedisRepository;
-import com.example.elasticsearch.redis.repository.LiveStockRedisRepository;
-import com.example.elasticsearch.redis.repository.RecommendStockRedisRepo;
-import com.example.elasticsearch.redis.repository.ThemaRedisRepo;
+import com.example.elasticsearch.redis.repository.*;
 import com.example.elasticsearch.stock.domain.FinanceStockRedis;
 import com.example.elasticsearch.stock.domain.StockDbDto;
 import com.example.elasticsearch.stock.domain.StockElasticDto;
@@ -49,6 +46,8 @@ public class CrawlerService {
     private final ThemaRedisRepo themaRedisRepo;
     @Autowired
     private final RecommendStockRedisRepo recommendStockRedisRepo;
+    @Autowired
+    private final StockNumberCheckRedis stockNumberCheckRedis;
 
     @Value("${crawler.url}")
     String url;
@@ -71,7 +70,11 @@ public class CrawlerService {
     @Value(("${crawler.naverUpJongUrl}"))
     String naverUpjongUrl;
 
-    public FinanceStockRedis financialCrawler(String stockNumber) {
+    public void financialCrawler(String stockNumber) {
+        if(!stockNumberCheckRedis.checkStockNumber(stockNumber)) {
+            log.info("해당 주식 넘버의 데이터는 가지고 있습니다. {}",stockNumber);
+            return;
+        }
         String prefix = "https://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?pGB=1&gicode=A";
         String suffix = "&cID=&MenuYn=Y&ReportGB=&NewMenuID=103&stkGb=701";
         String url = prefix + stockNumber + suffix;
@@ -104,13 +107,10 @@ public class CrawlerService {
             FinanceStockRedis financeStockRedis = FinanceStockRedis.of(stockName, stockNumber, sales, salesPercent, profit, profitPercent, currentProfit, currentProfitPercent, potential);
             recommendStockRedisRepo.saveStockRanking(financeStockRedis);
 
-            return financeStockRedis;
-
         } catch (IOException e) {
-            return new FinanceStockRedis();
+
         } catch (IndexOutOfBoundsException e) {
             log.error("인덱스 에러 - 크롤링 태그가 다름: {}", stockNumber);
-            return new FinanceStockRedis();
         }
     }
 
@@ -309,6 +309,7 @@ public class CrawlerService {
     }
 
     public void naverReadThema(boolean check, int i) {
+        log.info("page :{}", i);
         try {
             Document naverDoc = Jsoup.connect(naverUrl + i).get();
             /** 네이버 테마 관련 퍼센트를 크롤링 **/

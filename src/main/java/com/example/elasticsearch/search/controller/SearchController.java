@@ -122,7 +122,7 @@ public class SearchController {
         negativeInfo = String.valueOf(negative);
 
         // 테마 관련 기능 시작
-        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
+//        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
         themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
 
         if(themaList.isEmpty()){

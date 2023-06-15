@@ -85,11 +85,7 @@ public class ElasticCustomService {
                 String similarTitle = hit.getSourceAsMap().get("themaName").toString();
                 Optional<Thema> thema = themaElasticService.findByKeyword(similarTitle);
                 if (thema.isPresent()) similarWords.add(thema.get());
-
-                log.info("similar thema : {} , {}", thema.get().getThemaName(), thema.get().getPercent());
             }
-            log.info("test log : {}", similarWords.get(0));
-            log.info("test log : {}", similarWords.size());
             return similarWords;
         } catch (IOException e) {
             // Handle exception

@@ -6,6 +6,7 @@ import com.example.elasticsearch.elastic.service.ThemaElasticService;
 import com.example.elasticsearch.helper.Timer;
 import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
 import com.example.elasticsearch.kafka.service.MainKafkaService;
+import com.example.elasticsearch.redis.repository.RecommendStockRedisRepo;
 import com.example.elasticsearch.redis.repository.ThemaRedisRepo;
 import com.example.elasticsearch.stock.domain.StockElasticDto;
 import com.example.elasticsearch.stock.domain.StockForm;
@@ -32,24 +33,21 @@ public class CrawlerController {
     @Autowired private final CrawlingKafkaService crawlingKafkaService;
     @Autowired private final ThemaElasticService themaElasticService;
     @Autowired private final ThemaRedisRepo themaRedisRepo;
+    @Autowired private final RecommendStockRedisRepo recommendStockRedisRepo;
 
     @GetMapping
     public String crawlerService(Model model,
                                  @ModelAttribute("themaList") ArrayList<Thema> themaList) {
 
-        log.info("크롤링 실행");
-
-        themaElasticService.clear();
-        themaRedisRepo.deleteThemaRedis();
+        log.info("크롤링 실행 : {}", Timer.time());
+        recommendStockRedisRepo.deleteAll(); // 테마 관련 주식 데이터 비우기
+        themaElasticService.clear(); // 테마 데이터 비우기
+        themaRedisRepo.deleteThemaRedis(); // 실시간 순위 데이터 비우기
 
         crawlerService.likeStockFindAll();
         crawlerService.saveLiveStock();
         crawlerService.crawlingArticle();
-//        crawlingKafkaService.sendNaverArticleMessage("기사 크롤링");
         crawlerService.naverReadThema(true,1);
-
-//        crawlerService.naverUpjongCrawler(); // 업종 관련 크롤링
-        //        crawlerService.paxNetReadThema(); naver 크롤링에서 다 처리해줘서 기능이 필요없어짐
 
         themaList = themaRedisRepo.getThemaRanking();
         List<String> likeStockRanking = stockService.getLikeStockRanking();
@@ -70,6 +68,7 @@ public class CrawlerController {
         crawlingKafkaService.sendNaverThemaMessage(6,5);
         crawlingKafkaService.sendNaverThemaMessage(7,6);
 
+        log.info("크롤링 끝 : {}", Timer.time());
         return "home";
     }
 }

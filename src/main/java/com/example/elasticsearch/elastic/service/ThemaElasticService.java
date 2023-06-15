@@ -32,6 +32,7 @@ public class ThemaElasticService {
     public void themaSave(Thema thema) {
         Optional<Thema> existThema = themaElasticRepository.findByThemaName(thema.getThemaName());
         if (existThema.isPresent()) {
+            log.info("해당 테마 데이터가 이미 존재합니다.: {}",existThema.get().getThemaName());
             return;
         }
         log.info("테마 데이터 저장: {}", thema.getThemaName());

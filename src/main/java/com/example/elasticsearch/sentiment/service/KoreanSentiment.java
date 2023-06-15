@@ -32,7 +32,7 @@ public class KoreanSentiment {
         String url = "http://localhost:8080/analyze"; // local jupyter url
 
         for(String i: articleList){
-            log.info("입력 기사 : {}", i);
+//            log.info("입력 기사 : {}", i);
             requestBody.put("text", i);
 
             HttpEntity<String> requestEntity = new HttpEntity<>(requestBody.toString(), headers);
@@ -51,7 +51,7 @@ public class KoreanSentiment {
 
             String response = jsonNode.get("sentiment").asText();
 
-            log.info("응답 라벨 : {}", response);
+//            log.info("응답 라벨 : {}", response);
 
             if(response.equals("LABEL_1")) artilceList.add(ArticleVO.of(i, "긍정"));
             if(response.equals("LABEL_0")) artilceList.add(ArticleVO.of(i, "부정"));

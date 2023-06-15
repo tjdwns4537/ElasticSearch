@@ -22,6 +22,10 @@ public class FinanceStockRedis implements Serializable {
     private String currentProfitPercent;
     private String potential;
 
+    public FinanceStockRedis(String stockNumber) {
+        this.stockNumber = stockNumber;
+    }
+
     public static FinanceStockRedis of(String stockName, String stockNumber, String sales, String salesPercent, String profit, String profitPercent, String currentProfit, String currentProfitPercent, String potential) {
         return new FinanceStockRedis(stockName, stockNumber, sales, salesPercent, profit, profitPercent, currentProfit, currentProfitPercent, potential);
     }

@@ -202,4 +202,14 @@ public class CrawlingKafkaService {
                                        int uri, int p) {
         crawlerService.naverReadThema(false,uri);
     }
+
+    @KafkaListener(topicPartitions = {
+            @TopicPartition(topic = Indices.NAVER_THEMA_CRAWLER_TOPIC, partitions = {"2"})
+    },
+            groupId = Indices.NAVER_THEMA_CRAWLER_TOPIC_GROUPID7)
+    public void listenGroupThemaGroup3(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key,
+                                       @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+                                       int uri, int p) {
+        crawlerService.naverReadThema(false,uri);
+    }
 }
