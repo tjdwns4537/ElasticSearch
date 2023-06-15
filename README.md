@@ -21,23 +21,23 @@
 
 ## 🚩 기술 분석
 
-###✔️ 크롤링
+### ✔️ 크롤링
   - 주식 데이터를 수집하기 위한 크롤링
   - 검색 테마주 관련 주식 정보 크롤링
   - 해당 주식 재무 정보 크롤링
   
-###✔️ Redis
+### ✔️ Redis
   - 실시간 순위를 캐시에 저장
   - Redisson Lock을 통해 분산 처리에 따른 데이터 무결성 유지
   
-###✔️ Elastic Search
+### ✔️ Elastic Search
   - 루씬 검색엔진 기반 빠른 데이터 검색
   - 단어 유사성 테스트
 
-###✔️ Jupyter
+### ✔️ Jupyter
   - 허깅 페이스의 Korean-sentiment Model을 활용한 뉴스 기사 감정 분석
 
-###✔️ Kafka
+### ✔️ Kafka
   - 실시간 주식 크롤링부터 테마주, 관련 주식 정보까지 모든 크롤링을 분산처리
 
 ## 🚩 Application Preview
