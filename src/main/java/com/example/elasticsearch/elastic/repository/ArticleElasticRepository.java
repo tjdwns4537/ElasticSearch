@@ -15,7 +15,4 @@ public interface ArticleElasticRepository extends ElasticsearchRepository<Articl
 
     @Override
     void deleteAll();
-
-    @Query("{\"bool\" : {\"must\" : {\"match\" : {\"title\" : \"keyword\"}}}}")
-    void deleteByTitle(String keyword);
 }
