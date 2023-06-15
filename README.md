@@ -67,6 +67,6 @@ https://docs.google.com/presentation/d/1QMBBblm1YjWw7Bjly6ThhGGXV86cxrUAzUoeHN1-
 - 엘라스틱 서치 초기 구성 : https://github.com/tjdwns4537/StockTotalService/wiki/%EC%97%98%EB%9D%BC%EC%8A%A4%ED%8B%B1-%EC%84%9C%EC%B9%98-%EB%89%B4%EC%8A%A4-%EA%B8%B0%EC%82%AC-%EB%B6%84%EC%84%9D%EC%9D%84-%EC%9C%84%ED%95%9C-%EA%B5%AC%EC%84%B1
 - 아키텍처 중간 수정 : https://github.com/tjdwns4537/StockTotalService/wiki/%EA%B8%B0%EB%8A%A5-%EA%B5%AC%EC%84%B1-(%EC%A4%91%EA%B0%84%ED%8F%89%EA%B0%80)
 - 구글 코랩 연동 : https://github.com/tjdwns4537/StockTotalService/wiki/%EA%B5%AC%EA%B8%80-%EC%BD%94%EB%9E%A9-%EC%97%B0%EB%8F%99
-- 구글 AWS SageMaker, AWS Search Service 활용 : https://github.com/tjdwns4537/StockTotalService/wiki/AWS-SageMaker-%ED%99%9C%EC%9A%A9
+- 구글 AWS SageMaker, AWS Search Service 활용 : https://github.com/tjdwns4537/StockTotalService/wiki/AWS-SageMaker-Search-Service-%ED%99%9C%EC%9A%A9
 - 키워드 감정 분석 및 엘라스틱 서치의 유사성 분석 : https://github.com/tjdwns4537/StockTotalService/wiki/%ED%82%A4%EC%9B%8C%EB%93%9C-%EB%B6%84%EC%84%9D-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
 - 카프카 구성 및 코드 개발 :https://github.com/tjdwns4537/StockTotalService/wiki/%EC%B9%B4%ED%94%84%EC%B9%B4-%ED%99%98%EA%B2%BD-%EA%B5%AC%EC%84%B1%EA%B3%BC-%EA%B4%80%EB%A0%A8-%EC%BD%94%EB%93%9C
