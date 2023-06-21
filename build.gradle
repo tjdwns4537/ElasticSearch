@@ -30,6 +30,9 @@ repositories {
 }
 
 dependencies {
+    //  예외 처리 테스트 코드 작성
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+
     testImplementation group: 'org.springframework.kafka', name: 'spring-kafka-test', version: '2.8.5'
 
     // redisson
