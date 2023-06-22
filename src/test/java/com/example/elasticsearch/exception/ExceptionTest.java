@@ -12,7 +12,11 @@ class ExceptionTest {
     public void IndexOutOfBoundsExceptionTest() {
 
         Assertions.assertThrows(CustomRuntimeException.class, () -> {
-            CustomRuntimeException.throwException("occur");
+            CustomRuntimeException.throwException("occur runtime error");
+        });
+
+        Assertions.assertThrows(IndexOutException.class, () -> {
+            IndexOutException.throwException("occur index error");
         });
     }
 }
