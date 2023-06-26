@@ -24,21 +24,8 @@ public class ElasticService {
         }
     }
 
-    public List<ArticleEls> containByKeyword(String keyword) {
-        List<ArticleEls> byTitle = articleElasticRepository.findByTitleContaining(keyword);
-
-        return byTitle;
-    }
-
-    public List<ArticleEls> findByTitle(String title) {
-        return articleElasticRepository.findByTitle(title);
-    }
-
     public void deleteAll() {
         articleElasticRepository.deleteAll();
     }
 
-    public void deleteById(String uid) {
-        articleElasticRepository.deleteById(uid);
-    }
 }

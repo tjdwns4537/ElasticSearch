@@ -1,6 +1,7 @@
 package com.example.elasticsearch.elastic.service;
 
 import com.example.elasticsearch.elastic.repository.ThemaElasticRepository;
+import com.example.elasticsearch.exception.ElasticSearchException;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
