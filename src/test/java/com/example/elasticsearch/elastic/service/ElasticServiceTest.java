@@ -54,10 +54,6 @@ class ElasticServiceTest {
     @DisplayName("문장 유사성 테스트")
     public void similarTest() {
 
-        /** TODO
-         *  - 유사성 테스트 다시해볼것
-         * **/
-
         elasticService.deleteAll();
 
         elasticService.articleSave(ArticleEls.of("오늘 반도체 시장은 망했다."));
@@ -65,11 +61,12 @@ class ElasticServiceTest {
         elasticService.articleSave(ArticleEls.of("반도체가 망했다."));
         String sentence = "반도체";
 
-        List<String> similarWords = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, sentence);
+//        List<String> similarWords = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, sentence);
 
-        for (String similarSentence : similarWords) {
-            System.out.println(similarSentence);
-        }
+//        for (String similarSentence : similarWords) {
+//            System.out.println(similarSentence);
+//        }
+
     }
 
     public boolean analyzeJavaWord(String word) throws IOException {

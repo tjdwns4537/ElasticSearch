@@ -97,42 +97,37 @@ public class ElasticCustomService {
         }
     }
 
-    public List<String> findSimilarWords(String IndexName, String title) {
-        try {
-            SearchRequest searchRequest = new SearchRequest(IndexName);
-            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+    public List<String> findSimilarWords(String IndexName, String title) throws IOException, ArrayIndexOutOfBoundsException{
+        SearchRequest searchRequest = new SearchRequest(IndexName);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
-            // Create a BoolQuery to combine multiple queries
-            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        // Create a BoolQuery to combine multiple queries
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
-            // Add a match query for exact match
-            boolQueryBuilder.should(QueryBuilders.matchQuery("title", title));
+        // Add a match query for exact match
+        boolQueryBuilder.should(QueryBuilders.matchQuery("title", title));
 
-            // Add a wildcard query for similar words
-            String wildcardQuery = "*" + title + "*";
-            boolQueryBuilder.should(QueryBuilders.wildcardQuery("title", wildcardQuery));
+        // Add a wildcard query for similar words
+        String wildcardQuery = "*" + title + "*";
+        boolQueryBuilder.should(QueryBuilders.wildcardQuery("title", wildcardQuery));
 
-            // Add a space query for simlar words
-            String spaceQuery = "* " + title + " *";
-            boolQueryBuilder.should(QueryBuilders.wildcardQuery("title", spaceQuery));
+        // Add a space query for simlar words
+        String spaceQuery = "* " + title + " *";
+        boolQueryBuilder.should(QueryBuilders.wildcardQuery("title", spaceQuery));
 
-            boolQueryBuilder.should(QueryBuilders.matchQuery("title", title).fuzziness("AUTO"));
+        boolQueryBuilder.should(QueryBuilders.matchQuery("title", title).fuzziness("AUTO"));
 
-            sourceBuilder.query(boolQueryBuilder);
-            searchRequest.source(sourceBuilder);
+        sourceBuilder.query(boolQueryBuilder);
+        searchRequest.source(sourceBuilder);
 
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits searchHits = searchResponse.getHits();
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits searchHits = searchResponse.getHits();
 
-            List<String> similarWords = new ArrayList<>();
-            for (SearchHit hit : searchHits.getHits()) {
-                String similarTitle = hit.getSourceAsMap().get("title").toString();
-                similarWords.add(similarTitle);
-            }
-            return similarWords;
-        } catch (IOException e) {
-            // Handle exception
-            return new ArrayList<>();
+        List<String> similarWords = new ArrayList<>();
+        for (SearchHit hit : searchHits.getHits()) {
+            String similarTitle = hit.getSourceAsMap().get("title").toString();
+            similarWords.add(similarTitle);
         }
+        return similarWords;
     }
 }

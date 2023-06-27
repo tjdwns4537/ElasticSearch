@@ -3,6 +3,7 @@ package com.example.elasticsearch.search.controller;
 import com.example.elasticsearch.article.domain.ArticleVO;
 import com.example.elasticsearch.crawler.service.CrawlerService;
 import com.example.elasticsearch.elastic.service.ElasticCustomService;
+import com.example.elasticsearch.exception.ElasticSearchException;
 import com.example.elasticsearch.helper.Indices;
 import com.example.elasticsearch.helper.Timer;
 import com.example.elasticsearch.kafka.service.CrawlingKafkaService;
@@ -16,14 +17,14 @@ import com.example.elasticsearch.thema.domain.Thema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,11 +40,7 @@ public class SearchController {
     @Autowired
     private final ElasticCustomService elasticCustomService;
     @Autowired
-    private final RedissonService redissonService;
-    @Autowired
     private final SearchService searchService;
-    @Autowired
-    private final RecommendStockRedisRepo recommendStockRedisRepo;
 
     @GetMapping("/searchResult")
     public String redirectView(@RequestParam("searchInfo") String searchInfo,
@@ -104,54 +101,74 @@ public class SearchController {
 
         log.info("검색 시작 : {} keyword, time : {}", searchInfo, Timer.time());
 
-        // 감정 분석 시작
-        int positive = 0;
-        int negative = 0;
+        try {
+            // 감정 분석 시작
+            int positive = 0;
+            int negative = 0;
 
-        crawlerService.googleCrawler(searchInfo);
-        List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
-        List<ArticleVO> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
+            crawlerService.googleCrawler(searchInfo);
 
-        for (ArticleVO i : analyzeResult) {
-            String label = i.getAnalyzeResult();
-            if (label.equals("긍정")) positive++;
-            if (label.equals("부정")) negative++;
-        }
+            List<String> articleList = elasticCustomService.findSimilarWords(Indices.ARTICLE_INDEX, searchInfo); // 뉴스 크롤링 정보 가져오기
+            List<ArticleVO> analyzeResult = koreanSentiment.articleAnalyze(articleList); // 검색 테마 감정 분석
+            for (ArticleVO i : analyzeResult) {
+                String label = i.getAnalyzeResult();
+                if (label.equals("긍정")) positive++;
+                if (label.equals("부정")) negative++;
+            }
 
-        positiveInfo = String.valueOf(positive);
-        negativeInfo = String.valueOf(negative);
+            positiveInfo = String.valueOf(positive);
+            negativeInfo = String.valueOf(negative);
 
-        // 테마 관련 기능 시작
+            // 테마 관련 기능 시작
 //        recommendStockRedisRepo.deleteAll(); // 관련 주식 순위 레디스 저장소 한번 비워주기
-        themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
+            themaList = elasticCustomService.findSimilarThema(Indices.THEMA_INDEX, searchInfo);
 
-        if(themaList.isEmpty()){
+            if (themaList.isEmpty()) {
+                redirectAttributes.addAttribute("searchInfo", searchInfo);
+                redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
+                redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
+                redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
+                return "redirect:/searchResult-inc";
+            }
+
+            for (int i = 0; i < themaList.size(); i++) {
+                relateStockList = themaList.get(i).getRelateStock();
+                searchService.saveBestStock(relateStockList);
+            }
+
+            financeStockList = searchService.extractBestStock();
+
+            log.info("테마 관련 주식 기능 수행 끝");
+
             redirectAttributes.addAttribute("searchInfo", searchInfo);
             redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
             redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
             redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
-            return "redirect:/searchResult-inc";
+            redirectAttributes.addFlashAttribute("themaList", themaList);
+            redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
+            redirectAttributes.addFlashAttribute("financeStockList", financeStockList);
+
+            log.info("검색 끝 : {} keyword, time : {}", searchInfo, Timer.time());
+
+            return "redirect:/searchResult";
+        } catch (IOException e) {
+            return "redirect:/";
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return "redirect:/";
         }
-
-        for (int i = 0; i < themaList.size(); i++) {
-            relateStockList = themaList.get(i).getRelateStock();
-            searchService.saveBestStock(relateStockList);
-        }
-
-        financeStockList = searchService.extractBestStock();
-
-        log.info("테마 관련 주식 기능 수행 끝");
-
-        redirectAttributes.addAttribute("searchInfo", searchInfo);
-        redirectAttributes.addFlashAttribute("positiveInfo", positiveInfo);
-        redirectAttributes.addFlashAttribute("negativeInfo", negativeInfo);
-        redirectAttributes.addFlashAttribute("analyzeResult", analyzeResult);
-        redirectAttributes.addFlashAttribute("themaList", themaList);
-        redirectAttributes.addFlashAttribute("relateStockList", relateStockList);
-        redirectAttributes.addFlashAttribute("financeStockList", financeStockList);
-
-        log.info("검색 끝 : {} keyword, time : {}", searchInfo, Timer.time());
-
-        return "redirect:/searchResult";
     }
+
+    @ExceptionHandler(ElasticSearchException.class)
+    public ResponseEntity<String> handleElasticSearchException(ElasticSearchException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof IOException) {
+            // IOException에 대한 처리
+            log.error("IOException이 발생했습니다: {}", cause.getMessage());
+        } else if (cause instanceof ArrayIndexOutOfBoundsException) {
+            log.info("{} 에러가 발생했습니다. {} ", cause, "ElasticCustomService의 입출력 문제입니다.");
+        }
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+    }
+
 }
